@@ -1993,10 +1993,9 @@
       <div class="kyc-header-title">Accès Espace Pro — Avocats &amp; Juristes</div>
       <div class="kyc-header-sub">L'Espace Pro donne accès à des fonctionnalités sensibles réservées aux professionnels du droit. Une vérification d'identité professionnelle est obligatoire avant tout accès.</div>
     </div>
-    <div class="kyc-steps-bar">
-      <div class="kyc-step-item active" id="kycStepItem1"><div class="kyc-step-dot">1</div><div class="kyc-step-label">Déclaratif</div></div>
-      <div class="kyc-step-item" id="kycStepItem2"><div class="kyc-step-dot">2</div><div class="kyc-step-label">Justificatif</div></div>
-      <div class="kyc-step-item" id="kycStepItem3"><div class="kyc-step-dot">3</div><div class="kyc-step-label">Confirmation</div></div>
+    <div style="background:#f9f6f1;border-bottom:1.5px solid var(--divider);padding:10px 32px;display:flex;align-items:center;gap:8px;">
+      <i class="fa-solid fa-shield-halved" style="color:var(--gold);font-size:.8rem;"></i>
+      <span style="font-size:.72rem;font-weight:700;color:var(--warm-gray);letter-spacing:.06em;text-transform:uppercase;">Déclaration professionnelle</span>
     </div>
     <!-- ÉTAPE 1 -->
     <div id="kycStep1">
@@ -2035,10 +2034,16 @@
           <i class="fa-solid fa-triangle-exclamation"></i>
           <p><strong>Déclaration sur l'honneur :</strong> Toute fausse déclaration engage votre responsabilité pénale (art. 441-1 C. pén.). Tout accès frauduleux sera immédiatement révoqué et signalé aux autorités compétentes.</p>
         </div>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:12px 14px;background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.25);border-radius:10px;margin-top:10px;">
+          <input type="checkbox" id="kyc_honor" style="width:16px;height:16px;margin-top:2px;accent-color:var(--gold);flex-shrink:0;" onchange="const btn=document.getElementById('btnKycSubmit');btn.disabled=!this.checked;btn.style.opacity=this.checked?'1':'.5';btn.style.cursor=this.checked?'pointer':'not-allowed';">
+          <span style="font-size:.78rem;color:var(--dark);line-height:1.5;">Je certifie sur l'honneur que les informations renseignées sont <strong>exactes et sincères</strong>, et que j'exerce bien la profession déclarée.</span>
+        </label>
       </div>
       <div class="kyc-footer">
-        <div class="kyc-progress"><strong>Étape 1</strong> sur 3 — Informations professionnelles</div>
-        <button class="btn-primary gold" onclick="kycGoStep2()">Continuer <i class="fa-solid fa-arrow-right" style="margin-left:6px;"></i></button>
+        <div class="kyc-progress" style="font-size:.7rem;color:var(--warm-gray);">Accès activé immédiatement après validation</div>
+        <button class="btn-primary gold" id="btnKycSubmit" onclick="kycGoStep2()" disabled style="opacity:.5;cursor:not-allowed;">
+          <i class="fa-solid fa-shield-check" style="margin-right:6px;"></i>Accéder à l'Espace Pro
+        </button>
       </div>
     </div>
     <!-- ÉTAPE 2 -->
@@ -6976,19 +6981,23 @@ function kycGoStep2() {
     errBox.classList.add('show');
     return;
   }
-  // Save Level 1 data
-  setUserProData({ prenom, nom, email, pays, profession: prof,
+  // Save declarative data + grant immediate verified access
+  setUserProData({
+    prenom, nom, email, pays, profession: prof,
     barreau: document.getElementById('kyc_barreau')?.value || '',
     entreprise: document.getElementById('kyc_entreprise')?.value || '',
     poste: document.getElementById('kyc_poste')?.value || '',
-    submittedAt: new Date().toISOString()
+    kycStatus: 'verified',
+    verifiedAt: new Date().toISOString(),
+    verifiedBy: 'declaration_honneur'
   });
-  // Navigate to step 2
-  document.getElementById('kycStep1').style.display = 'none';
-  document.getElementById('kycStep2').style.display = 'flex';
-  document.getElementById('kycStepItem1').classList.remove('active');
-  document.getElementById('kycStepItem1').classList.add('done');
-  document.getElementById('kycStepItem2').classList.add('active');
+  setUserRole(PRO_ROLES.VERIFIED);
+  updateProNavBadge();
+  closeModal('modalProKYC');
+  showToast('✅ Accès Espace Pro activé — bienvenue, ' + prenom + ' !', 'success');
+  enterApp();
+  if (_pendingProCallback) { _pendingProCallback(); _pendingProCallback = null; }
+  else showModule('avocat');
 }
 
 function kycGoStep1() {
@@ -7030,6 +7039,11 @@ function kycResetModal() {
   ['kycStep1','kycStep2','kycStep3'].forEach((id, i) => {
     document.getElementById(id).style.display = i === 0 ? 'flex' : 'none';
   });
+  // Reset honor checkbox + button state
+  const cb = document.getElementById('kyc_honor');
+  const btn = document.getElementById('btnKycSubmit');
+  if (cb) cb.checked = false;
+  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; btn.style.cursor = 'not-allowed'; }
   ['kycStepItem1','kycStepItem2','kycStepItem3'].forEach((id, i) => {
     const el = document.getElementById(id);
     el.classList.remove('active','done');
