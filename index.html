@@ -2036,9 +2036,9 @@
         </div>
       </div>
       <div class="kyc-footer" style="flex-direction:column;gap:10px;align-items:stretch;">
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.25);border-radius:10px;">
-          <input type="checkbox" id="kyc_honor" style="width:18px;height:18px;min-width:18px;margin-top:2px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;" onchange="const btn=document.getElementById('btnKycSubmit');btn.disabled=!this.checked;btn.style.opacity=this.checked?'1':'.5';btn.style.cursor=this.checked?'pointer':'not-allowed';">
-          <label for="kyc_honor" style="font-size:.78rem;color:var(--dark);line-height:1.5;cursor:pointer;">Je certifie sur l'honneur que les informations renseignées sont <strong>exactes et sincères</strong>, et que j'exerce bien la profession déclarée.</label>
+        <div onclick="kycToggleHonor()" style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.25);border-radius:10px;cursor:pointer;user-select:none;">
+          <input type="checkbox" id="kyc_honor" style="width:18px;height:18px;min-width:18px;margin-top:2px;accent-color:var(--gold);flex-shrink:0;pointer-events:none;" tabindex="-1">
+          <span style="font-size:.78rem;color:var(--dark);line-height:1.5;pointer-events:none;">Je certifie sur l'honneur que les informations renseignées sont <strong>exactes et sincères</strong>, et que j'exerce bien la profession déclarée.</span>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
           <div style="font-size:.68rem;color:var(--warm-gray);">Accès activé immédiatement après validation</div>
@@ -6948,6 +6948,15 @@ function kycToggleProfFields() {
   document.getElementById('kycFieldJuriste').classList.toggle('show', prof === 'juriste' || prof === 'dj' || prof === 'conseil');
 }
 
+function kycToggleHonor() {
+  const cb  = document.getElementById('kyc_honor');
+  const btn = document.getElementById('btnKycSubmit');
+  cb.checked = !cb.checked;
+  btn.disabled       = !cb.checked;
+  btn.style.opacity  = cb.checked ? '1'       : '.5';
+  btn.style.cursor   = cb.checked ? 'pointer' : 'not-allowed';
+}
+
 function kycGoStep2() {
   const prenom = document.getElementById('kyc_prenom').value.trim();
   const nom = document.getElementById('kyc_nom').value.trim();
@@ -7044,8 +7053,9 @@ function kycResetModal() {
   // Reset honor checkbox + button state
   const cb = document.getElementById('kyc_honor');
   const btn = document.getElementById('btnKycSubmit');
-  if (cb) cb.checked = false;
+  if (cb)  cb.checked = false;
   if (btn) { btn.disabled = true; btn.style.opacity = '.5'; btn.style.cursor = 'not-allowed'; }
+
   ['kycStepItem1','kycStepItem2','kycStepItem3'].forEach((id, i) => {
     const el = document.getElementById(id);
     el.classList.remove('active','done');
