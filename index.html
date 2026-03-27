@@ -2034,16 +2034,18 @@
           <i class="fa-solid fa-triangle-exclamation"></i>
           <p><strong>Déclaration sur l'honneur :</strong> Toute fausse déclaration engage votre responsabilité pénale (art. 441-1 C. pén.). Tout accès frauduleux sera immédiatement révoqué et signalé aux autorités compétentes.</p>
         </div>
-        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:12px 14px;background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.25);border-radius:10px;margin-top:10px;">
-          <input type="checkbox" id="kyc_honor" style="width:16px;height:16px;margin-top:2px;accent-color:var(--gold);flex-shrink:0;" onchange="const btn=document.getElementById('btnKycSubmit');btn.disabled=!this.checked;btn.style.opacity=this.checked?'1':'.5';btn.style.cursor=this.checked?'pointer':'not-allowed';">
+      </div>
+      <div class="kyc-footer" style="flex-direction:column;gap:10px;align-items:stretch;">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:12px 14px;background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.25);border-radius:10px;position:relative;z-index:10;user-select:none;">
+          <input type="checkbox" id="kyc_honor" style="width:18px;height:18px;min-width:18px;margin-top:1px;accent-color:var(--gold);cursor:pointer;position:relative;z-index:10;" onchange="const btn=document.getElementById('btnKycSubmit');btn.disabled=!this.checked;btn.style.opacity=this.checked?'1':'.5';btn.style.cursor=this.checked?'pointer':'not-allowed';">
           <span style="font-size:.78rem;color:var(--dark);line-height:1.5;">Je certifie sur l'honneur que les informations renseignées sont <strong>exactes et sincères</strong>, et que j'exerce bien la profession déclarée.</span>
         </label>
-      </div>
-      <div class="kyc-footer">
-        <div class="kyc-progress" style="font-size:.7rem;color:var(--warm-gray);">Accès activé immédiatement après validation</div>
-        <button class="btn-primary gold" id="btnKycSubmit" onclick="kycGoStep2()" disabled style="opacity:.5;cursor:not-allowed;">
-          <i class="fa-solid fa-shield-check" style="margin-right:6px;"></i>Accéder à l'Espace Pro
-        </button>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:.68rem;color:var(--warm-gray);">Accès activé immédiatement après validation</div>
+          <button class="btn-primary gold" id="btnKycSubmit" onclick="kycGoStep2()" disabled style="opacity:.5;cursor:not-allowed;padding:10px 22px;">
+            <i class="fa-solid fa-shield-check" style="margin-right:6px;"></i>Accéder à l'Espace Pro
+          </button>
+        </div>
       </div>
     </div>
     <!-- ÉTAPE 2 -->
