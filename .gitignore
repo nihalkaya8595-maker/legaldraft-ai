@@ -1,0 +1,29 @@
+# ── Dépendances Node.js ──────────────────────────────────────
+node_modules/
+
+# ── Variables d'environnement (SECRETS — ne jamais publier) ──
+.env
+.env.local
+.env.production
+
+# ── Base de données locale (données privées utilisateurs) ─────
+legaldraft-users.json
+legaldraft-freedoc.json
+*.db
+*.sqlite
+
+# ── Config IDE locale ─────────────────────────────────────────
+.claude/
+
+# ── Fichiers système macOS ────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+nodemon-debug.log*
+
+# ── Backups ──────────────────────────────────────────────────
+*.bak
+*.backup
