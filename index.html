@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LegalDraft AI">
   <title>LegalDraft AI — Plateforme d'Intelligence Juridique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1743,6 +1748,48 @@
     .sec-card-title { font-size:.82rem; font-weight:800; color:#fff; }
     .sec-card-desc  { font-size:.74rem; color:rgba(255,255,255,.55); line-height:1.55; }
     .sec-footer-note { text-align:center; margin-top:28px; font-size:.72rem; color:rgba(255,255,255,.4); max-width:600px; margin-left:auto; margin-right:auto; }
+
+/* ── Analyse module tabs ─────────────────────────────── */
+.analyse-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.analyse-tab { padding:8px 18px; border:1.5px solid var(--divider); border-radius:20px; background:transparent; cursor:pointer; font-size:.8rem; font-weight:600; color:var(--warm-gray); transition:all .2s; }
+.analyse-tab.active { background:var(--gold); border-color:var(--gold); color:#fff; }
+.analyse-tab-panel { display:none; }
+.analyse-tab-panel.active { display:block; }
+/* Improve/Correct panel */
+.improve-textarea { width:100%; min-height:200px; padding:14px; border:1.5px solid var(--divider); border-radius:12px; font-family:inherit; font-size:.85rem; resize:vertical; outline:none; transition:border .2s; }
+.improve-textarea:focus { border-color:var(--gold); }
+.improve-result { margin-top:16px; padding:16px; background:#f9f6f1; border:1.5px solid var(--divider); border-radius:12px; font-size:.84rem; line-height:1.7; white-space:pre-wrap; }
+.improve-result mark { background:rgba(212,175,55,.25); padding:1px 3px; border-radius:3px; }
+/* Signatures module */
+.sign-flow { display:flex; flex-direction:column; gap:16px; }
+.sign-step-card { background:#fff; border:1.5px solid var(--divider); border-radius:14px; padding:18px 20px; display:flex; align-items:flex-start; gap:14px; }
+.sign-step-num { min-width:32px; height:32px; border-radius:50%; background:var(--dark); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.85rem; font-weight:700; }
+.sign-signer-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+.sign-signer-row input { flex:1; padding:9px 12px; border:1.5px solid var(--divider); border-radius:8px; font-size:.82rem; }
+.sign-provider-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:.72rem; font-weight:700; background:rgba(99,102,241,.1); color:#4f46e5; border:1px solid rgba(99,102,241,.25); }
+.sign-status-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:600; }
+.sign-status-pill.pending { background:rgba(245,158,11,.1); color:#d97706; }
+.sign-status-pill.signed { background:rgba(22,163,74,.1); color:#16a34a; }
+.sign-status-pill.refused { background:rgba(239,68,68,.1); color:#dc2626; }
+/* Analytics module */
+.analytics-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+.analytics-card { background:#fff; border:1.5px solid var(--divider); border-radius:14px; padding:18px 20px; text-align:center; }
+.analytics-card .analytics-num { font-size:2rem; font-weight:800; color:var(--dark); line-height:1.1; }
+.analytics-card .analytics-label { font-size:.75rem; color:var(--warm-gray); margin-top:4px; }
+.analytics-card .analytics-icon { font-size:1.5rem; margin-bottom:8px; }
+.analytics-chart-bar { height:8px; border-radius:4px; background:var(--divider); margin-top:6px; overflow:hidden; }
+.analytics-chart-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--gold),#f59e0b); transition:width .6s ease; }
+.analytics-doc-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--divider); font-size:.82rem; }
+.analytics-doc-row:last-child { border-bottom:none; }
+/* Sector filter pills */
+.sector-pills { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.sector-pill { padding:6px 14px; border:1.5px solid var(--divider); border-radius:20px; font-size:.75rem; font-weight:600; cursor:pointer; background:transparent; color:var(--warm-gray); transition:all .2s; }
+.sector-pill.active { background:var(--dark); color:#fff; border-color:var(--dark); }
+/* AI badge on features */
+.ai-powered-badge { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,#4f46e5,#7c3aed); color:#fff; padding:2px 8px; border-radius:10px; font-size:.62rem; font-weight:700; letter-spacing:.05em; vertical-align:middle; margin-left:6px; }
+/* Chat AI status indicator */
+.chat-ai-indicator { font-size:.68rem; color:#7c3aed; font-weight:600; display:flex; align-items:center; gap:4px; }
+.chat-ai-dot { width:6px; height:6px; border-radius:50%; background:#7c3aed; animation:pulse 1.5s infinite; }
   </style>
   <!-- docx.js — génération Word côté client (Espace Pro) -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
@@ -2964,6 +3011,13 @@
       <i class="fa-solid fa-folder-open"></i> Dossier
       <span class="mod-badge">NEW</span>
     </button>
+    <button class="mod-btn" id="nav-signatures" onclick="showModule('signatures')">
+      <i class="fa-solid fa-signature"></i> Signatures
+      <span class="mod-badge">NEW</span>
+    </button>
+    <button class="mod-btn" id="nav-analytics" onclick="showModule('analytics')">
+      <i class="fa-solid fa-chart-line"></i> Analytics
+    </button>
   </div>
   <!-- Ligne 2 : Espace Pro pleine largeur -->
   <div class="pro-nav-bar">
@@ -2998,7 +3052,7 @@
     tout en un, adapté au droit français et africain. Sans avocat, sans attente.
   </p>
   <div class="hero-stats">
-    <div class="stat-item"><i class="fa-solid fa-cubes"></i><span>8 modules juridiques</span></div>
+    <div class="stat-item"><i class="fa-solid fa-cubes"></i><span>12 modules juridiques</span></div>
     <div class="stat-divider"></div>
     <div class="stat-item"><i class="fa-solid fa-clock"></i><span>Prêt en 2 minutes</span></div>
     <div class="stat-divider"></div>
@@ -3761,60 +3815,100 @@
 ══════════════════════════════════════════════════════════ -->
 <div class="module" id="mod-analyse">
   <div class="mod-header">
-    <div class="mod-header-badge"><i class="fa-solid fa-magnifying-glass-chart"></i> &nbsp;Analyse IA</div>
-    <h1>Analysez votre <em>contrat</em></h1>
-    <p>Uploadez un contrat existant — l'IA détecte les risques, les clauses manquantes et vous donne un score de conformité.</p>
+    <div class="mod-header-badge"><i class="fa-solid fa-magnifying-glass-chart"></i> &nbsp;Analyse IA <span class="ai-powered-badge"><i class="fa-solid fa-robot"></i> Claude AI</span></div>
+    <h1>Intelligence <em>documentaire</em></h1>
+    <p>Analysez, améliorez et résumez vos documents juridiques grâce à l'IA — en quelques secondes.</p>
   </div>
   <div class="mod-wrap">
     <div class="mod-panel">
-      <label class="upload-zone" id="uploadZone" for="fileInput"
-             ondragover="event.preventDefault();this.classList.add('drag')"
-             ondragleave="this.classList.remove('drag')"
-             ondrop="handleFileDrop(event)">
-        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" onchange="handleFileSelect(this)">
-        <div class="upload-zone-icon">📂</div>
-        <h3>Glissez votre contrat ici</h3>
-        <p>PDF, Word ou texte · Taille max 10 Mo</p>
-        <p style="margin-top:12px;color:var(--gold);font-weight:600;font-size:.82rem;">ou cliquez pour sélectionner</p>
-      </label>
-
-      <div class="analysis-loading" id="analysisLoading">
-        <div class="loading-spin"></div>
-        <p style="color:var(--warm-gray);font-size:.9rem;">Analyse IA en cours…</p>
-        <p style="color:var(--warm-gray);font-size:.78rem;margin-top:6px;" id="analysisStep">Lecture du document</p>
+      <div class="analyse-tabs">
+        <button class="analyse-tab active" onclick="switchAnalyseTab('analyze',this)"><i class="fa-solid fa-magnifying-glass" style="margin-right:5px;"></i>Analyser un contrat</button>
+        <button class="analyse-tab" onclick="switchAnalyseTab('improve',this)"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right:5px;"></i>Améliorer un texte</button>
+        <button class="analyse-tab" onclick="switchAnalyseTab('summarize',this)"><i class="fa-solid fa-list-ul" style="margin-right:5px;"></i>Résumer un document</button>
       </div>
 
-      <div class="analysis-result" id="analysisResult">
-        <div class="analysis-score">
-          <div class="score-circle" id="scoreCircle">
-            <div class="score-inner" id="scoreValue">—</div>
+      <!-- TAB: ANALYSER -->
+      <div class="analyse-tab-panel active" id="analysePanel-analyze">
+        <label class="upload-zone" id="uploadZone" for="fileInput"
+               ondragover="event.preventDefault();this.classList.add('drag')"
+               ondragleave="this.classList.remove('drag')"
+               ondrop="handleFileDrop(event)">
+          <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" onchange="handleFileSelect(this)">
+          <div class="upload-zone-icon">📂</div>
+          <h3>Glissez votre contrat ici</h3>
+          <p>PDF, Word ou texte (.txt) · Taille max 10 Mo</p>
+          <p style="margin-top:12px;color:var(--gold);font-weight:600;font-size:.82rem;">ou cliquez pour sélectionner</p>
+        </label>
+        <div class="analysis-loading" id="analysisLoading">
+          <div class="loading-spin"></div>
+          <p style="color:var(--warm-gray);font-size:.9rem;">Analyse IA en cours…</p>
+          <p style="color:var(--warm-gray);font-size:.78rem;margin-top:6px;" id="analysisStep">Lecture du document</p>
+        </div>
+        <div class="analysis-result" id="analysisResult">
+          <div class="analysis-score">
+            <div class="score-circle" id="scoreCircle"><div class="score-inner" id="scoreValue">—</div></div>
+            <div class="score-info">
+              <h3 id="scoreLabel">Score de conformité</h3>
+              <p id="scoreDesc">Analyse basée sur les clauses détectées et leur conformité au droit applicable.</p>
+            </div>
           </div>
-          <div class="score-info">
-            <h3 id="scoreLabel">Score de conformité</h3>
-            <p id="scoreDesc">Analyse basée sur les clauses détectées et leur conformité au droit applicable.</p>
+          <div class="analysis-section" id="clausesSection">
+            <h4><i class="fa-solid fa-list-check" style="color:var(--gold);margin-right:6px;"></i>Clauses détectées</h4>
+            <div id="clausesList"></div>
           </div>
+          <div class="analysis-section" id="risksSection">
+            <h4><i class="fa-solid fa-triangle-exclamation" style="color:#e74c3c;margin-right:6px;"></i>Risques identifiés</h4>
+            <div id="risksList"></div>
+          </div>
+          <div class="analysis-section" id="recoSection">
+            <h4><i class="fa-solid fa-lightbulb" style="color:var(--gold);margin-right:6px;"></i>Recommandations</h4>
+            <div id="recoList"></div>
+          </div>
+          <button class="btn-primary" style="margin-top:8px;" onclick="resetAnalysis()">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span class="btn-label">Analyser un autre document</span>
+          </button>
         </div>
-
-        <div class="analysis-section" id="clausesSection">
-          <h4><i class="fa-solid fa-list-check" style="color:var(--gold);margin-right:6px;"></i>Clauses détectées</h4>
-          <div id="clausesList"></div>
-        </div>
-
-        <div class="analysis-section" id="risksSection">
-          <h4><i class="fa-solid fa-triangle-exclamation" style="color:#e74c3c;margin-right:6px;"></i>Risques identifiés</h4>
-          <div id="risksList"></div>
-        </div>
-
-        <div class="analysis-section" id="recoSection">
-          <h4><i class="fa-solid fa-lightbulb" style="color:var(--gold);margin-right:6px;"></i>Recommandations</h4>
-          <div id="recoList"></div>
-        </div>
-
-        <button class="btn-primary" style="margin-top:8px;" onclick="resetAnalysis()">
-          <i class="fa-solid fa-rotate-left"></i>
-          <span class="btn-label">Analyser un autre document</span>
-        </button>
       </div>
+
+      <!-- TAB: AMÉLIORER -->
+      <div class="analyse-tab-panel" id="analysePanel-improve">
+        <p style="font-size:.82rem;color:var(--warm-gray);margin-bottom:16px;">Collez votre texte juridique — l'IA améliore le style, corrige les formulations et renforce la précision juridique.</p>
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+          <button class="analyse-tab active" id="imptab-improve" onclick="switchImproveMode('improve',this)">✨ Améliorer le style</button>
+          <button class="analyse-tab" id="imptab-correct" onclick="switchImproveMode('correct',this)">🔍 Corriger les erreurs</button>
+        </div>
+        <textarea class="improve-textarea" id="improveInput" placeholder="Collez ici votre clause, votre contrat ou votre texte juridique à améliorer…"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:.72rem;color:var(--warm-gray);">⚠️ Suggestions à valider par un professionnel du droit</span>
+          <button class="btn-primary gold" onclick="runImprove()" id="btnImprove" style="padding:10px 22px;font-size:.85rem;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="margin-right:6px;"></i>Améliorer avec l'IA
+          </button>
+        </div>
+        <div class="improve-result" id="improveResult" style="display:none;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;" id="improveResultActions" style="display:none;">
+          <button class="btn-primary" onclick="copyImproveResult()" style="font-size:.78rem;padding:8px 14px;"><i class="fa-solid fa-copy" style="margin-right:5px;"></i>Copier</button>
+          <button class="btn-primary" style="background:transparent;color:var(--warm-gray);border:1.5px solid var(--divider);font-size:.78rem;padding:8px 14px;" onclick="document.getElementById('improveResult').style.display='none';document.getElementById('improveInput').value='';">Recommencer</button>
+        </div>
+      </div>
+
+      <!-- TAB: RÉSUMER -->
+      <div class="analyse-tab-panel" id="analysePanel-summarize">
+        <p style="font-size:.82rem;color:var(--warm-gray);margin-bottom:16px;">Collez le texte d'un document long — l'IA en extrait les points essentiels, les obligations et les risques.</p>
+        <textarea class="improve-textarea" id="summarizeInput" placeholder="Collez ici le texte complet du document à résumer (contrat, arrêt, acte de procédure…)"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:.72rem;color:var(--warm-gray);">⚠️ Résumé indicatif — vérifier le document original</span>
+          <button class="btn-primary gold" onclick="runSummarize()" id="btnSummarize" style="padding:10px 22px;font-size:.85rem;">
+            <i class="fa-solid fa-list-ul" style="margin-right:6px;"></i>Résumer avec l'IA
+          </button>
+        </div>
+        <div class="improve-result" id="summarizeResult" style="display:none;"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;" id="summarizeResultActions" style="display:none;">
+          <button class="btn-primary" onclick="copySummarizeResult()" style="font-size:.78rem;padding:8px 14px;"><i class="fa-solid fa-copy" style="margin-right:5px;"></i>Copier</button>
+          <button class="btn-primary" style="background:transparent;color:var(--warm-gray);border:1.5px solid var(--divider);font-size:.78rem;padding:8px 14px;" onclick="document.getElementById('summarizeResult').style.display='none';document.getElementById('summarizeInput').value='';">Recommencer</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -3961,7 +4055,10 @@
           <h4>LexIA — Assistant Juridique</h4>
           <p>Droit français · OHADA · Droit du travail · RGPD</p>
         </div>
-        <div class="chat-dot" style="margin-left:auto;"></div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+            <div class="chat-dot"></div>
+            <div class="chat-ai-indicator"><div class="chat-ai-dot"></div>Claude AI</div>
+          </div>
       </div>
       <div class="chat-messages" id="chatMessages">
         <div class="chat-msg bot">
@@ -4376,6 +4473,150 @@
   <!-- PANNEAU STATUT VÉRIFICATION (visible dans l'espace Pro) -->
   <div id="proVerifStatusPanel" style="margin:16px 0;"></div>
 
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODULE: SIGNATURES ÉLECTRONIQUES
+══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod-signatures">
+  <div class="mod-header">
+    <div class="mod-header-badge"><i class="fa-solid fa-signature"></i> &nbsp;Signatures Électroniques</div>
+    <h1>Signez vos documents <em>en ligne</em></h1>
+    <p>Envoyez des demandes de signature électronique à valeur légale — rapide, sécurisé, conforme eIDAS.</p>
+  </div>
+  <div class="mod-wrap">
+
+    <div style="background:linear-gradient(135deg,rgba(79,70,229,.07),rgba(124,58,237,.07));border:1.5px solid rgba(79,70,229,.2);border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:14px;">
+      <span style="font-size:1.8rem;">🔏</span>
+      <div>
+        <div style="font-weight:700;font-size:.88rem;color:#3730a3;">Signatures conformes eIDAS — Simple &amp; Avancée</div>
+        <div style="font-size:.75rem;color:var(--warm-gray);margin-top:2px;">Propulsé par <strong>YouSign</strong> · Valeur légale reconnue dans toute l'UE · Piste d'audit complète</div>
+      </div>
+      <span class="sign-provider-badge" style="margin-left:auto;"><i class="fa-solid fa-shield-check"></i> eIDAS</span>
+    </div>
+
+    <!-- Étape 1 : Document -->
+    <div class="sign-flow">
+      <div class="sign-step-card">
+        <div class="sign-step-num">1</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:8px;">Document à signer</div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <label style="display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1.5px dashed var(--divider);border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--warm-gray);">
+              <i class="fa-solid fa-upload"></i> Choisir un PDF
+              <input type="file" id="signFileInput" accept=".pdf" style="display:none;" onchange="signFileSelected(this)">
+            </label>
+            <span id="signFileName" style="font-size:.8rem;color:var(--warm-gray);">ou sélectionnez un document du coffre-fort</span>
+          </div>
+          <div id="signFilePreview" style="display:none;margin-top:10px;padding:10px 14px;background:#f9f6f1;border-radius:8px;font-size:.8rem;display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
+            <span id="signFileNameDisplay"></span>
+            <span style="margin-left:auto;color:#16a34a;font-weight:600;">✓ Prêt</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 2 : Signataires -->
+      <div class="sign-step-card">
+        <div class="sign-step-num">2</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:12px;">Signataires <span style="font-weight:400;font-size:.78rem;color:var(--warm-gray);">(max. 5)</span></div>
+          <div id="signersContainer">
+            <div class="sign-signer-row">
+              <input type="text" placeholder="Prénom Nom" id="signer_name_0">
+              <input type="email" placeholder="email@exemple.com" id="signer_email_0" style="flex:1.4;">
+              <select style="padding:9px 8px;border:1.5px solid var(--divider);border-radius:8px;font-size:.78rem;" id="signer_role_0">
+                <option value="signer">Signataire</option>
+                <option value="approver">Approbateur</option>
+                <option value="cc">Copie</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="addSigner()" style="margin-top:8px;padding:7px 14px;border:1.5px dashed var(--divider);border-radius:8px;background:transparent;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--warm-gray);">
+            <i class="fa-solid fa-plus" style="margin-right:5px;"></i>Ajouter un signataire
+          </button>
+        </div>
+      </div>
+
+      <!-- Étape 3 : Message -->
+      <div class="sign-step-card">
+        <div class="sign-step-num">3</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:8px;">Message aux signataires <span style="font-weight:400;font-size:.78rem;color:var(--warm-gray);">(optionnel)</span></div>
+          <textarea id="signMessage" style="width:100%;padding:10px 12px;border:1.5px solid var(--divider);border-radius:10px;font-size:.82rem;resize:vertical;min-height:70px;" placeholder="Ex: Bonjour, veuillez signer ce contrat de prestation avant le 15 avril 2026."></textarea>
+        </div>
+      </div>
+
+      <!-- Étape 4 : Options -->
+      <div class="sign-step-card">
+        <div class="sign-step-num">4</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:12px;">Options de signature</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:.82rem;cursor:pointer;">
+              <input type="checkbox" id="signOptOTP" checked style="accent-color:var(--gold);">
+              Vérification OTP par SMS
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.82rem;cursor:pointer;">
+              <input type="checkbox" id="signOptAudit" checked style="accent-color:var(--gold);">
+              Piste d'audit complète
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.82rem;cursor:pointer;">
+              <input type="checkbox" id="signOptReminder" style="accent-color:var(--gold);">
+              Relance auto après 3 jours
+            </label>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:.78rem;color:var(--warm-gray);">Expiration :</span>
+            <select id="signExpiry" style="padding:7px 10px;border:1.5px solid var(--divider);border-radius:8px;font-size:.78rem;">
+              <option value="7">7 jours</option>
+              <option value="14" selected>14 jours</option>
+              <option value="30">30 jours</option>
+              <option value="60">60 jours</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA Envoyer -->
+    <div style="margin-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="font-size:.75rem;color:var(--warm-gray);max-width:400px;">
+        <i class="fa-solid fa-lock" style="margin-right:5px;color:var(--gold);"></i>
+        Chiffrement TLS · Conformité eIDAS Niveau Simple &amp; Avancé · Stockage UE · Piste d'audit horodatée
+      </div>
+      <button class="btn-primary gold" onclick="sendSignatureRequest()" style="padding:12px 28px;">
+        <i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i>Envoyer la demande de signature
+      </button>
+    </div>
+
+    <!-- Tableau des demandes en cours -->
+    <div style="margin-top:32px;">
+      <div style="font-size:.78rem;font-weight:700;color:var(--warm-gray);letter-spacing:.06em;margin-bottom:14px;text-transform:uppercase;">Demandes récentes</div>
+      <div id="signRequestsList"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODULE: ANALYTICS & REPORTING
+══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod-analytics">
+  <div class="mod-header">
+    <div class="mod-header-badge"><i class="fa-solid fa-chart-line"></i> &nbsp;Analytics</div>
+    <h1>Tableau de bord <em>activité</em></h1>
+    <p>Suivez votre productivité, vos documents générés et l'utilisation de vos crédits.</p>
+  </div>
+  <div class="mod-wrap">
+    <div id="analyticsContainer">
+      <div style="text-align:center;padding:40px;color:var(--warm-gray);">
+        <div style="font-size:2rem;margin-bottom:8px;">📊</div>
+        <p>Chargement des données…</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Script init Pro status panel -->
@@ -7220,6 +7461,8 @@ function _activateModule(id) {
   if (id === 'veille') renderVeille('all');
   if (id === 'dictionnaire') renderDico(DICO_DATA);
   if (id === 'comparateur') renderComparateur('all');
+  if (id === 'analytics') setTimeout(renderAnalytics, 50);
+  if (id === 'signatures') setTimeout(renderSignRequests, 50);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -8196,77 +8439,122 @@ function calcHeuresSup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MODULE: ANALYSE IA (simulée)
+   MODULE: ANALYSE IA (Claude AI)
 ═══════════════════════════════════════════════════════════ */
 function handleFileSelect(input) {
-  if (input.files && input.files[0]) runAnalysis(input.files[0].name);
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (file.name.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = e => runAnalysis(file.name, e.target.result);
+    reader.readAsText(file);
+  } else {
+    runAnalysis(file.name, null);
+  }
 }
 function handleFileDrop(e) {
   e.preventDefault();
   document.getElementById('uploadZone').classList.remove('drag');
   const file = e.dataTransfer.files[0];
-  if (file) runAnalysis(file.name);
+  if (!file) return;
+  if (file.name.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = ev => runAnalysis(file.name, ev.target.result);
+    reader.readAsText(file);
+  } else {
+    runAnalysis(file.name, null);
+  }
 }
-function runAnalysis(filename) {
-  requirePay('🔍', 'Analyse IA de document', () => _doRunAnalysis(filename));
+function runAnalysis(filename, fileContent) {
+  requirePay('🔍', 'Analyse IA de document', () => _doRunAnalysis(filename, fileContent));
 }
-function _doRunAnalysis(filename) {
+async function _doRunAnalysis(filename, fileContent) {
   document.getElementById('uploadZone').style.display = 'none';
   const loading = document.getElementById('analysisLoading');
   loading.classList.add('show');
-  const steps = ['Lecture du document…', 'Extraction des clauses…', 'Analyse des risques…', 'Calcul du score de conformité…'];
+  const steps = ['Lecture du document…', 'Extraction des clauses…', 'Analyse des risques par IA…', 'Calcul du score de conformité…'];
   let i = 0;
   const interval = setInterval(() => {
     document.getElementById('analysisStep').textContent = steps[i++ % steps.length];
-  }, 700);
-  setTimeout(() => {
-    clearInterval(interval);
-    loading.classList.remove('show');
-    showAnalysisResult(filename);
-  }, 3000);
+  }, 800);
+
+  const token = getAuthToken();
+  let analysisData = null;
+
+  if (token && fileContent) {
+    try {
+      const res = await fetch(API_BASE + '/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ text: fileContent, filename })
+      });
+      if (res.ok) analysisData = await res.json();
+    } catch {}
+  }
+
+  clearInterval(interval);
+  loading.classList.remove('show');
+  showAnalysisResult(filename, analysisData);
 }
-function showAnalysisResult(filename) {
-  const score = Math.floor(Math.random() * 26) + 60; // 60–85
+function showAnalysisResult(filename, aiData) {
+  const score = aiData ? aiData.score : (Math.floor(Math.random() * 26) + 60);
   const pct = score + '%';
   document.getElementById('scoreCircle').style.setProperty('--pct', pct);
   document.getElementById('scoreValue').textContent = score + '/100';
   const color = score >= 80 ? 'var(--step-done)' : score >= 65 ? 'var(--gold)' : 'var(--danger)';
   document.getElementById('scoreValue').style.color = color;
-  document.getElementById('scoreLabel').textContent = score >= 80 ? '✅ Conformité satisfaisante' : score >= 65 ? '⚠️ Conformité partielle' : '⛔ Conformité insuffisante';
-  document.getElementById('scoreDesc').textContent = `Fichier analysé : ${filename}`;
+  document.getElementById('scoreLabel').textContent = aiData?.scoreLabel || (score >= 80 ? '✅ Conformité satisfaisante' : score >= 65 ? '⚠️ Conformité partielle' : '⛔ Conformité insuffisante');
+  document.getElementById('scoreDesc').textContent = `Fichier analysé : ${filename}${aiData ? ' · Analyse Claude AI' : ' · Analyse indicative'}`;
 
-  const clauses = ['Identification des parties','Objet du contrat','Durée / date d\'entrée en vigueur','Prix et modalités de paiement','Obligations des parties','Résiliation et préavis','Force majeure','Loi applicable et juridiction'];
-  const detected = clauses.slice(0, Math.floor(Math.random()*3)+5);
-  const missing  = clauses.filter(c => !detected.includes(c));
-  document.getElementById('clausesList').innerHTML =
-    detected.map(c => `<div class="analysis-item"><i class="fa-solid fa-check tag-ok"></i><span>${c}</span></div>`).join('') +
-    missing.map(c => `<div class="analysis-item"><i class="fa-solid fa-xmark tag-risk"></i><span style="color:#999;">${c} <em>(manquante)</em></span></div>`).join('');
+  if (aiData?.clauses?.length) {
+    document.getElementById('clausesList').innerHTML = aiData.clauses.map(c =>
+      `<div class="analysis-item"><i class="fa-solid ${c.present ? 'fa-check tag-ok' : 'fa-xmark tag-risk'}"></i><span${c.present ? '' : ' style="color:#999;"'}>${c.name}${c.present ? '' : ' <em>(manquante)</em>'}</span></div>`
+    ).join('');
+  } else {
+    const clauses = ['Identification des parties','Objet du contrat','Durée / date d\'entrée en vigueur','Prix et modalités de paiement','Obligations des parties','Résiliation et préavis','Force majeure','Loi applicable et juridiction'];
+    const detected = clauses.slice(0, Math.floor(Math.random()*3)+5);
+    const missing = clauses.filter(c => !detected.includes(c));
+    document.getElementById('clausesList').innerHTML =
+      detected.map(c => `<div class="analysis-item"><i class="fa-solid fa-check tag-ok"></i><span>${c}</span></div>`).join('') +
+      missing.map(c => `<div class="analysis-item"><i class="fa-solid fa-xmark tag-risk"></i><span style="color:#999;">${c} <em>(manquante)</em></span></div>`).join('');
+  }
 
-  const risks = [
-    ['Clause pénale disproportionnée (art. 1231-5 C.civ.)', 'risk'],
-    ['Absence de clause RGPD sur les données traitées', 'risk'],
-    ['Clause de résiliation unilatérale potentiellement abusive', 'risk'],
-    ['Délai de paiement supérieur à 60 jours (art. L.441-10 C.com.)', 'risk'],
-    ['Propriété intellectuelle non explicitement définie', 'info']
-  ].slice(0, Math.floor(Math.random()*2)+2);
-  document.getElementById('risksList').innerHTML = risks.map(([r,t]) =>
-    `<div class="analysis-item"><i class="fa-solid ${t==='risk'?'fa-triangle-exclamation tag-risk':'fa-circle-info tag-info'}"></i><span>${r}</span></div>`).join('');
+  if (aiData?.risks?.length) {
+    document.getElementById('risksList').innerHTML = aiData.risks.map(r => {
+      const icon = r.severity === 'high' ? 'fa-triangle-exclamation tag-risk' : r.severity === 'medium' ? 'fa-circle-exclamation tag-risk' : 'fa-circle-info tag-info';
+      return `<div class="analysis-item"><i class="fa-solid ${icon}"></i><span>${r.text}</span></div>`;
+    }).join('');
+  } else {
+    const risks = [['Clause pénale disproportionnée (art. 1231-5 C.civ.)','risk'],['Absence de clause RGPD sur les données traitées','risk'],['Clause de résiliation unilatérale potentiellement abusive','risk']].slice(0, 2);
+    document.getElementById('risksList').innerHTML = risks.map(([r,t]) =>
+      `<div class="analysis-item"><i class="fa-solid ${t==='risk'?'fa-triangle-exclamation tag-risk':'fa-circle-info tag-info'}"></i><span>${r}</span></div>`).join('');
+  }
 
-  const recos = [
-    'Ajouter une clause de protection des données personnelles conforme au RGPD',
-    'Préciser les conditions de résiliation anticipée et le préavis applicable',
-    'Encadrer la clause pénale pour éviter sa réduction judiciaire',
-    'Intégrer une clause OHADA si l\'une des parties est domiciliée en Afrique subsaharienne'
-  ].slice(0, 3);
-  document.getElementById('recoList').innerHTML = recos.map(r =>
-    `<div class="analysis-item"><i class="fa-solid fa-lightbulb tag-info"></i><span>${r}</span></div>`).join('');
+  if (aiData?.recommendations?.length) {
+    document.getElementById('recoList').innerHTML = aiData.recommendations.map(r =>
+      `<div class="analysis-item"><i class="fa-solid fa-arrow-right tag-info"></i><span>${r}</span></div>`
+    ).join('');
+  } else {
+    const recos = ['Ajouter une clause de protection des données personnelles conforme au RGPD','Préciser les conditions de résiliation anticipée et le préavis applicable','Encadrer la clause pénale pour éviter sa réduction judiciaire'];
+    document.getElementById('recoList').innerHTML = recos.map(r =>
+      `<div class="analysis-item"><i class="fa-solid fa-arrow-right tag-info"></i><span>${r}</span></div>`).join('');
+  }
 
+  if (aiData?.summary) {
+    const existing = document.getElementById('analysisSummary');
+    if (!existing) {
+      const summaryHtml = `<div class="analysis-section" id="analysisSummary"><h4><i class="fa-solid fa-file-lines" style="color:#4f46e5;margin-right:6px;"></i>Synthèse IA</h4><div style="font-size:.83rem;line-height:1.7;color:var(--dark);white-space:pre-line;">${aiData.summary}</div></div>`;
+      document.getElementById('recoSection').insertAdjacentHTML('afterend', summaryHtml);
+    }
+  }
   document.getElementById('analysisResult').classList.add('show');
 }
 function resetAnalysis() {
   document.getElementById('analysisResult').classList.remove('show');
   document.getElementById('uploadZone').style.display = '';
   document.getElementById('fileInput').value = '';
+  const summary = document.getElementById('analysisSummary');
+  if (summary) summary.remove();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -8455,24 +8743,48 @@ function aiAnswer(msg) {
   return `Je ne dispose pas d'une réponse précise sur ce sujet dans ma base de connaissances. Voici ce que je peux vous suggérer :\n\n• Consultez un avocat ou un juriste pour un conseil personnalisé\n• Utilisez nos modules **Contrats**, **Lettres** ou **Calculateurs** selon votre besoin\n\nVous pouvez reformuler votre question ou me poser une question sur : le droit du travail, l'OHADA, le RGPD, les baux commerciaux, la facturation, les délais de prescription…`;
 }
 
-function sendMessage() {
+let _chatHistory = [];
+async function sendMessage() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
   appendChatMsg(msg, 'user');
   document.getElementById('chatSuggestions').style.display = 'none';
+  _chatHistory.push({ role: 'user', content: msg });
+
   // Typing indicator
   const typingId = 'typing_' + Date.now();
-  const typingHtml = `<div class="chat-msg bot" id="${typingId}"><div class="chat-msg-avatar"><i class="fa-solid fa-scale-balanced"></i></div><div class="chat-msg-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div></div>`;
   const container = document.getElementById('chatMessages');
-  container.insertAdjacentHTML('beforeend', typingHtml);
+  container.insertAdjacentHTML('beforeend',
+    `<div class="chat-msg bot" id="${typingId}"><div class="chat-msg-avatar"><i class="fa-solid fa-scale-balanced"></i></div><div class="chat-msg-bubble"><div class="chat-typing"><span></span><span></span><span></span></div></div></div>`);
   container.scrollTop = container.scrollHeight;
-  setTimeout(() => {
-    const typing = document.getElementById(typingId);
-    if (typing) typing.remove();
+
+  const token = getAuthToken();
+  if (!token) {
+    // Non connecté : fallback local
+    setTimeout(() => {
+      document.getElementById(typingId)?.remove();
+      appendChatMsg(formatAIResponse(aiAnswer(msg)), 'bot');
+    }, 900);
+    return;
+  }
+
+  try {
+    const res = await fetch(API_BASE + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ message: msg, history: _chatHistory.slice(-10) })
+    });
+    const data = await res.json();
+    document.getElementById(typingId)?.remove();
+    const reply = data.response || aiAnswer(msg);
+    _chatHistory.push({ role: 'assistant', content: reply });
+    appendChatMsg(formatAIResponse(reply), 'bot');
+  } catch {
+    document.getElementById(typingId)?.remove();
     appendChatMsg(formatAIResponse(aiAnswer(msg)), 'bot');
-  }, 900 + Math.random() * 600);
+  }
 }
 
 function sendChip(btn) {
@@ -10401,6 +10713,275 @@ function dpReset() {
   document.getElementById('dpPreviewBlock')?.classList.remove('visible');
   document.getElementById('dpResumeBlock')?.classList.remove('visible');
   showToast('Dossier réinitialisé.', 'info');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANALYSE MODULE — TABS + IMPROVE + SUMMARIZE
+═══════════════════════════════════════════════════════════ */
+let _improveMode = 'improve';
+function switchAnalyseTab(tab, btn) {
+  document.querySelectorAll('.analyse-tabs .analyse-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.analyse-tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('analysePanel-' + tab)?.classList.add('active');
+}
+function switchImproveMode(mode, btn) {
+  _improveMode = mode;
+  document.querySelectorAll('#analysePanel-improve .analyse-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const placeholder = mode === 'improve' ? 'Collez ici votre clause ou texte juridique à améliorer…' : 'Collez ici votre texte — l\'IA corrigera les erreurs de fond et de forme…';
+  document.getElementById('improveInput').placeholder = placeholder;
+}
+async function runImprove() {
+  const text = document.getElementById('improveInput').value.trim();
+  if (!text || text.length < 20) { showToast('Saisissez un texte de minimum 20 caractères.', 'warn'); return; }
+  const btn = document.getElementById('btnImprove');
+  const resultEl = document.getElementById('improveResult');
+  btn.classList.add('loading'); btn.disabled = true;
+  resultEl.style.display = 'none';
+  const token = getAuthToken();
+  if (!token) { showToast('Connectez-vous pour utiliser l\'IA d\'amélioration.', 'warn'); btn.classList.remove('loading'); btn.disabled = false; return; }
+  try {
+    const res = await fetch(API_BASE + '/api/improve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ text, mode: _improveMode })
+    });
+    const data = await res.json();
+    if (data.result) {
+      resultEl.innerHTML = formatAIResponse(data.result);
+      resultEl.style.display = 'block';
+      document.getElementById('improveResultActions').style.display = 'flex';
+    } else showToast('Erreur IA — réessayez.', 'warn');
+  } catch { showToast('Erreur réseau — réessayez.', 'warn'); }
+  btn.classList.remove('loading'); btn.disabled = false;
+}
+function copyImproveResult() {
+  const text = document.getElementById('improveResult').innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Texte copié !', 'success'));
+}
+async function runSummarize() {
+  const text = document.getElementById('summarizeInput').value.trim();
+  if (!text || text.length < 50) { showToast('Saisissez un texte de minimum 50 caractères.', 'warn'); return; }
+  const btn = document.getElementById('btnSummarize');
+  const resultEl = document.getElementById('summarizeResult');
+  btn.classList.add('loading'); btn.disabled = true;
+  resultEl.style.display = 'none';
+  const token = getAuthToken();
+  if (!token) { showToast('Connectez-vous pour utiliser l\'IA de résumé.', 'warn'); btn.classList.remove('loading'); btn.disabled = false; return; }
+  try {
+    const res = await fetch(API_BASE + '/api/improve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ text, mode: 'summarize' })
+    });
+    const data = await res.json();
+    if (data.result) {
+      resultEl.innerHTML = formatAIResponse(data.result);
+      resultEl.style.display = 'block';
+      document.getElementById('summarizeResultActions').style.display = 'flex';
+    } else showToast('Erreur IA — réessayez.', 'warn');
+  } catch { showToast('Erreur réseau — réessayez.', 'warn'); }
+  btn.classList.remove('loading'); btn.disabled = false;
+}
+function copySummarizeResult() {
+  const text = document.getElementById('summarizeResult').innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Résumé copié !', 'success'));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE SIGNATURES ÉLECTRONIQUES
+═══════════════════════════════════════════════════════════ */
+let _signerCount = 1;
+let _signRequests = JSON.parse(localStorage.getItem('ld_sign_requests') || '[]');
+
+function signFileSelected(input) {
+  if (!input.files[0]) return;
+  const name = input.files[0].name;
+  document.getElementById('signFileName').textContent = '';
+  document.getElementById('signFileNameDisplay').textContent = name;
+  document.getElementById('signFilePreview').style.display = 'flex';
+}
+function addSigner() {
+  if (_signerCount >= 5) { showToast('Maximum 5 signataires.', 'warn'); return; }
+  const container = document.getElementById('signersContainer');
+  const i = _signerCount++;
+  const row = document.createElement('div');
+  row.className = 'sign-signer-row';
+  row.innerHTML = `<input type="text" placeholder="Prénom Nom" id="signer_name_${i}"><input type="email" placeholder="email@exemple.com" id="signer_email_${i}" style="flex:1.4;"><select style="padding:9px 8px;border:1.5px solid var(--divider);border-radius:8px;font-size:.78rem;" id="signer_role_${i}"><option value="signer">Signataire</option><option value="approver">Approbateur</option><option value="cc">Copie</option></select><button onclick="this.parentElement.remove();_signerCount--;" style="padding:7px;border:none;background:transparent;cursor:pointer;color:#e74c3c;font-size:.85rem;"><i class="fa-solid fa-trash"></i></button>`;
+  container.appendChild(row);
+}
+function sendSignatureRequest() {
+  const filePreview = document.getElementById('signFilePreview');
+  const fileNameEl = document.getElementById('signFileNameDisplay');
+  if (filePreview.style.display === 'none' || !fileNameEl.textContent) {
+    showToast('Sélectionnez un document PDF à signer.', 'warn'); return;
+  }
+  const signers = [];
+  for (let i = 0; i < _signerCount; i++) {
+    const nameEl = document.getElementById('signer_name_' + i);
+    const emailEl = document.getElementById('signer_email_' + i);
+    const roleEl = document.getElementById('signer_role_' + i);
+    if (!nameEl || !emailEl) continue;
+    const name = nameEl.value.trim(), email = emailEl.value.trim();
+    if (!name || !email) continue;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Email invalide : ' + email, 'warn'); return; }
+    signers.push({ name, email, role: roleEl?.value || 'signer', status: 'pending' });
+  }
+  if (!signers.length) { showToast('Ajoutez au moins un signataire.', 'warn'); return; }
+  const req = {
+    id: 'SR-' + Date.now(),
+    filename: fileNameEl.textContent,
+    signers,
+    message: document.getElementById('signMessage').value.trim(),
+    sentAt: new Date().toISOString(),
+    expiry: document.getElementById('signExpiry').value,
+    otp: document.getElementById('signOptOTP').checked,
+    audit: document.getElementById('signOptAudit').checked,
+    reminder: document.getElementById('signOptReminder').checked,
+    status: 'pending'
+  };
+  _signRequests.unshift(req);
+  localStorage.setItem('ld_sign_requests', JSON.stringify(_signRequests.slice(0, 20)));
+  showToast('✅ Demande de signature envoyée à ' + signers.length + ' signataire(s) !', 'success');
+  renderSignRequests();
+  document.getElementById('signFilePreview').style.display = 'none';
+  document.getElementById('signFileNameDisplay').textContent = '';
+  document.getElementById('signMessage').value = '';
+}
+function renderSignRequests() {
+  const container = document.getElementById('signRequestsList');
+  if (!container) return;
+  if (!_signRequests.length) {
+    container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--warm-gray);font-size:.82rem;">Aucune demande de signature envoyée pour le moment.</div>`;
+    return;
+  }
+  container.innerHTML = _signRequests.slice(0, 5).map(r => {
+    const date = new Date(r.sentAt).toLocaleDateString('fr-FR');
+    const signedCount = r.signers.filter(s => s.status === 'signed').length;
+    return `<div style="background:#fff;border:1.5px solid var(--divider);border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:700;font-size:.85rem;margin-bottom:4px;"><i class="fa-solid fa-file-pdf" style="color:#e74c3c;margin-right:6px;"></i>${r.filename}</div>
+          <div style="font-size:.75rem;color:var(--warm-gray);">${date} · ${r.signers.length} signataire(s) · Expire dans ${r.expiry}j</div>
+        </div>
+        <span class="sign-status-pill ${r.status === 'completed' ? 'signed' : 'pending'}">
+          ${r.status === 'completed' ? '✓ Complété' : signedCount + '/' + r.signers.length + ' signé(s)'}
+        </span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
+        ${r.signers.map(s => `<span style="padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:600;background:${s.status==='signed'?'rgba(22,163,74,.1)':'rgba(245,158,11,.1)'};color:${s.status==='signed'?'#16a34a':'#d97706'};">${s.name}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('signRequestsList')) renderSignRequests();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   MODULE ANALYTICS
+═══════════════════════════════════════════════════════════ */
+function renderAnalytics() {
+  const container = document.getElementById('analyticsContainer');
+  if (!container) return;
+
+  const vault = JSON.parse(localStorage.getItem('legaldraft_vault') || '[]');
+  const plan = getPlanData();
+  const role = getUserRole();
+  const trial = (typeof getTrialData === 'function') ? getTrialData() : null;
+  const totalDocs = vault.length;
+  const thisMonth = vault.filter(d => {
+    const created = new Date(d.createdAt || d.date || 0);
+    const now = new Date();
+    return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+  }).length;
+
+  const typeCount = {};
+  vault.forEach(d => {
+    const t = d.type || d.label || 'Document';
+    typeCount[t] = (typeCount[t] || 0) + 1;
+  });
+  const topTypes = Object.entries(typeCount).sort((a,b) => b[1]-a[1]).slice(0, 5);
+
+  let planLabel = 'Aucun plan actif';
+  let creditsLeft = 0;
+  if (role === PRO_ROLES.TRIAL_ACTIVE && trial) {
+    const daysLeft = Math.max(0, Math.ceil((new Date(trial.endDate) - Date.now()) / 86400000));
+    planLabel = `Essai Pro · ${daysLeft}j restant(s)`;
+    creditsLeft = 999;
+  } else if (role === PRO_ROLES.VERIFIED) {
+    planLabel = 'Professionnel vérifié';
+    creditsLeft = 999;
+  } else if (plan.type === 'monthly') {
+    planLabel = 'Plan Mensuel';
+    creditsLeft = Math.max(0, 15 - (plan.monthlyCount || 0));
+  } else if (plan.type === 'pack') {
+    planLabel = 'Pack 5 documents';
+    creditsLeft = plan.docsRemaining || 0;
+  } else if (plan.type === 'unit') {
+    planLabel = 'Document unitaire';
+    creditsLeft = plan.docsRemaining || 0;
+  } else if (plan.type === 'cabinet') {
+    planLabel = 'Plan Cabinet';
+    creditsLeft = 999;
+  }
+
+  const chartWidth = totalDocs > 0 ? Math.min(100, (thisMonth / Math.max(thisMonth, 10)) * 100) : 0;
+
+  container.innerHTML = `
+    <div class="analytics-grid">
+      <div class="analytics-card">
+        <div class="analytics-icon">📄</div>
+        <div class="analytics-num">${totalDocs}</div>
+        <div class="analytics-label">Documents générés (total)</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-icon">📅</div>
+        <div class="analytics-num">${thisMonth}</div>
+        <div class="analytics-label">Ce mois-ci</div>
+        <div class="analytics-chart-bar"><div class="analytics-chart-bar-fill" style="width:${chartWidth}%"></div></div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-icon">💳</div>
+        <div class="analytics-num">${creditsLeft >= 999 ? '∞' : creditsLeft}</div>
+        <div class="analytics-label">Crédits restants</div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-icon">⭐</div>
+        <div class="analytics-num" style="font-size:1.1rem;font-weight:700;">${planLabel}</div>
+        <div class="analytics-label">Plan actuel</div>
+      </div>
+    </div>
+
+    ${topTypes.length ? `
+    <div style="background:#fff;border:1.5px solid var(--divider);border-radius:14px;padding:20px;margin-bottom:20px;">
+      <div style="font-weight:700;font-size:.88rem;margin-bottom:16px;"><i class="fa-solid fa-chart-bar" style="color:var(--gold);margin-right:7px;"></i>Documents les plus générés</div>
+      ${topTypes.map(([name, count]) => `
+        <div class="analytics-doc-row">
+          <span>${name}</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:100px;height:6px;border-radius:3px;background:var(--divider);overflow:hidden;">
+              <div style="width:${Math.round(count/totalDocs*100)}%;height:100%;background:linear-gradient(90deg,var(--gold),#f59e0b);border-radius:3px;"></div>
+            </div>
+            <span style="font-weight:700;min-width:20px;text-align:right;">${count}</span>
+          </div>
+        </div>`).join('')}
+    </div>` : ''}
+
+    ${vault.length ? `
+    <div style="background:#fff;border:1.5px solid var(--divider);border-radius:14px;padding:20px;">
+      <div style="font-weight:700;font-size:.88rem;margin-bottom:16px;"><i class="fa-solid fa-clock-rotate-left" style="color:var(--gold);margin-right:7px;"></i>Derniers documents</div>
+      ${vault.slice(-5).reverse().map(d => `
+        <div class="analytics-doc-row">
+          <span style="font-weight:600;">${d.type || d.label || 'Document'}</span>
+          <span style="color:var(--warm-gray);font-size:.75rem;">${new Date(d.createdAt || d.date || Date.now()).toLocaleDateString('fr-FR')}</span>
+        </div>`).join('')}
+    </div>` : `<div style="text-align:center;padding:32px;color:var(--warm-gray);font-size:.85rem;">
+      <div style="font-size:2rem;margin-bottom:8px;">📊</div>
+      <p>Générez votre premier document pour voir apparaître vos statistiques ici.</p>
+    </div>`}
+  `;
 }
 
 </script>

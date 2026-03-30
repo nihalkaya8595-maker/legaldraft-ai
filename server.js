@@ -233,6 +233,108 @@ app.get('/admin/free-doc-usage', (req, res) => {
   });
 });
 
+/* ══════════════════════════════════════════════════════
+   AI ENDPOINTS — Claude API
+══════════════════════════════════════════════════════ */
+
+/**
+ * POST /api/chat  (JWT requis)
+ * Body : { message: string, history: [{role, content}] }
+ * Réponse : { response: string }
+ */
+app.post('/api/chat', requireAuth, async (req, res) => {
+  const { message, history = [] } = req.body || {};
+  if (!message) return res.status(400).json({ error: 'Message requis.' });
+
+  try {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const result = await anthropic.messages.create({
+      model: 'claude-opus-4-5',
+      max_tokens: 1024,
+      system: "Tu es LexIA, un assistant juridique expert en droit français, droit du travail, droit OHADA et RGPD. Tu fournis des informations juridiques générales claires, structurées et précises. Tu ne donnes JAMAIS de conseil juridique personnalisé. Tu rappelles toujours de consulter un professionnel pour les cas spécifiques. Tu réponds toujours en français.",
+      messages: [...history, { role: 'user', content: message }]
+    });
+    res.json({ response: result.content[0].text });
+  } catch (err) {
+    console.error('Chat AI error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/analyze  (JWT requis)
+ * Body : { text: string, filename: string }
+ * Réponse : JSON d'analyse de contrat
+ */
+app.post('/api/analyze', requireAuth, async (req, res) => {
+  const { text, filename = 'document' } = req.body || {};
+  if (!text) return res.status(400).json({ error: 'Texte requis.' });
+
+  try {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const result = await anthropic.messages.create({
+      model: 'claude-opus-4-5',
+      max_tokens: 2048,
+      system: 'Tu es un expert en analyse de contrats juridiques français. Analyse le document fourni et retourne UNIQUEMENT un JSON valide sans markdown avec cette structure exacte: { "score": number(0-100), "scoreLabel": string, "clauses": [{"name":string,"present":boolean}], "risks": [{"text":string,"severity":"high"|"medium"|"low"}], "recommendations": [string], "summary": string }. Ne retourne aucun texte avant ou après le JSON.',
+      messages: [{ role: 'user', content: `Analyse ce document juridique:\n\nFichier: ${filename}\n\n${text.slice(0, 8000)}` }]
+    });
+    let raw = result.content[0].text.trim();
+    // Strip markdown code fences if present
+    raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    try {
+      const parsed = JSON.parse(raw);
+      res.json(parsed);
+    } catch {
+      res.json({
+        score: 70,
+        scoreLabel: 'Analyse indicative',
+        clauses: [],
+        risks: [{ text: 'Analyse automatique non disponible pour ce format.', severity: 'low' }],
+        recommendations: ['Consultez un professionnel pour une analyse complète.'],
+        summary: 'Analyse du document non disponible — format non supporté ou contenu insuffisant.'
+      });
+    }
+  } catch (err) {
+    console.error('Analyze AI error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/improve  (JWT requis)
+ * Body : { text: string, mode: 'improve'|'correct'|'summarize' }
+ * Réponse : { result: string }
+ */
+app.post('/api/improve', requireAuth, async (req, res) => {
+  const { text, mode = 'improve' } = req.body || {};
+  if (!text) return res.status(400).json({ error: 'Texte requis.' });
+
+  const prompts = {
+    improve: `Améliore le style rédactionnel de ce texte juridique en le rendant plus professionnel, précis et complet. Retourne le texte amélioré avec des commentaires entre [[commentaire: ...]]:\n\n${text}`,
+    correct: `Corrige les erreurs de fond juridique, de forme et de style dans ce texte. Signale chaque correction avec [CORRECTION: description]. Retourne le texte corrigé:\n\n${text}`,
+    summarize: `Résume ce document juridique en identifiant: les parties, l'objet principal, les obligations clés, les clauses importantes, les risques. Format: sections avec titres en **gras**:\n\n${text}`,
+  };
+
+  const userPrompt = prompts[mode] || prompts.improve;
+
+  try {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const result = await anthropic.messages.create({
+      model: 'claude-opus-4-5',
+      max_tokens: 2048,
+      system: "Tu es un expert en rédaction juridique française. Tu améliores, corriges et synthétises les textes juridiques. Réponds toujours en français.",
+      messages: [{ role: 'user', content: userPrompt }]
+    });
+    res.json({ result: result.content[0].text });
+  } catch (err) {
+    console.error('Improve AI error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 /**
  * POST /create-payment-intent
  * Corps : { offer: 'unit' | 'pack' | 'sub', currency?: 'eur' | 'xof' }
