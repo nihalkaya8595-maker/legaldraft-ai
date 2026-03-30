@@ -2035,17 +2035,13 @@
           <p><strong>Déclaration sur l'honneur :</strong> Toute fausse déclaration engage votre responsabilité pénale (art. 441-1 C. pén.). Tout accès frauduleux sera immédiatement révoqué et signalé aux autorités compétentes.</p>
         </div>
       </div>
-      <div class="kyc-footer" style="flex-direction:column;gap:10px;align-items:stretch;">
-        <div onclick="kycToggleHonor()" style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(212,175,55,.06);border:1.5px solid rgba(212,175,55,.25);border-radius:10px;cursor:pointer;user-select:none;">
-          <input type="checkbox" id="kyc_honor" style="width:18px;height:18px;min-width:18px;margin-top:2px;accent-color:var(--gold);flex-shrink:0;pointer-events:none;" tabindex="-1">
-          <span style="font-size:.78rem;color:var(--dark);line-height:1.5;pointer-events:none;">Je certifie sur l'honneur que les informations renseignées sont <strong>exactes et sincères</strong>, et que j'exerce bien la profession déclarée.</span>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:.68rem;color:var(--warm-gray);">Accès activé immédiatement après validation</div>
-          <button class="btn-primary gold" id="btnKycSubmit" onclick="kycGoStep2()" disabled style="opacity:.5;cursor:not-allowed;padding:10px 22px;">
-            <i class="fa-solid fa-shield-check" style="margin-right:6px;"></i>Accéder à l'Espace Pro
-          </button>
-        </div>
+      <div class="kyc-footer" style="flex-direction:column;gap:8px;align-items:stretch;">
+        <p style="font-size:.72rem;color:var(--warm-gray);text-align:center;line-height:1.5;margin:0;">
+          En cliquant sur le bouton ci-dessous, vous certifiez sur l'honneur que les informations renseignées sont <strong style="color:var(--dark);">exactes et sincères</strong> et engagez votre responsabilité pénale en cas de fausse déclaration (art. 441-1 C. pén.).
+        </p>
+        <button class="btn-primary gold" onclick="kycGoStep2()" style="width:100%;padding:13px;font-size:.9rem;">
+          <i class="fa-solid fa-shield-check" style="margin-right:8px;"></i>Je certifie et accède à l'Espace Pro
+        </button>
       </div>
     </div>
     <!-- ÉTAPE 2 -->
@@ -6948,15 +6944,6 @@ function kycToggleProfFields() {
   document.getElementById('kycFieldJuriste').classList.toggle('show', prof === 'juriste' || prof === 'dj' || prof === 'conseil');
 }
 
-function kycToggleHonor() {
-  const cb  = document.getElementById('kyc_honor');
-  const btn = document.getElementById('btnKycSubmit');
-  cb.checked = !cb.checked;
-  btn.disabled       = !cb.checked;
-  btn.style.opacity  = cb.checked ? '1'       : '.5';
-  btn.style.cursor   = cb.checked ? 'pointer' : 'not-allowed';
-}
-
 function kycGoStep2() {
   const prenom = document.getElementById('kyc_prenom').value.trim();
   const nom = document.getElementById('kyc_nom').value.trim();
@@ -7050,11 +7037,7 @@ function kycResetModal() {
   ['kycStep1','kycStep2','kycStep3'].forEach((id, i) => {
     document.getElementById(id).style.display = i === 0 ? 'flex' : 'none';
   });
-  // Reset honor checkbox + button state
-  const cb = document.getElementById('kyc_honor');
-  const btn = document.getElementById('btnKycSubmit');
-  if (cb)  cb.checked = false;
-  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; btn.style.cursor = 'not-allowed'; }
+
 
   ['kycStepItem1','kycStepItem2','kycStepItem3'].forEach((id, i) => {
     const el = document.getElementById(id);
