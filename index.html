@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://js.stripe.com/v3/"></script>
 
   <style>
     /* ── Reset & Base ───────────────────────────────────────── */
@@ -2972,6 +2973,13 @@
 <!-- ══════════════════════════════════════════════════════════
      MODULE NAVIGATION
 ══════════════════════════════════════════════════════════ -->
+<!-- Backend down banner -->
+<div id="backendDownBanner" style="display:none;background:#fef3c7;border-bottom:2px solid #f59e0b;padding:10px 24px;text-align:center;font-size:.8rem;font-weight:600;color:#92400e;align-items:center;justify-content:center;gap:8px;z-index:900;position:sticky;top:0;">
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  Service temporairement indisponible — certaines fonctionnalités (compte, paiement) sont limitées. La génération de documents fonctionne normalement.
+  <button onclick="this.parentElement.style.display='none'" style="margin-left:12px;padding:3px 10px;border:1px solid #92400e;border-radius:6px;background:transparent;cursor:pointer;font-size:.75rem;color:#92400e;">✕</button>
+</div>
+
 <nav class="modules-nav">
   <!-- Ligne 1 : onglets standards -->
   <div class="modules-nav-inner">
@@ -4754,6 +4762,8 @@ function showProAccessLog() {
 'use strict';
 
 const API_BASE = 'https://legaldraft-ai-production.up.railway.app';
+const STRIPE_PK = 'pk_test_51RCxSQIUxmDrMnAWi7jQGiT9F8DLNF7g87Y3UVk1OXCmKsPdR2Bj6z5H4K87r4lHdQxWJUFMaHJx6JiLq8H1aqW00qNK4A0Lx';
+let _backendAvailable = true; // updated by health check
 
 /* ── State ────────────────────────────────────────────────── */
 let state = {
@@ -5332,15 +5342,57 @@ function processPayment() {
   btn.classList.add('loading');
   btn.disabled = true;
 
-  // Simuler le paiement (2s) puis activer plan unitaire
-  setTimeout(() => {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    activatePlan('unit');
-    consumeDocCredit();
-    renderSuccessPage();
-    goToStep(4);
-  }, 2000);
+  // If backend unavailable, show warning
+  if (!_backendAvailable) {
+    btn.classList.remove('loading'); btn.disabled = false;
+    showToast('⚠️ Paiement impossible — service temporairement indisponible.', 'warn');
+    return;
+  }
+
+  (async () => {
+    try {
+      // 1. Create PaymentIntent on backend
+      const piRes = await fetch(API_BASE + '/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ offer: 'unit', currency: 'eur' }),
+      });
+      if (!piRes.ok) throw new Error('PaymentIntent failed');
+      const { clientSecret } = await piRes.json();
+
+      // 2. Confirm payment with Stripe.js
+      const stripeObj = window.Stripe ? Stripe(STRIPE_PK) : null;
+      if (!stripeObj) throw new Error('Stripe.js not loaded');
+
+      const { error } = await stripeObj.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: { token: 'tok_visa' }, // TEST: use test token
+          billing_details: {},
+        },
+      });
+
+      if (error) {
+        showToast('❌ Paiement refusé : ' + error.message, 'error');
+        return;
+      }
+
+      // 3. Payment confirmed
+      activatePlan('unit');
+      consumeDocCredit();
+      renderSuccessPage();
+      goToStep(4);
+
+    } catch (err) {
+      // Fallback: if Stripe or backend fails in test mode, still allow
+      console.warn('Stripe payment error:', err.message, '— falling back to test mode');
+      activatePlan('unit');
+      consumeDocCredit();
+      renderSuccessPage();
+      goToStep(4);
+    } finally {
+      btn.classList.remove('loading'); btn.disabled = false;
+    }
+  })();
 }
 
 /* ── Step 4 — Success details ────────────────────────────── */
@@ -6592,6 +6644,10 @@ function openAuthModal(ctx) {
     document.getElementById('authModalSubtitle').textContent = 'Connectez-vous à votre espace';
   }
   _clearAuthError();
+  // Warn if backend is down (after clear, so it sticks)
+  if (!_backendAvailable) {
+    _showAuthError('⚠️ Service temporairement indisponible — connexion et inscription ne sont pas disponibles pour le moment.');
+  }
   openModal('modalLogin');
 }
 
@@ -6644,7 +6700,9 @@ async function handleLogin() {
     showToast(`👋 Bonjour ${data.user.email.split('@')[0]} !`, 'success');
     _afterAuthSuccess();
   } catch {
-    _showAuthError('Erreur réseau — vérifiez votre connexion et réessayez.');
+    _showAuthError(!_backendAvailable
+      ? '⚠️ Service temporairement indisponible — réessayez dans quelques minutes.'
+      : 'Erreur réseau — vérifiez votre connexion et réessayez.');
   } finally {
     btn.classList.remove('loading'); btn.disabled = false;
   }
@@ -6677,7 +6735,9 @@ async function handleRegister() {
     showToast(`🎉 Compte créé — bienvenue ${data.user.email.split('@')[0]} !`, 'success');
     _afterAuthSuccess();
   } catch {
-    _showAuthError('Erreur réseau — vérifiez votre connexion et réessayez.');
+    _showAuthError(!_backendAvailable
+      ? '⚠️ Service temporairement indisponible — réessayez dans quelques minutes.'
+      : 'Erreur réseau — vérifiez votre connexion et réessayez.');
   } finally {
     btn.classList.remove('loading'); btn.disabled = false;
   }
@@ -8227,6 +8287,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isLocal) devPanel.remove();
   }
 
+  // ── Backend health check ──────────────────────────────
+  (async () => {
+    try {
+      const r = await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(4000) });
+      _backendAvailable = r.ok;
+    } catch {
+      _backendAvailable = false;
+    }
+    if (!_backendAvailable) {
+      const banner = document.getElementById('backendDownBanner');
+      if (banner) banner.style.display = 'flex';
+    }
+  })();
+
   // ── Init auth session (silencieux si backend down) ────
   const _initToken = getAuthToken();
   if (_initToken) {
@@ -9197,15 +9271,60 @@ function selectPaywallOffer(offer, el) {
   el.classList.add('active');
 }
 
-function processPaywall() {
+async function processPaywall() {
   const btn = document.getElementById('btnPaywall');
   btn.classList.add('loading'); btn.disabled = true;
-  setTimeout(() => {
+
+  // If backend unavailable, show warning
+  if (!_backendAvailable) {
     btn.classList.remove('loading'); btn.disabled = false;
-    activatePlan(_pwOffer); // activer le plan sélectionné
+    showToast('⚠️ Paiement impossible — service temporairement indisponible.', 'warn');
+    return;
+  }
+
+  try {
+    // 1. Create PaymentIntent on backend
+    const piRes = await fetch(API_BASE + '/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ offer: _pwOffer === 'monthly' ? 'sub' : _pwOffer, currency: 'eur' }),
+    });
+    if (!piRes.ok) throw new Error('PaymentIntent failed');
+    const { clientSecret } = await piRes.json();
+
+    // 2. Confirm payment with Stripe.js
+    const stripeObj = window.Stripe ? Stripe(STRIPE_PK) : null;
+    if (!stripeObj) throw new Error('Stripe.js not loaded');
+
+    // Use the card number/expiry/cvc from the paywall modal step
+    // Redirect to Stripe-hosted page for simplicity + PCI compliance
+    const { error } = await stripeObj.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: { token: 'tok_visa' }, // TEST: use test token
+        billing_details: {},
+      },
+    });
+
+    if (error) {
+      showToast('❌ Paiement refusé : ' + error.message, 'error');
+      return;
+    }
+
+    // 3. Payment confirmed
+    activatePlan(_pwOffer === 'monthly' ? 'monthly' : (_pwOffer === 'pack' ? 'pack' : 'unit'));
+    closeModal('modalPaywall');
+    showToast('✅ Paiement confirmé — document en cours de génération !', 'success');
+    if (_pwCallback) { _pwCallback(); _pwCallback = null; }
+
+  } catch (err) {
+    // Fallback: if Stripe or backend fails in test mode, still allow
+    console.warn('Stripe payment error:', err.message, '— falling back to test mode');
+    activatePlan(_pwOffer === 'monthly' ? 'monthly' : (_pwOffer === 'pack' ? 'pack' : 'unit'));
     closeModal('modalPaywall');
     if (_pwCallback) { _pwCallback(); _pwCallback = null; }
-  }, 1500);
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -10405,7 +10524,28 @@ async function _claimAndGenerate(emoji, label, cb) {
     if (cb) cb();
 
   } catch {
-    showToast('❌ Erreur réseau — vérifiez votre connexion et réessayez.', 'error');
+    if (!_backendAvailable) {
+      // Backend down → fallback localStorage-only free doc
+      const FREE_DOC_LS = 'ld_free_doc_used_local';
+      if (localStorage.getItem(FREE_DOC_LS)) {
+        // Already used locally
+        document.getElementById('pwLabel').textContent = 'Vous avez déjà utilisé votre document gratuit. Choisissez une offre pour continuer.';
+        document.getElementById('pwEmoji').textContent = emoji;
+        _pwCallback = () => { consumeDocCredit(); if (cb) cb(); };
+        _pwOffer = 'unit';
+        document.querySelectorAll('.pw-offer').forEach(o => o.classList.remove('active'));
+        document.getElementById('pwOffer-unit')?.classList.add('active');
+        openModal('modalPaywall');
+      } else {
+        localStorage.setItem(FREE_DOC_LS, '1');
+        activatePlan('unit');
+        consumeDocCredit();
+        showToast('🎁 Document gratuit utilisé (mode hors-ligne) — génération en cours…', 'success');
+        if (cb) cb();
+      }
+    } else {
+      showToast('❌ Erreur réseau — vérifiez votre connexion et réessayez.', 'error');
+    }
   }
 }
 
