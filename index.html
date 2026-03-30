@@ -5028,7 +5028,8 @@ function renderOrderSummary() {
   let planBadgeHtml = '';
   if (check.ok) {
     let planLabel = '';
-    if (role === PRO_ROLES.VERIFIED) planLabel = '∞ Espace Pro — illimité';
+    if (role === PRO_ROLES.TRIAL_ACTIVE)           planLabel = '🧪 Essai Pro 7 jours — illimité';
+    else if (role === PRO_ROLES.TRIAL_CANCEL_SCHEDULED) planLabel = '🧪 Essai Pro (annulation programmée) — illimité';
     else if (plan.type === 'monthly')  planLabel = `Plan mensuel — ${15-(plan.monthlyCount||0)} doc${15-(plan.monthlyCount||0)!==1?'s':''} restant${15-(plan.monthlyCount||0)!==1?'s':''}`;
     else if (plan.type === 'pack')     planLabel = `Pack — ${plan.docsRemaining} doc${plan.docsRemaining!==1?'s':''} restant${plan.docsRemaining!==1?'s':''}`;
     else if (plan.type === 'unit')     planLabel = 'Plan unitaire — 1 document';
@@ -6695,7 +6696,6 @@ function setPlanData(data) {
 }
 function canGenerateDocument() {
   const role = getUserRole();
-  if (role === PRO_ROLES.VERIFIED) return { ok: true };
   // Trial actif → accès illimité
   if (role === PRO_ROLES.TRIAL_ACTIVE || role === PRO_ROLES.TRIAL_CANCEL_SCHEDULED) return { ok: true };
   const plan = getPlanData();
@@ -9828,13 +9828,15 @@ function proQuickAction(prompt) {
 /* ── PAYWALL PRO ─────────────────────────────────────────── */
 function requireProPay(emoji, label, cb) {
   const role = getUserRole();
-  if (role === PRO_ROLES.VERIFIED) {
-    if (cb) cb();
-    return;
-  }
   // Trial actif → accès complet
   if (role === PRO_ROLES.TRIAL_ACTIVE || role === PRO_ROLES.TRIAL_CANCEL_SCHEDULED) {
     if (cb) cb();
+    return;
+  }
+  // KYC validé mais sans trial ni abonnement → proposer l'essai gratuit
+  if (role === PRO_ROLES.VERIFIED) {
+    _pendingProCallback = cb || null;
+    openTrialModal();
     return;
   }
   document.getElementById('kycBlockedFeatureName').textContent =
