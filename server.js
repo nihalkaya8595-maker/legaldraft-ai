@@ -7,6 +7,20 @@
 
 require('dotenv').config();
 const express  = require('express');
+
+// ── Sentry Error Monitoring ─────────────────────────────
+const Sentry = require('@sentry/node');
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'production',
+    tracesSampleRate: 0.1,
+  });
+  console.log('✅ Sentry initialisé');
+} else {
+  console.warn('⚠️  SENTRY_DSN manquant — monitoring désactivé');
+}
+
 const cors     = require('cors');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
@@ -29,6 +43,53 @@ try {
   stripe = { paymentIntents: { create: async () => { throw new Error('Stripe non configuré'); } },
              subscriptions:  { create: async () => { throw new Error('Stripe non configuré'); } },
              webhooks:       { constructEvent: () => { throw new Error('Stripe non configuré'); } } };
+}
+
+// ── Email (Resend) ──────────────────────────────────────
+let resendClient = null;
+try {
+  if (process.env.RESEND_API_KEY) {
+    const { Resend } = require('resend');
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+    console.log('✅ Resend email initialisé');
+  } else {
+    console.warn('⚠️  RESEND_API_KEY manquant — emails désactivés');
+  }
+} catch(e) {
+  console.warn('⚠️  Resend indisponible:', e.message);
+}
+
+async function sendEmail({ to, subject, html }) {
+  if (!resendClient) return;
+  try {
+    await resendClient.emails.send({
+      from: 'LegalDraft AI <noreply@legaldraft.ai>',
+      to, subject, html
+    });
+  } catch(e) {
+    console.error('Email error:', e.message);
+  }
+}
+
+async function sendTrialExpiryEmail(userEmail, daysLeft) {
+  if (daysLeft !== 2 && daysLeft !== 1) return;
+  await sendEmail({
+    to: userEmail,
+    subject: daysLeft === 2 ? '⏰ Votre essai LegalDraft AI expire dans 2 jours' : '🚨 Dernière chance — votre essai expire demain',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;">⚖️ LegalDraft AI</h1>
+        </div>
+        <h2 style="color:#1e293b;">Votre essai expire ${daysLeft === 1 ? 'demain' : 'dans 2 jours'}</h2>
+        <p style="color:#475569;">Votre accès Pro gratuit se termine bientôt. Pour continuer à bénéficier de toutes les fonctionnalités, souscrivez à l'Espace Pro.</p>
+        <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
+          Continuer avec LegalDraft Pro →
+        </a>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">Vous pouvez annuler à tout moment depuis votre espace.</p>
+      </div>
+    `
+  });
 }
 
 const app        = express();
@@ -124,6 +185,27 @@ app.post('/auth/register', async (req, res) => {
     res.status(201).json({
       token,
       user: { id: user.id, email: user.email, freeDocUsed: user.free_doc_used },
+    });
+
+    // Email de bienvenue
+    sendEmail({
+      to: email,
+      subject: 'Bienvenue sur LegalDraft AI 🎉',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+          <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+            <h1 style="color:#f5c842;margin:0;font-size:1.5rem;">⚖️ LegalDraft AI</h1>
+            <p style="color:#94a3b8;margin:8px 0 0;font-size:0.85rem;">Intelligence Juridique</p>
+          </div>
+          <h2 style="color:#1e293b;">Bienvenue ${email} !</h2>
+          <p style="color:#475569;">Votre compte LegalDraft AI a été créé avec succès.</p>
+          <p style="color:#475569;">Vous pouvez maintenant accéder à la plateforme et générer vos premiers documents juridiques.</p>
+          <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
+            Accéder à la plateforme →
+          </a>
+          <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Droit français & OHADA. Les documents générés sont des modèles indicatifs.</p>
+        </div>
+      `
     });
   } catch (err) {
     console.error('Register error:', err.message);
@@ -503,6 +585,11 @@ app.post('/webhook', (req, res) => {
 
   res.json({ received: true });
 });
+
+// Sentry error handler
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
 
 // ── DÉMARRAGE ─────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {

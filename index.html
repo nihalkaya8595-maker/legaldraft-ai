@@ -1791,6 +1791,43 @@
 /* Chat AI status indicator */
 .chat-ai-indicator { font-size:.68rem; color:#7c3aed; font-weight:600; display:flex; align-items:center; gap:4px; }
 .chat-ai-dot { width:6px; height:6px; border-radius:50%; background:#7c3aed; animation:pulse 1.5s infinite; }
+/* ── Cookie Banner ─────────────────────────────────────── */
+#cookieBanner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 9999;
+  font-size: 0.83rem;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.25);
+  flex-wrap: wrap;
+}
+#cookieBanner a { color: #f5c842; text-decoration: underline; }
+.cookie-btns { display: flex; gap: 10px; flex-shrink: 0; }
+.cookie-btn-accept {
+  padding: 8px 18px;
+  background: #f5c842;
+  color: #1e293b;
+  border: none;
+  border-radius: 7px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.cookie-btn-refuse {
+  padding: 8px 18px;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid #475569;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
   </style>
   <!-- docx.js — génération Word côté client (Espace Pro) -->
   <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
@@ -11139,7 +11176,33 @@ function renderAnalytics() {
   `;
 }
 
+// ── Cookie Consent ──────────────────────────────────────
+function closeCookieBanner(choice) {
+  if (choice) localStorage.setItem('ld_cookie_consent', choice);
+  document.getElementById('cookieBanner').style.display = 'none';
+}
+(function initCookieBanner() {
+  if (!localStorage.getItem('ld_cookie_consent')) {
+    setTimeout(() => {
+      const b = document.getElementById('cookieBanner');
+      if (b) b.style.display = 'flex';
+    }, 1500);
+  }
+})();
+
 </script>
+
+<!-- RGPD Cookie Banner -->
+<div id="cookieBanner" style="display:none">
+  <div style="flex:1;min-width:200px">
+    🍪 <strong>Gestion des cookies</strong> — Nous utilisons des cookies essentiels au fonctionnement de la plateforme. Aucune donnée n'est partagée avec des tiers à des fins publicitaires.
+    <a href="#" onclick="showModule('conformite');closeCookieBanner();return false" style="margin-left:6px">En savoir plus</a>
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-btn-refuse" onclick="closeCookieBanner('refused')">Refuser</button>
+    <button class="cookie-btn-accept" onclick="closeCookieBanner('accepted')">Accepter</button>
+  </div>
+</div>
 
 </div><!-- /app-shell -->
 </body>
