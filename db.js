@@ -19,9 +19,14 @@ let pool = null;
 
 if (USE_POSTGRES) {
   const { Pool } = require('pg');
+  // DATABASE_PUBLIC_URL si Postgres est dans un projet différent (réseau public)
+  // DATABASE_URL si même projet (réseau privé Railway)
+  const connStr = process.env.DATABASE_PUBLIC_URL || process.env.DATABASE_URL;
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },  // Railway PostgreSQL nécessite SSL
+    connectionString: connStr,
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
   });
 
   // Crée les tables si elles n'existent pas (migration automatique)
