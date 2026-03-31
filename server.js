@@ -10,8 +10,26 @@ const express  = require('express');
 const cors     = require('cors');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
-const stripe   = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const db       = require('./db');
+
+// Stripe — initialisation défensive (ne crash pas si la clé est absente au démarrage)
+let stripe;
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    console.log('✅ Stripe initialisé');
+  } else {
+    console.warn('⚠️  STRIPE_SECRET_KEY manquant — paiements désactivés');
+    stripe = { paymentIntents: { create: async () => { throw new Error('Stripe non configuré'); } },
+               subscriptions:  { create: async () => { throw new Error('Stripe non configuré'); } },
+               webhooks:       { constructEvent: () => { throw new Error('Stripe non configuré'); } } };
+  }
+} catch (e) {
+  console.error('❌ Stripe init error:', e.message);
+  stripe = { paymentIntents: { create: async () => { throw new Error('Stripe non configuré'); } },
+             subscriptions:  { create: async () => { throw new Error('Stripe non configuré'); } },
+             webhooks:       { constructEvent: () => { throw new Error('Stripe non configuré'); } } };
+}
 
 const app        = express();
 const PORT       = process.env.PORT || 4242;
