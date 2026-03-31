@@ -73,8 +73,10 @@ try {
 async function sendEmail({ to, subject, html }) {
   if (!resendClient) return;
   try {
+    // from: domaine à vérifier sur resend.com → utilise onboarding@resend.dev en attendant
+    const fromAddr = process.env.RESEND_FROM || 'LegalDraft AI <onboarding@resend.dev>';
     await resendClient.emails.send({
-      from: 'LegalDraft AI <noreply@legaldraft.ai>',
+      from: fromAddr,
       to, subject, html
     });
   } catch(e) {
