@@ -6,6 +6,11 @@
  */
 
 require('dotenv').config();
+
+// ── Crash handlers (empêche les exits silencieux) ──────────────────────────
+process.on('uncaughtException',  (err) => console.error('💥 uncaughtException:', err.stack || err));
+process.on('unhandledRejection', (err) => console.error('💥 unhandledRejection:', err?.stack || err));
+
 const express  = require('express');
 
 // ── Sentry Error Monitoring (lazy — ne crash pas si absent) ──
