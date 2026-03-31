@@ -185,12 +185,12 @@ app.post('/auth/register', async (req, res) => {
   if (password.length < 6)
     return res.status(400).json({ error: 'Mot de passe : 6 caractères minimum.' });
 
-  if (db.getUserByEmail(emailClean))
+  if (await db.getUserByEmail(emailClean))
     return res.status(409).json({ error: 'Un compte existe déjà avec cet email.' });
 
   try {
     const hash = await bcrypt.hash(password, 10);
-    const user = db.createUser(emailClean, hash);
+    const user = await db.createUser(emailClean, hash);
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
 
     console.log(`✅ Nouveau compte : ${user.email}`);
@@ -236,7 +236,7 @@ app.post('/auth/login', async (req, res) => {
   if (!email || !password)
     return res.status(400).json({ error: 'Email et mot de passe requis.' });
 
-  const user = db.getUserByEmail(email);
+  const user = await db.getUserByEmail(email);
   if (!user) return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
 
   try {
@@ -260,8 +260,8 @@ app.post('/auth/login', async (req, res) => {
  * GET /auth/me  (JWT requis)
  * Réponse : profil complet de l'utilisateur
  */
-app.get('/auth/me', requireAuth, (req, res) => {
-  const user = db.getUserById(req.user.id);
+app.get('/auth/me', requireAuth, async (req, res) => {
+  const user = await db.getUserById(req.user.id);
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable.' });
 
   res.json({
@@ -283,8 +283,8 @@ app.get('/auth/me', requireAuth, (req, res) => {
  * GET /free-doc/status  (JWT requis)
  * Réponse : { eligible: true|false }
  */
-app.get('/free-doc/status', requireAuth, (req, res) => {
-  const user = db.getUserById(req.user.id);
+app.get('/free-doc/status', requireAuth, async (req, res) => {
+  const user = await db.getUserById(req.user.id);
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable.' });
   res.json({ eligible: db.canUseFreeDocument(user) });
 });
@@ -297,9 +297,9 @@ app.get('/free-doc/status', requireAuth, (req, res) => {
  * Protection backend : 1 document gratuit maximum par compte.
  * Toute tentative de contournement frontend est bloquée ici.
  */
-app.post('/free-doc/claim', requireAuth, (req, res) => {
+app.post('/free-doc/claim', requireAuth, async (req, res) => {
   const { docType = 'non renseigné' } = req.body || {};
-  const user = db.getUserById(req.user.id);
+  const user = await db.getUserById(req.user.id);
 
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable.' });
 
@@ -312,7 +312,7 @@ app.post('/free-doc/claim', requireAuth, (req, res) => {
   }
 
   try {
-    db.markFreeDocumentAsUsed(user.id, docType);
+    await db.markFreeDocumentAsUsed(user.id, docType);
     res.json({ ok: true, message: 'Document gratuit enregistré.' });
   } catch (err) {
     console.error('Free-doc claim error:', err.message);
@@ -329,12 +329,12 @@ app.post('/free-doc/claim', requireAuth, (req, res) => {
  * Liste tous les utilisateurs et leur usage du document gratuit.
  * Header : X-Admin-Key: <ADMIN_KEY>
  */
-app.get('/admin/free-doc-usage', (req, res) => {
+app.get('/admin/free-doc-usage', async (req, res) => {
   if (req.headers['x-admin-key'] !== ADMIN_KEY)
     return res.status(403).json({ error: 'Accès refusé.' });
 
-  const users = db.getAllUsers();
-  const log   = db.getFreeDocLog();
+  const users = await db.getAllUsers();
+  const log   = await db.getFreeDocLog();
 
   res.json({
     total_users:     users.length,

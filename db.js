@@ -1,158 +1,170 @@
 /**
- * LegalDraft AI — Base de données JSON (fichier local)
- * Production-ready pour petits volumes ; migrable vers SQLite/Postgres.
+ * LegalDraft AI — Base de données
  *
- * Fichiers :
- *   legaldraft-users.json    — comptes utilisateurs
- *   legaldraft-freedoc.json  — log des documents gratuits consommés
+ * Production : PostgreSQL via DATABASE_URL (Railway)
+ * Développement local : fallback JSON si DATABASE_URL absent
  */
 
 'use strict';
 
-const fs      = require('fs');
-const path    = require('path');
-const crypto  = require('crypto');
+const fs     = require('fs');
+const path   = require('path');
+const crypto = require('crypto');
 
-const USERS_FILE    = path.join(__dirname, 'legaldraft-users.json');
-const FREEDOC_FILE  = path.join(__dirname, 'legaldraft-freedoc.json');
+// ── Mode détection ───────────────────────────────────────────────────────────
+const USE_POSTGRES = !!process.env.DATABASE_URL;
 
-// ── Helpers lecture / écriture ───────────────────────────────────────────────
+// ── PostgreSQL (production) ──────────────────────────────────────────────────
+let pool = null;
 
-function _read(file) {
-  try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch {
-    return [];
-  }
+if (USE_POSTGRES) {
+  const { Pool } = require('pg');
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },  // Railway PostgreSQL nécessite SSL
+  });
+
+  // Crée les tables si elles n'existent pas (migration automatique)
+  pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id               TEXT PRIMARY KEY,
+      email            TEXT UNIQUE NOT NULL,
+      password_hash    TEXT NOT NULL,
+      created_at       TEXT NOT NULL,
+      free_doc_used    BOOLEAN NOT NULL DEFAULT FALSE,
+      free_doc_used_at TEXT,
+      free_doc_type    TEXT,
+      current_plan     TEXT NOT NULL DEFAULT 'none',
+      updated_at       TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS freedoc_log (
+      id        SERIAL PRIMARY KEY,
+      user_id   TEXT NOT NULL,
+      email     TEXT NOT NULL,
+      doc_type  TEXT NOT NULL,
+      used_at   TEXT NOT NULL
+    );
+  `).then(() => {
+    console.log('✅ PostgreSQL — tables vérifiées/créées');
+  }).catch(err => {
+    console.error('❌ PostgreSQL migration error:', err.message);
+  });
 }
 
+// ── JSON fallback (dev local) ────────────────────────────────────────────────
+const USERS_FILE   = path.join(__dirname, 'legaldraft-users.json');
+const FREEDOC_FILE = path.join(__dirname, 'legaldraft-freedoc.json');
+
+function _read(file) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return []; }
+}
 function _write(file, data) {
   const tmp = file + '.tmp';
   fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
-  fs.renameSync(tmp, file);           // écriture atomique
+  fs.renameSync(tmp, file);
 }
 
 // ── USERS ────────────────────────────────────────────────────────────────────
 
-/**
- * Crée un nouvel utilisateur.
- * @param {string} email
- * @param {string} passwordHash  — hash bcrypt
- * @returns {object} utilisateur créé
- */
-function createUser(email, passwordHash) {
-  const users = _read(USERS_FILE);
-  const now   = new Date().toISOString();
-  const user  = {
-    id:                crypto.randomUUID(),
-    email:             email.toLowerCase().trim(),
-    password_hash:     passwordHash,
-    created_at:        now,
-    free_doc_used:     false,
-    free_doc_used_at:  null,
-    free_doc_type:     null,
-    current_plan:      'none',
-    updated_at:        now,
+async function createUser(email, passwordHash) {
+  const now  = new Date().toISOString();
+  const id   = crypto.randomUUID();
+  const user = {
+    id, email: email.toLowerCase().trim(), password_hash: passwordHash,
+    created_at: now, free_doc_used: false, free_doc_used_at: null,
+    free_doc_type: null, current_plan: 'none', updated_at: now,
   };
-  users.push(user);
-  _write(USERS_FILE, users);
+
+  if (USE_POSTGRES) {
+    await pool.query(
+      `INSERT INTO users (id,email,password_hash,created_at,free_doc_used,free_doc_used_at,free_doc_type,current_plan,updated_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      [id, user.email, passwordHash, now, false, null, null, 'none', now]
+    );
+  } else {
+    const users = _read(USERS_FILE);
+    users.push(user);
+    _write(USERS_FILE, users);
+  }
   return user;
 }
 
-/**
- * Recherche un utilisateur par email (insensible à la casse).
- * @param {string} email
- * @returns {object|null}
- */
-function getUserByEmail(email) {
+async function getUserByEmail(email) {
+  const emailClean = email.toLowerCase().trim();
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query('SELECT * FROM users WHERE email=$1', [emailClean]);
+    return rows[0] || null;
+  }
   const users = _read(USERS_FILE);
-  return users.find(u => u.email === email.toLowerCase().trim()) || null;
+  return users.find(u => u.email === emailClean) || null;
 }
 
-/**
- * Recherche un utilisateur par id.
- * @param {string} id
- * @returns {object|null}
- */
-function getUserById(id) {
+async function getUserById(id) {
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query('SELECT * FROM users WHERE id=$1', [id]);
+    return rows[0] || null;
+  }
   const users = _read(USERS_FILE);
   return users.find(u => u.id === id) || null;
 }
 
 // ── FREE DOC ─────────────────────────────────────────────────────────────────
 
-/**
- * Vérifie si l'utilisateur peut encore utiliser son document gratuit.
- * @param {object} user  — objet utilisateur complet
- * @returns {boolean}
- */
 function canUseFreeDocument(user) {
   return !user.free_doc_used;
 }
 
-/**
- * Marque le document gratuit comme consommé pour cet utilisateur.
- * Met à jour le fichier users + ajoute une entrée dans le log.
- * @param {string} userId
- * @param {string} docType  — libellé du document généré
- * @returns {object} utilisateur mis à jour
- */
-function markFreeDocumentAsUsed(userId, docType) {
+async function markFreeDocumentAsUsed(userId, docType) {
+  const now = new Date().toISOString();
+
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query(
+      `UPDATE users SET free_doc_used=TRUE, free_doc_used_at=$1, free_doc_type=$2, updated_at=$3
+       WHERE id=$4 RETURNING *`,
+      [now, docType, now, userId]
+    );
+    if (!rows[0]) throw new Error('Utilisateur introuvable : ' + userId);
+    await pool.query(
+      'INSERT INTO freedoc_log (user_id,email,doc_type,used_at) VALUES ($1,$2,$3,$4)',
+      [userId, rows[0].email, docType, now]
+    );
+    console.log(`📝 Free doc — ${rows[0].email} — ${docType}`);
+    return rows[0];
+  }
+
   const users = _read(USERS_FILE);
-  const now   = new Date().toISOString();
-
-  const idx = users.findIndex(u => u.id === userId);
+  const idx   = users.findIndex(u => u.id === userId);
   if (idx === -1) throw new Error('Utilisateur introuvable : ' + userId);
-
-  users[idx] = {
-    ...users[idx],
-    free_doc_used:     true,
-    free_doc_used_at:  now,
-    free_doc_type:     docType,
-    updated_at:        now,
-  };
+  users[idx] = { ...users[idx], free_doc_used: true, free_doc_used_at: now, free_doc_type: docType, updated_at: now };
   _write(USERS_FILE, users);
-
-  // Log dédié (pour admin)
-  const log  = _read(FREEDOC_FILE);
-  log.push({
-    id:       log.length + 1,
-    user_id:  userId,
-    email:    users[idx].email,
-    doc_type: docType,
-    used_at:  now,
-  });
+  const log = _read(FREEDOC_FILE);
+  log.push({ id: log.length + 1, user_id: userId, email: users[idx].email, doc_type: docType, used_at: now });
   _write(FREEDOC_FILE, log);
-
   console.log(`📝 Free doc — ${users[idx].email} — ${docType}`);
   return users[idx];
 }
 
 // ── ADMIN ────────────────────────────────────────────────────────────────────
 
-/**
- * Retourne tous les utilisateurs avec leur statut free doc.
- * (route admin uniquement)
- * @returns {object[]}
- */
-function getAllUsers() {
+async function getAllUsers() {
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query(
+      'SELECT id,email,created_at,free_doc_used,free_doc_used_at,free_doc_type,current_plan,updated_at FROM users ORDER BY created_at DESC'
+    );
+    return rows;
+  }
   return _read(USERS_FILE).map(u => ({
-    id:               u.id,
-    email:            u.email,
-    created_at:       u.created_at,
-    free_doc_used:    u.free_doc_used,
-    free_doc_used_at: u.free_doc_used_at,
-    free_doc_type:    u.free_doc_type,
-    current_plan:     u.current_plan,
-    updated_at:       u.updated_at,
+    id: u.id, email: u.email, created_at: u.created_at,
+    free_doc_used: u.free_doc_used, free_doc_used_at: u.free_doc_used_at,
+    free_doc_type: u.free_doc_type, current_plan: u.current_plan, updated_at: u.updated_at,
   }));
 }
 
-/**
- * Retourne uniquement les entrées du log de documents gratuits consommés.
- * @returns {object[]}
- */
-function getFreeDocLog() {
+async function getFreeDocLog() {
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query('SELECT * FROM freedoc_log ORDER BY id DESC');
+    return rows;
+  }
   return _read(FREEDOC_FILE);
 }
 
