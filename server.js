@@ -8,17 +8,23 @@
 require('dotenv').config();
 const express  = require('express');
 
-// ── Sentry Error Monitoring ─────────────────────────────
-const Sentry = require('@sentry/node');
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'production',
-    tracesSampleRate: 0.1,
-  });
-  console.log('✅ Sentry initialisé');
-} else {
-  console.warn('⚠️  SENTRY_DSN manquant — monitoring désactivé');
+// ── Sentry Error Monitoring (lazy — ne crash pas si absent) ──
+let Sentry = null;
+try {
+  if (process.env.SENTRY_DSN) {
+    Sentry = require('@sentry/node');
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV || 'production',
+      tracesSampleRate: 0.1,
+    });
+    console.log('✅ Sentry initialisé');
+  } else {
+    console.warn('⚠️  SENTRY_DSN manquant — monitoring désactivé');
+  }
+} catch(e) {
+  console.warn('⚠️  Sentry indisponible (package manquant):', e.message);
+  Sentry = null;
 }
 
 const cors     = require('cors');
@@ -587,8 +593,8 @@ app.post('/webhook', (req, res) => {
 });
 
 // Sentry error handler
-if (process.env.SENTRY_DSN) {
-  Sentry.setupExpressErrorHandler(app);
+if (Sentry && process.env.SENTRY_DSN) {
+  try { Sentry.setupExpressErrorHandler(app); } catch(e) {}
 }
 
 // ── DÉMARRAGE ─────────────────────────────────────────────────────────────────
