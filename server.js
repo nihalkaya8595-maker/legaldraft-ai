@@ -110,8 +110,11 @@ const JWT_EXPIRY = '30d';
 const ADMIN_KEY  = process.env.ADMIN_KEY  || 'ld-admin-dev';
 
 // ── MIDDLEWARE ───────────────────────────────────────────────────────────────
+// Nettoie FRONTEND_URL des éventuels guillemets/espaces parasites
+const _rawOrigin = process.env.FRONTEND_URL || '';
+const CORS_ORIGIN = _rawOrigin.replace(/['"]/g, '').trim() || '*';
 app.use(cors({
-  origin:  process.env.FRONTEND_URL || '*',   // Mettez votre domaine en prod
+  origin:  CORS_ORIGIN,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key'],
 }));
