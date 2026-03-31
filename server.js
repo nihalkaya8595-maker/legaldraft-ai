@@ -124,10 +124,6 @@ function requireAuth(req, res, next) {
   }
 }
 
-// ── FRONTEND STATIQUE ────────────────────────────────────────────────────────
-// Sert index.html et les assets depuis le même dossier que server.js
-app.use(express.static(__dirname));
-
 // Raw body pour les webhooks Stripe (avant express.json)
 app.use('/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
@@ -596,6 +592,13 @@ app.post('/webhook', (req, res) => {
 if (Sentry && process.env.SENTRY_DSN) {
   try { Sentry.setupExpressErrorHandler(app); } catch(e) {}
 }
+
+// ── GESTIONNAIRE D'ERREUR GLOBAL ──────────────────────────────────────────────
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error('❌ Express error handler:', err.stack || err.message);
+  res.status(err.status || 500).json({ error: err.message || 'Erreur interne du serveur.' });
+});
 
 // ── DÉMARRAGE ─────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
