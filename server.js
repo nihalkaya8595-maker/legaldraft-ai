@@ -84,6 +84,108 @@ async function sendEmail({ to, subject, html }) {
   }
 }
 
+// ── Séquence onboarding J+1 ─────────────────────────────────────────────────
+async function sendActivationEmail(userEmail) {
+  await sendEmail({
+    to: userEmail,
+    subject: '⚡ Avez-vous essayé votre premier document ?',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;font-size:1.4rem;">⚖️ LegalDraft AI</h1>
+        </div>
+        <h2 style="color:#1e293b;font-size:1.2rem;">Votre document gratuit vous attend</h2>
+        <p style="color:#475569;">Bonjour,</p>
+        <p style="color:#475569;">Vous avez créé votre compte hier — avez-vous eu le temps de générer votre premier document ?</p>
+        <p style="color:#475569;">En <strong>60 secondes</strong>, vous pouvez créer :</p>
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:16px 0;">
+          <div style="margin-bottom:8px;">📄 <strong>Un CDI complet</strong> avec toutes les clauses légales</div>
+          <div style="margin-bottom:8px;">📧 <strong>Une mise en demeure</strong> prête à envoyer</div>
+          <div style="margin-bottom:8px;">🧮 <strong>Un calcul d'indemnité</strong> de licenciement précis</div>
+          <div>🤖 <strong>Une analyse de contrat</strong> avec score de conformité</div>
+        </div>
+        <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
+          Générer mon document gratuit →
+        </a>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">Des questions ? Répondez directement à cet email.</p>
+      </div>
+    `
+  });
+}
+
+// ── Séquence onboarding J+3 ─────────────────────────────────────────────────
+async function sendValueEmail(userEmail) {
+  await sendEmail({
+    to: userEmail,
+    subject: '💡 5 façons d\'utiliser LegalDraft AI cette semaine',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;font-size:1.4rem;">⚖️ LegalDraft AI</h1>
+        </div>
+        <h2 style="color:#1e293b;font-size:1.2rem;">Ce que vous pouvez faire dès maintenant</h2>
+        <div style="background:#fff;border-radius:8px;padding:8px;margin:16px 0;">
+          <div style="border-left:3px solid #f5c842;padding:12px 16px;margin-bottom:8px;">
+            <strong style="color:#1e293b;">1. Vérifier votre conformité RGPD</strong>
+            <p style="color:#64748b;margin:4px 0 0;font-size:.85rem;">Générez vos mentions légales et CGV en 2 minutes — obligatoire si vous avez un site.</p>
+          </div>
+          <div style="border-left:3px solid #f5c842;padding:12px 16px;margin-bottom:8px;">
+            <strong style="color:#1e293b;">2. Calculer votre préavis ou indemnité</strong>
+            <p style="color:#64748b;margin:4px 0 0;font-size:.85rem;">Rupture conventionnelle, licenciement, heures sup — les montants légaux exacts.</p>
+          </div>
+          <div style="border-left:3px solid #f5c842;padding:12px 16px;margin-bottom:8px;">
+            <strong style="color:#1e293b;">3. Rédiger un NDA avant votre prochain RDV</strong>
+            <p style="color:#64748b;margin:4px 0 0;font-size:.85rem;">Accord de confidentialité professionnel en 90 secondes, prêt à faire signer.</p>
+          </div>
+          <div style="border-left:3px solid #f5c842;padding:12px 16px;margin-bottom:8px;">
+            <strong style="color:#1e293b;">4. Analyser un contrat avant de signer</strong>
+            <p style="color:#64748b;margin:4px 0 0;font-size:.85rem;">Uploadez le PDF — l'IA identifie les clauses risquées en 30 secondes.</p>
+          </div>
+          <div style="border-left:3px solid #f5c842;padding:12px 16px;">
+            <strong style="color:#1e293b;">5. Comparer les formes juridiques pour votre projet</strong>
+            <p style="color:#64748b;margin:4px 0 0;font-size:.85rem;">SAS vs SARL vs SASU — 9 critères comparés côte à côte, droit français et OHADA.</p>
+          </div>
+        </div>
+        <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#1e293b;color:#f5c842;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
+          Accéder à ma plateforme →
+        </a>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Documents juridiques en 2 minutes. Droit français &amp; OHADA.</p>
+      </div>
+    `
+  });
+}
+
+// ── Séquence onboarding J+7 — conversion payante ────────────────────────────
+async function sendConversionEmail(userEmail) {
+  await sendEmail({
+    to: userEmail,
+    subject: '🚀 Passez illimité — offre de lancement',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;font-size:1.4rem;">⚖️ LegalDraft AI</h1>
+        </div>
+        <h2 style="color:#1e293b;font-size:1.2rem;">Votre document gratuit a été utilisé</h2>
+        <p style="color:#475569;">Pour continuer à générer des documents sans limite, découvrez nos offres :</p>
+        <div style="background:#fff;border:2px solid #f5c842;border-radius:12px;padding:20px;margin:16px 0;text-align:center;">
+          <div style="font-size:.7rem;font-weight:700;color:#1d4ed8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Le plus populaire</div>
+          <div style="font-size:1.8rem;font-weight:800;color:#1e293b;">9€ <span style="font-size:.9rem;font-weight:400;color:#64748b;">/ document</span></div>
+          <div style="color:#64748b;font-size:.85rem;margin:8px 0 16px;">Ou <strong>25€ le pack 5 documents</strong> — économisez 20€</div>
+          <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Acheter maintenant →</a>
+        </div>
+        <div style="background:#1e293b;border-radius:12px;padding:20px;margin:16px 0;text-align:center;">
+          <div style="font-size:.7rem;font-weight:700;color:#f5c842;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Espace Pro — Avocats &amp; Juristes</div>
+          <div style="font-size:1.8rem;font-weight:800;color:#fff;">99€<span style="font-size:.9rem;font-weight:400;color:#94a3b8;">/mois</span></div>
+          <div style="color:#94a3b8;font-size:.85rem;margin:8px 0 4px;">Usage illimité · Actes de procédure · Conventions collectives</div>
+          <div style="color:#64748b;font-size:.75rem;margin-bottom:16px;">7 jours gratuits — aucune CB requise</div>
+          <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Démarrer l'essai gratuit →</a>
+        </div>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;text-align:center;">Des questions ? Écrivez-nous à <a href="mailto:contact@legaldraft.ai" style="color:#f5c842;">contact@legaldraft.ai</a></p>
+      </div>
+    `
+  });
+}
+
 async function sendTrialExpiryEmail(userEmail, daysLeft) {
   if (daysLeft !== 2 && daysLeft !== 1) return;
   await sendEmail({

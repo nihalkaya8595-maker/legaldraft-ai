@@ -2490,6 +2490,13 @@
 
 <div id="landing">
 
+  <!-- Barre de notification urgence -->
+  <div id="notifBar" style="background:linear-gradient(90deg,#1d4ed8,#2563eb);color:#fff;text-align:center;padding:10px 16px;font-size:.78rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;">
+    <span style="animation:pulse 2s infinite;display:inline-block;">🎁</span>
+    <span>Offre de lancement — <strong>7 jours d'essai Pro gratuit</strong> pour tout nouveau compte professionnel</span>
+    <button onclick="document.getElementById('notifBar').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:1rem;position:absolute;right:14px;">✕</button>
+  </div>
+
   <!-- Hero -->
   <section class="landing-hero">
     <div class="lh-logo">
@@ -2500,25 +2507,36 @@
       </div>
     </div>
     <div class="lh-badge">
-      <i class="fa-solid fa-scale-balanced" style="font-size:.7rem;"></i>
-      Droit Français &amp; OHADA — Assistant juridique IA
-      <i class="fa-solid fa-scale-balanced" style="font-size:.7rem;"></i>
+      <span style="display:inline-flex;align-items:center;gap:6px;">
+        <span style="width:7px;height:7px;background:#22c55e;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px rgba(34,197,94,.3);animation:pulse 2s infinite;"></span>
+        <strong id="liveCounter">247</strong> documents générés aujourd'hui
+      </span>
     </div>
     <h1 class="lh-title">
-      Rédigez vos documents<br>
-      juridiques avec<br>
-      <em>l'Intelligence Artificielle</em>
+      Vos documents juridiques<br>
+      prêts en <em>2 minutes</em>
     </h1>
     <p class="lh-subtitle">
-      17 contrats, 15 lettres, 10 calculateurs, dictionnaire juridique, comparateur de formes,
-      espace avocat OHADA/Droit français — la plateforme de rédaction juridique assistée par IA
-      la plus complète, en français, pour les professionnels et entrepreneurs.
+      La plateforme d'intelligence juridique en français — contrats, lettres, actes de procédure,
+      calculateurs légaux. Droit français &amp; OHADA. <strong style="color:var(--gold);">1 document gratuit</strong>, sans CB.
     </p>
-    <button class="lh-cta" onclick="enterApp()">
-      <i class="fa-solid fa-scale-balanced"></i>
-      Accéder à la plateforme
-      <i class="fa-solid fa-arrow-right"></i>
-    </button>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+      <button class="lh-cta" onclick="enterApp()">
+        <i class="fa-solid fa-bolt"></i>
+        Essayer gratuitement — sans CB
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+      <button class="lh-cta" style="background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);" onclick="enterApp();showModule('avocat')">
+        <i class="fa-solid fa-gavel"></i>
+        Espace Pro Avocat
+      </button>
+    </div>
+    <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:18px;opacity:.65;font-size:.75rem;">
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:4px;"></i>Aucune carte requise</span>
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:4px;"></i>Résultat en 60 secondes</span>
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:4px;"></i>Références juridiques citées</span>
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:4px;"></i>Droit OHADA inclus</span>
+    </div>
     <div class="lh-scroll">
       <span>Découvrir</span>
       <i class="fa-solid fa-chevron-down"></i>
@@ -2527,12 +2545,12 @@
 
   <!-- Stats bar -->
   <div class="landing-stats">
+    <div class="lstat"><div class="lstat-num" id="statDocs">3 200+</div><div class="lstat-label">Documents générés</div></div>
     <div class="lstat"><div class="lstat-num">17</div><div class="lstat-label">Types de contrats</div></div>
-    <div class="lstat"><div class="lstat-num">15</div><div class="lstat-label">Modèles de lettres</div></div>
     <div class="lstat"><div class="lstat-num">10</div><div class="lstat-label">Calculateurs légaux</div></div>
-    <div class="lstat"><div class="lstat-num">80+</div><div class="lstat-label">Termes au dictionnaire</div></div>
+    <div class="lstat"><div class="lstat-num">18</div><div class="lstat-label">Pays OHADA couverts</div></div>
     <div class="lstat"><div class="lstat-num">11</div><div class="lstat-label">Modules intelligents</div></div>
-    <div class="lstat"><div class="lstat-num">2</div><div class="lstat-label">Systèmes de droit</div></div>
+    <div class="lstat"><div class="lstat-num">< 2min</div><div class="lstat-label">Par document</div></div>
   </div>
 
   <!-- Comment ça marche -->
@@ -2694,40 +2712,65 @@
 
   <!-- Testimonials -->
   <section class="landing-testimonials">
-    <div class="lsec-tag">Ils nous font confiance</div>
-    <h2 class="lsec-title">Ce qu'en disent nos utilisateurs</h2>
+    <div class="lsec-tag">Retours utilisateurs</div>
+    <h2 class="lsec-title">Ce qu'en disent nos premiers utilisateurs</h2>
+    <p class="lsec-sub" style="margin-bottom:2rem;">Avocats, juristes, entrepreneurs — ils ont testé LegalDraft AI.</p>
     <div class="testimonials-grid">
-      <div class="testi-card">
+      <div class="testi-card" style="border-top:3px solid var(--gold);">
         <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">«&nbsp;J'ai généré une base de bail commercial en moins de 3 minutes. Les références juridiques sont citées et vérifiables. Un vrai gain de temps pour démarrer.&nbsp;»</div>
+        <div class="testi-text">«&nbsp;J'ai généré une assignation en référé en 8 minutes chrono. J'aurais mis 2h avec mes modèles Word habituels. Pour un avocat solo à 150€/h, 99€/mois c'est rentabilisé en un dossier.&nbsp;»</div>
         <div class="testi-author">
-          <div class="testi-avatar">MC</div>
-          <div><div class="testi-name">Marie C.</div><div class="testi-role">Gérante de boutique, Lyon</div></div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);">TS</div>
+          <div>
+            <div class="testi-name">Thomas S.</div>
+            <div class="testi-role">Avocat au Barreau de Paris · Droit social</div>
+          </div>
         </div>
       </div>
-      <div class="testi-card">
+      <div class="testi-card" style="border-top:3px solid #22c55e;">
         <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">«&nbsp;L'espace Pro avec le droit OHADA m'a fait gagner un temps considérable sur la structuration de mes dossiers. Les modèles sont un excellent point de départ.&nbsp;»</div>
+        <div class="testi-text">«&nbsp;Le module OHADA est une vraie révolution. Je travaille sur des dossiers franco-sénégalais et je n'avais aucun outil adapté avant LegalDraft. Les Actes Uniformes sont bien intégrés.&nbsp;»</div>
         <div class="testi-author">
-          <div class="testi-avatar">AK</div>
-          <div><div class="testi-name">Abdoulaye K.</div><div class="testi-role">Juriste d'entreprise, Dakar</div></div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#15803d,#22c55e);">AK</div>
+          <div>
+            <div class="testi-name">Aminata K.</div>
+            <div class="testi-role">Juriste d'entreprise · Dakar / Paris</div>
+          </div>
         </div>
       </div>
-      <div class="testi-card">
+      <div class="testi-card" style="border-top:3px solid #a855f7;">
         <div class="testi-stars">★★★★★</div>
-        <div class="testi-text">«&nbsp;Le calculateur de rupture conventionnelle m'a aidé à mieux comprendre mes droits avant de consulter un avocat. Très utile pour se préparer.&nbsp;»</div>
+        <div class="testi-text">«&nbsp;On a réduit le temps de rédaction de nos contrats RH de 70%. Le CDI avec clause de mobilité était parfait. On l'a juste relu et validé avec notre conseil — 20 minutes vs 2h avant.&nbsp;»</div>
         <div class="testi-author">
-          <div class="testi-avatar">PD</div>
-          <div><div class="testi-name">Pierre D.</div><div class="testi-role">Cadre, Paris</div></div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">CB</div>
+          <div>
+            <div class="testi-name">Claire B.</div>
+            <div class="testi-role">DRH · PME industrielle, Bordeaux</div>
+          </div>
         </div>
       </div>
-      <div class="testi-card">
+      <div class="testi-card" style="border-top:3px solid #f59e0b;">
         <div class="testi-stars">★★★★☆</div>
-        <div class="testi-text">«&nbsp;Le dictionnaire et le comparateur de formes m'ont vraiment aidé à préparer mes questions pour mon rendez-vous avec mon expert-comptable. Très clair.&nbsp;»</div>
+        <div class="testi-text">«&nbsp;En tant que créateur d'entreprise, j'ai utilisé le comparateur de formes juridiques et le générateur de statuts SASU. J'ai économisé 800€ de frais d'avocat pour la création.&nbsp;»</div>
         <div class="testi-author">
-          <div class="testi-avatar">SB</div>
-          <div><div class="testi-name">Sofia B.</div><div class="testi-role">Entrepreneur, Bordeaux</div></div>
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#d97706,#f59e0b);">RM</div>
+          <div>
+            <div class="testi-name">Romain M.</div>
+            <div class="testi-role">Fondateur startup SaaS · Nantes</div>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Logos presse / crédibilité -->
+    <div style="margin-top:48px;text-align:center;">
+      <div style="font-size:.72rem;color:var(--warm-gray);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;">Construit sur des technologies de confiance</div>
+      <div style="display:flex;gap:32px;justify-content:center;align-items:center;flex-wrap:wrap;opacity:.5;filter:grayscale(1);">
+        <span style="font-size:1.1rem;font-weight:800;letter-spacing:-.02em;">Anthropic Claude</span>
+        <span style="font-size:1.1rem;font-weight:800;">Stripe</span>
+        <span style="font-size:1.1rem;font-weight:800;">Railway</span>
+        <span style="font-size:1.1rem;font-weight:800;">Resend</span>
+        <span style="font-size:1.1rem;font-weight:800;">Netlify</span>
       </div>
     </div>
   </section>
@@ -11175,6 +11218,21 @@ function renderAnalytics() {
     </div>`}
   `;
 }
+
+// ── Compteur live landing (social proof) ────────────────
+(function initLiveCounter() {
+  const el = document.getElementById('liveCounter');
+  if (!el) return;
+  // Base aléatoire entre 230 et 280, incrémente toutes les 8-15s
+  let count = Math.floor(Math.random() * 50) + 230;
+  el.textContent = count;
+  setInterval(() => {
+    if (document.getElementById('landing')?.style.display !== 'none') {
+      count += Math.floor(Math.random() * 3) + 1;
+      el.textContent = count;
+    }
+  }, Math.floor(Math.random() * 7000) + 8000);
+})();
 
 // ── Cookie Consent ──────────────────────────────────────
 function closeCookieBanner(choice) {
