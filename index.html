@@ -7247,7 +7247,9 @@ function checkTrialExpiry() {
   if (role !== PRO_ROLES.TRIAL_ACTIVE && role !== PRO_ROLES.TRIAL_CANCEL_SCHEDULED) return;
   const trial = getTrialData();
   if (!trial || !trial.endDate) return;
-  if (new Date() > new Date(trial.endDate)) {
+  const now = new Date();
+  const end = new Date(trial.endDate);
+  if (now > end) {
     const newRole = trial.cancelScheduled ? PRO_ROLES.TRIAL_READY : PRO_ROLES.TRIAL_EXPIRED;
     setUserRole(newRole);
     if (typeof showToast === 'function') {
@@ -7255,6 +7257,25 @@ function checkTrialExpiry() {
         trial.cancelScheduled ? '💜 Votre essai Pro est terminé — prêt à souscrire' : '⏱ Votre essai Pro a expiré',
         trial.cancelScheduled ? 'info' : 'warn'
       );
+    }
+    return;
+  }
+  // Email J+5 : si ≤ 48h restantes et email pas encore envoyé
+  const msLeft = end - now;
+  const hoursLeft = msLeft / 3600000;
+  if (hoursLeft <= 48 && !trial.warningEmailSent) {
+    const user = getAuthUser ? getAuthUser() : null;
+    const email = user && user.email ? user.email : null;
+    if (email) {
+      const daysLeft = Math.max(1, Math.ceil(hoursLeft / 24));
+      const apiBase = window.API_BASE || '';
+      fetch(`${apiBase}/api/send-trial-warning`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('ld_token')}` },
+        body: JSON.stringify({ email, firstName: user.firstName || user.name || '', daysLeft })
+      }).then(r => {
+        if (r.ok) setTrialData({ warningEmailSent: true, warningEmailSentAt: new Date().toISOString() });
+      }).catch(() => {});
     }
   }
 }

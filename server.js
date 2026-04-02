@@ -705,6 +705,67 @@ if (Sentry && process.env.SENTRY_DSN) {
   try { Sentry.setupExpressErrorHandler(app); } catch(e) {}
 }
 
+/**
+ * POST /api/send-trial-warning
+ * Envoie un email J+5 à un utilisateur en essai Pro (2 jours restants).
+ * Appelé depuis le frontend quand trialData.endDate - now() <= 48h ET pas encore envoyé.
+ * Body: { email, firstName?, daysLeft }
+ */
+app.post('/api/send-trial-warning', requireAuth, async (req, res) => {
+  const { email, firstName, daysLeft } = req.body;
+  if (!email) return res.status(400).json({ error: 'email requis' });
+
+  const name = firstName || 'vous';
+  const days = typeof daysLeft === 'number' ? daysLeft : 2;
+
+  try {
+    await sendEmail({
+      to: email,
+      subject: `⏳ Il vous reste ${days} jour${days > 1 ? 's' : ''} d'essai Pro — agissez maintenant`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+          <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+            <h1 style="color:#f5c842;margin:0;font-size:1.4rem;">⚖️ LegalDraft AI</h1>
+          </div>
+
+          <h2 style="color:#1e293b;font-size:1.2rem;">⏳ Votre essai Pro se termine dans ${days} jour${days > 1 ? 's' : ''}</h2>
+          <p style="color:#475569;">Bonjour ${name},</p>
+          <p style="color:#475569;">Votre période d'essai Pro expire bientôt. Après cette date, vous perdrez l'accès à :</p>
+
+          <ul style="color:#475569;line-height:1.8;">
+            <li>📄 Génération illimitée de documents</li>
+            <li>⚖️ Actes OHADA et droit international</li>
+            <li>🤖 Assistant juridique IA</li>
+            <li>📊 Calculateurs avancés (préavis, indemnités)</li>
+            <li>🔒 Coffre-fort sécurisé de documents</li>
+          </ul>
+
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin:24px 0;">
+            <p style="color:#1d4ed8;margin:0;font-weight:600;">💡 Continuez sans interruption</p>
+            <p style="color:#3b82f6;margin:8px 0 0;">Souscrivez maintenant et conservez tous vos documents générés pendant l'essai.</p>
+          </div>
+
+          <div style="text-align:center;margin:32px 0;">
+            <a href="https://legaldraft.fr" style="display:inline-block;background:#2563eb;color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem;">
+              Continuer avec Pro →
+            </a>
+          </div>
+
+          <p style="color:#94a3b8;font-size:0.8rem;text-align:center;">
+            Sans engagement · Annulation en 1 clic · Support inclus<br>
+            <a href="https://legaldraft.fr" style="color:#94a3b8;">legaldraft.fr</a>
+          </p>
+        </div>
+      `
+    });
+
+    res.json({ ok: true, message: `Email trial warning envoyé à ${email}` });
+  } catch (err) {
+    console.error('send-trial-warning error:', err.message);
+    res.status(500).json({ error: 'Échec envoi email' });
+  }
+});
+
 // ── GESTIONNAIRE D'ERREUR GLOBAL ──────────────────────────────────────────────
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
