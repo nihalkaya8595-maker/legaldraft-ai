@@ -2593,6 +2593,124 @@
     </div>
   </div>
 
+  <!-- Section segmentation profils -->
+  <section style="padding:72px 24px;background:white;text-align:center;border-top:1px solid #e2e8f0;">
+    <div style="max-width:960px;margin:0 auto;">
+      <p style="font-size:12px;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:.08em;margin:0 0 12px;">FAIT POUR VOUS</p>
+      <h2 style="font-size:30px;font-weight:800;color:#0f172a;margin:0 0 12px;">Choisissez votre profil</h2>
+      <p style="color:#64748b;font-size:16px;margin:0 0 40px;">Voyez exactement ce que LegalDraft vous apporte</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:36px;">
+
+        <div onclick="showLdProfile('avocat')" id="btn-avocat"
+             style="cursor:pointer;border:2px solid #e2e8f0;border-radius:14px;padding:24px 16px;background:white;transition:all .2s;">
+          <div style="font-size:30px;margin-bottom:10px;">⚖️</div>
+          <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:4px;">Avocat</div>
+          <div style="font-size:13px;color:#94a3b8;">Assignations · Contrats · NDA</div>
+        </div>
+
+        <div onclick="showLdProfile('rh')" id="btn-rh"
+             style="cursor:pointer;border:2px solid #e2e8f0;border-radius:14px;padding:24px 16px;background:white;transition:all .2s;">
+          <div style="font-size:30px;margin-bottom:10px;">👔</div>
+          <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:4px;">DRH / RH</div>
+          <div style="font-size:13px;color:#94a3b8;">CDI · Ruptures · Lettres RH</div>
+        </div>
+
+        <div onclick="showLdProfile('juriste')" id="btn-juriste"
+             style="cursor:pointer;border:2px solid #e2e8f0;border-radius:14px;padding:24px 16px;background:white;transition:all .2s;">
+          <div style="font-size:30px;margin-bottom:10px;">🏢</div>
+          <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:4px;">Juriste</div>
+          <div style="font-size:13px;color:#94a3b8;">Contrats · CGV · Statuts</div>
+        </div>
+
+        <div onclick="showLdProfile('ohada')" id="btn-ohada"
+             style="cursor:pointer;border:2px solid #e2e8f0;border-radius:14px;padding:24px 16px;background:white;transition:all .2s;">
+          <div style="font-size:30px;margin-bottom:10px;">🌍</div>
+          <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:4px;">Droit OHADA</div>
+          <div style="font-size:13px;color:#94a3b8;">18 pays · Actes Uniformes</div>
+        </div>
+
+      </div>
+
+      <!-- Zone résultat -->
+      <div id="ldProfileResult" style="display:none;max-width:680px;margin:0 auto;background:#f8fafc;border:2px solid #2563eb;border-radius:16px;padding:28px;text-align:left;animation:fadeInUp .3s ease;">
+        <h3 id="ldProfileTitle" style="font-size:17px;font-weight:800;color:#0f172a;margin:0 0 14px;"></h3>
+        <ul id="ldProfileList" style="list-style:none;padding:0;margin:0 0 20px;"></ul>
+        <button onclick="document.getElementById('authTab').click();document.getElementById('landing').style.display='none';document.getElementById('authSection').style.display='block';"
+                style="background:#2563eb;color:white;border:none;padding:13px 24px;border-radius:8px;font-weight:700;cursor:pointer;font-size:15px;">
+          Essayer gratuitement →
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <style>
+  @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .ld-profile-active { border-color:#2563eb !important; background:#eff6ff !important; }
+  </style>
+
+  <script>
+  const ldProfiles = {
+    avocat: {
+      title: '⚖️ Pour les avocats — ce que LegalDraft vous évite',
+      items: [
+        '✅ Assignation en référé — de 1h30 à 8 minutes',
+        '✅ NDA avec clauses de confidentialité renforcées',
+        '✅ Lettre de mise en demeure — prête à signer',
+        '✅ Calcul automatique des délais de prescription',
+        '✅ Export .docx modifiable dans votre logiciel habituel'
+      ]
+    },
+    rh: {
+      title: '👔 Pour les DRH — moins de risque, plus de rapidité',
+      items: [
+        '✅ CDI cadre / non-cadre — conforme Code du travail 2025',
+        '✅ Rupture conventionnelle avec calcul des indemnités légales',
+        '✅ Avenant modification de poste — prêt en 3 minutes',
+        '✅ Lettre de licenciement — motifs personnels et économiques',
+        '✅ Calculateur préavis / ancienneté / congés intégré'
+      ]
+    },
+    juriste: {
+      title: '🏢 Pour les juristes — vos contrats standards automatisés',
+      items: [
+        '✅ CGV / CGU e-commerce — conformes droit français 2025',
+        '✅ Contrat de prestation de services — clés en main',
+        '✅ Statuts SAS / SARL selon votre structure',
+        '✅ Accord de partenariat / MOU',
+        '✅ PV d\'Assemblée Générale ordinaire et extraordinaire'
+      ]
+    },
+    ohada: {
+      title: '🌍 Pour le droit OHADA — le seul outil IA en français',
+      items: [
+        '✅ Contrat de vente commerciale — Acte Uniforme OHADA',
+        '✅ Statuts SARL / SA selon droit OHADA',
+        '✅ Bail commercial OHADA',
+        '✅ Reconnaissance de dette — valable dans les 18 États',
+        '✅ Assistant IA sur les Actes Uniformes en vigueur'
+      ]
+    }
+  };
+
+  function showLdProfile(type) {
+    // Reset all buttons
+    ['avocat','rh','juriste','ohada'].forEach(t => {
+      document.getElementById('btn-' + t).classList.remove('ld-profile-active');
+    });
+    document.getElementById('btn-' + type).classList.add('ld-profile-active');
+
+    const p = ldProfiles[type];
+    document.getElementById('ldProfileTitle').textContent = p.title;
+    document.getElementById('ldProfileList').innerHTML = p.items
+      .map(i => `<li style="padding:7px 0;border-bottom:1px solid #e2e8f0;font-size:14px;color:#334155;">${i}</li>`)
+      .join('');
+    const res = document.getElementById('ldProfileResult');
+    res.style.display = 'block';
+    res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  </script>
+
   <!-- Features grid -->
   <section class="landing-features">
     <div class="lsec-tag">Fonctionnalités</div>
