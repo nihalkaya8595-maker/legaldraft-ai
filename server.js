@@ -374,7 +374,26 @@ app.get('/auth/me', requireAuth, async (req, res) => {
     freeDocType:     user.free_doc_type,
     currentPlan:     user.current_plan,
     createdAt:       user.created_at,
+    profile:         user.profile || null,
   });
+});
+
+/**
+ * PATCH /api/me/profile
+ * Met à jour le profil utilisateur (avocat, rh, juriste, ohada).
+ * Body: { profile: string }
+ */
+app.patch('/api/me/profile', requireAuth, async (req, res) => {
+  const { profile } = req.body;
+  const ALLOWED = ['avocat', 'rh', 'juriste', 'ohada'];
+  if (!profile || !ALLOWED.includes(profile)) return res.status(400).json({ error: 'Profil invalide' });
+  try {
+    await db.updateUserProfile(req.user.id, profile);
+    res.json({ ok: true, profile });
+  } catch (err) {
+    console.error('PATCH /api/me/profile error:', err.message);
+    res.status(500).json({ error: 'Erreur mise à jour profil' });
+  }
 });
 
 /* ══════════════════════════════════════════════════════

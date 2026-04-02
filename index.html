@@ -2070,6 +2070,16 @@ function selectWelcomeProfile(type, btn) {
   document.querySelectorAll('.welcome-profile-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   localStorage.setItem('ld_profile', type);
+  // Sync serveur si connecté
+  const token = localStorage.getItem('ld_token');
+  if (token) {
+    const apiBase = window.API_BASE || '';
+    fetch(`${apiBase}/api/me/profile`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ profile: type })
+    }).catch(() => {});
+  }
 }
 </script>
 
@@ -9437,6 +9447,24 @@ function _vaultServerSave(doc) {
   }).catch(() => {}); // silencieux — localStorage reste la source de vérité locale
 }
 
+/** Au login : charge le profil depuis /auth/me et l'applique au localStorage si absent. */
+async function _syncUserProfile() {
+  const token = localStorage.getItem('ld_token');
+  if (!token) return;
+  try {
+    const apiBase = window.API_BASE || '';
+    const r = await fetch(`${apiBase}/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } });
+    if (!r.ok) return;
+    const user = await r.json();
+    // Profil serveur prioritaire sur le localStorage
+    if (user.profile && !localStorage.getItem('ld_profile')) {
+      localStorage.setItem('ld_profile', user.profile);
+    } else if (user.profile && user.profile !== localStorage.getItem('ld_profile')) {
+      localStorage.setItem('ld_profile', user.profile);
+    }
+  } catch (_) {}
+}
+
 /** Au login : charge le vault serveur et fusionne avec le localStorage (serveur prioritaire). */
 async function _syncVaultFromServer() {
   const token = localStorage.getItem('ld_token');
@@ -11202,7 +11230,8 @@ function enterApp() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
   window.scrollTo({ top: 0 });
-  // Sync coffre-fort depuis le serveur (si connecté)
+  // Sync profil + coffre-fort depuis le serveur (si connecté)
+  _syncUserProfile();
   _syncVaultFromServer();
   // Afficher le dashboard d'accueil
   _activateModule('accueil');

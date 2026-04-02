@@ -40,8 +40,10 @@ if (USE_POSTGRES) {
       free_doc_used_at TEXT,
       free_doc_type    TEXT,
       current_plan     TEXT NOT NULL DEFAULT 'none',
-      updated_at       TEXT NOT NULL
+      updated_at       TEXT NOT NULL,
+      profile          TEXT
     );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS profile TEXT;
     CREATE TABLE IF NOT EXISTS freedoc_log (
       id        SERIAL PRIMARY KEY,
       user_id   TEXT NOT NULL,
@@ -159,6 +161,19 @@ async function markFreeDocumentAsUsed(userId, docType) {
   return users[idx];
 }
 
+// ── USER PROFILE ─────────────────────────────────────────────────────────────
+
+async function updateUserProfile(userId, profile) {
+  const now = new Date().toISOString();
+  if (USE_POSTGRES) {
+    await pool.query('UPDATE users SET profile=$1, updated_at=$2 WHERE id=$3', [profile, now, userId]);
+  } else {
+    const users = _read(USERS_FILE);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx >= 0) { users[idx].profile = profile; users[idx].updated_at = now; _write(USERS_FILE, users); }
+  }
+}
+
 // ── VAULT DOCS ───────────────────────────────────────────────────────────────
 
 const VAULT_FILE = path.join(__dirname, 'legaldraft-vault.json');
@@ -240,4 +255,5 @@ module.exports = {
   getVaultDocs,
   saveVaultDoc,
   deleteVaultDoc,
+  updateUserProfile,
 };
