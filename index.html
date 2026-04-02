@@ -9631,6 +9631,10 @@ function _showPostGenBanner(label, docId) {
             style="background:#2563eb;color:white;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
       📁 Voir dans le coffre
     </button>
+    <button onclick="_reopenForm('${docId}')"
+            style="background:#374151;color:white;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+      ✏️ Modifier les champs
+    </button>
     <button onclick="_openIAWithDoc('${docId}')"
             style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
       ✨ Améliorer avec l'IA
@@ -9667,6 +9671,38 @@ function _openIAWithDoc(docId) {
     // Scroll jusqu'au champ de saisie
     input.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 300);
+}
+
+/** Mapping type de document → module à rouvrir */
+const _DOC_TYPE_TO_MODULE = {
+  // Lettres
+  miseendemeure:'lettres', resiliation:'lettres', licenciement:'lettres',
+  reclamation:'lettres', opposition:'lettres', relance:'lettres',
+  demission:'lettres', rupture:'lettres', convocation:'lettres',
+  avertissement:'lettres', contestation_lic:'lettres', resil_bail:'lettres',
+  transaction_amiable:'lettres', abandon_poste:'lettres', recours_admin:'lettres',
+  // Conformité
+  mentions:'conformite', cgu:'conformite', rgpd:'conformite',
+  // Espace Pro
+  dossier:'avocat', acte:'avocat', docpro:'avocat',
+};
+
+/** Rouvre le formulaire du module qui a généré ce document, champs pré-remplis. */
+function _reopenForm(docId) {
+  document.getElementById('postGenBanner')?.remove();
+  const doc = getVault().find(d => d.id === docId);
+  const moduleId = (doc && _DOC_TYPE_TO_MODULE[doc.type]) || 'contrats';
+  showModule(moduleId);
+  setTimeout(() => {
+    // FormAutosave.restore() est appelé automatiquement par _activateModule()
+    // On scroll vers le bouton générer pour rappeler à l'utilisateur l'action
+    const genBtn = document.querySelector('#mod-' + moduleId + ' button[onclick*="generate"], #mod-' + moduleId + ' .generate-btn, #mod-' + moduleId + ' button.primary');
+    if (genBtn) {
+      genBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      genBtn.style.boxShadow = '0 0 0 3px rgba(37,99,235,.4)';
+      setTimeout(() => { genBtn.style.boxShadow = ''; }, 2000);
+    }
+  }, 400);
 }
 
 // Style animation
