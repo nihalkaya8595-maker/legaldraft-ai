@@ -9511,6 +9511,10 @@ function _showPostGenBanner(label, docId) {
             style="background:#2563eb;color:white;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
       📁 Voir dans le coffre
     </button>
+    <button onclick="_openIAWithDoc('${docId}')"
+            style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:white;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+      ✨ Améliorer avec l'IA
+    </button>
     <button onclick="document.getElementById('postGenBanner').remove()"
             style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;line-height:1;">✕</button>
   `;
@@ -9518,6 +9522,31 @@ function _showPostGenBanner(label, docId) {
 
   // Disparaît automatiquement après 8s
   setTimeout(() => banner?.remove(), 8000);
+}
+
+/** Ouvre l'assistant IA avec le document pré-chargé pour analyse/amélioration. */
+function _openIAWithDoc(docId) {
+  document.getElementById('postGenBanner')?.remove();
+  const doc = getVault().find(d => d.id === docId);
+  showModule('ia');
+  setTimeout(() => {
+    const input = document.getElementById('chatInput');
+    if (!input) return;
+    // Extraire texte brut du HTML du document
+    let docText = '';
+    if (doc && doc.html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = doc.html;
+      docText = (tmp.innerText || tmp.textContent || '').replace(/\s+/g, ' ').trim().substring(0, 1200);
+    }
+    const label = doc?.typeLabel || doc?.type || 'document';
+    input.value = docText
+      ? `Voici mon ${label} :\n\n"${docText}…"\n\nPeux-tu identifier les clauses manquantes ou améliorer ce document ?`
+      : `J'ai généré un ${label}. Quelles clauses importantes dois-je vérifier ou ajouter ?`;
+    input.focus();
+    // Scroll jusqu'au champ de saisie
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300);
 }
 
 // Style animation
