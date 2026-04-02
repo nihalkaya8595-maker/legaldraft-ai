@@ -3240,6 +3240,69 @@ function selectWelcomeProfile(type, btn) {
     </div>
   </section>
 
+  <!-- FAQ Objections Prix -->
+  <section id="faq-prix" style="background:#fff;padding:64px 24px 48px;">
+    <div style="max-width:720px;margin:0 auto;">
+      <div class="lsec-tag" style="text-align:center;display:block;">Questions fréquentes</div>
+      <h2 class="lsec-title" style="text-align:center;margin-bottom:36px;">Tout ce que vous devez savoir</h2>
+      <div id="faqList">
+        <!-- FAQ items injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <script>
+  (function() {
+    const FAQS = [
+      {
+        q: "Les documents sont-ils juridiquement valables en France ?",
+        a: "Oui. Chaque modèle est basé sur le Code civil, le Code du travail et la jurisprudence récente. Pour les actes OHADA, nous suivons le Traité de Port-Louis et ses Actes uniformes. Les documents générés sont des bases solides à adapter à votre situation — comme tout contrat type fourni par un cabinet."
+      },
+      {
+        q: "Puis-je annuler à tout moment sans frais ?",
+        a: "Oui, sans engagement et sans frais de résiliation. Vous pouvez annuler en 1 clic depuis votre Espace Pro, à n'importe quel moment. Vous conservez l'accès jusqu'à la fin de la période en cours."
+      },
+      {
+        q: "Que se passe-t-il après les 7 jours d'essai ?",
+        a: "Si vous ne souscrivez pas, votre accès Pro s'arrête automatiquement. Aucun débit n'est effectué sans votre accord explicite. Vos documents générés restent accessibles dans votre coffre-fort."
+      },
+      {
+        q: "LegalDraft remplace-t-il un avocat ?",
+        a: "Non — et nous le disons clairement. LegalDraft accélère la rédaction des documents courants et vous donne une base professionnelle. Pour les litiges complexes ou les contrats à forts enjeux, un avocat reste indispensable. Notre outil vous fait gagner du temps sur le travail de routine."
+      },
+      {
+        q: "Mes données sont-elles sécurisées ?",
+        a: "Toutes les données sont hébergées en Europe (UE), chiffrées en transit (SSL/TLS) et au repos. Nous ne revendons aucune donnée. Conformité RGPD complète — vous pouvez demander la suppression de vos données à tout moment."
+      }
+    ];
+
+    const list = document.getElementById('faqList');
+    if (!list) return;
+
+    FAQS.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'border-bottom:1px solid #f1f5f9;';
+      div.innerHTML = `
+        <button onclick="toggleFaq(${i},this)" style="width:100%;text-align:left;background:none;border:none;padding:18px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;">
+          <span style="font-weight:600;color:#1e293b;font-size:.97rem;">${item.q}</span>
+          <span class="faq-icon" style="flex-shrink:0;font-size:1.1rem;color:#2563eb;transition:transform .2s;">＋</span>
+        </button>
+        <div class="faq-answer" style="display:none;padding:0 0 18px;color:#64748b;font-size:.9rem;line-height:1.7;">${item.a}</div>
+      `;
+      list.appendChild(div);
+    });
+
+    window.toggleFaq = function(idx, btn) {
+      const answer = btn.nextElementSibling;
+      const icon = btn.querySelector('.faq-icon');
+      const isOpen = answer.style.display !== 'none';
+      answer.style.display = isOpen ? 'none' : 'block';
+      icon.textContent = isOpen ? '＋' : '－';
+      icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(0deg)';
+    };
+  })();
+  </script>
+
   <!-- Mention légale pricing -->
   <p style="text-align:center;font-size:.68rem;color:var(--warm-gray);max-width:680px;margin:0 auto 40px;padding:0 24px;line-height:1.6;">
     <i class="fa-solid fa-circle-info" style="color:var(--gold);margin-right:5px;"></i>
