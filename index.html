@@ -11263,5 +11263,70 @@ function closeCookieBanner(choice) {
 </div>
 
 </div><!-- /app-shell -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER LÉGAL — Crédibilité & RGPD
+════════════════════════════════════════════════════════════ -->
+<footer id="legalFooterBar" style="background:#0f172a;color:#94a3b8;padding:28px 24px;text-align:center;font-size:13px;border-top:1px solid #1e293b;margin-top:0;">
+  <div style="max-width:900px;margin:0 auto;">
+    <div style="display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-bottom:14px;">
+      <a href="#" onclick="showLegalModal('mentions');return false;" style="color:#94a3b8;text-decoration:none;">Mentions légales</a>
+      <a href="#" onclick="showLegalModal('cgu');return false;" style="color:#94a3b8;text-decoration:none;">CGU</a>
+      <a href="#" onclick="showLegalModal('rgpd');return false;" style="color:#94a3b8;text-decoration:none;">Politique de confidentialité</a>
+      <a href="mailto:contact@legaldraft.fr" style="color:#94a3b8;text-decoration:none;">Contact</a>
+    </div>
+    <p style="margin:0 0 6px;">🔒 Données hébergées en Europe &nbsp;·&nbsp; Chiffrement SSL &nbsp;·&nbsp; Conforme RGPD</p>
+    <p style="margin:0;font-size:12px;">© 2026 LegalDraft AI — Tous droits réservés</p>
+  </div>
+</footer>
+
+<!-- Modal légal -->
+<div id="legalModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.85);z-index:99999;overflow-y:auto;padding:40px 16px;">
+  <div style="background:white;border-radius:16px;max-width:680px;margin:0 auto;padding:40px;position:relative;">
+    <button onclick="document.getElementById('legalModal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#64748b;">✕</button>
+    <div id="legalModalContent"></div>
+  </div>
+</div>
+
+<script>
+const legalContent = {
+  mentions: `
+    <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 24px;">Mentions légales</h2>
+    <p><strong>Éditeur :</strong> LegalDraft AI</p>
+    <p><strong>Contact :</strong> <a href="mailto:contact@legaldraft.fr">contact@legaldraft.fr</a></p>
+    <p><strong>Hébergement frontend :</strong> Netlify, Inc. — 44 Montgomery Street, San Francisco, CA 94104, USA</p>
+    <p><strong>Hébergement backend :</strong> Railway Corp — Serveurs européens</p>
+    <p style="margin-top:16px;padding:16px;background:#fef9c3;border-radius:8px;font-size:13px;color:#713f12;">
+      <strong>Avertissement :</strong> LegalDraft AI est un outil d'assistance à la rédaction juridique. Les documents générés ne constituent pas un conseil juridique et ne remplacent pas l'intervention d'un avocat ou juriste qualifié. L'utilisateur reste seul responsable de l'usage des documents produits.
+    </p>
+  `,
+  cgu: `
+    <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 24px;">Conditions Générales d'Utilisation</h2>
+    <p><strong>Objet :</strong> LegalDraft AI fournit un service d'assistance à la rédaction de documents juridiques par intelligence artificielle.</p>
+    <p><strong>Accès au service :</strong> L'accès aux fonctionnalités complètes nécessite la création d'un compte et, selon les fonctionnalités, la souscription d'un abonnement.</p>
+    <p><strong>Responsabilité :</strong> Les documents générés sont fournis à titre indicatif. LegalDraft AI ne saurait être tenu responsable des conséquences juridiques liées à leur utilisation. L'utilisateur est seul responsable de la vérification et de la validation des documents produits.</p>
+    <p><strong>Propriété intellectuelle :</strong> Les documents générés appartiennent à l'utilisateur. La plateforme LegalDraft AI et ses algorithmes restent la propriété exclusive de l'éditeur.</p>
+    <p><strong>Résiliation :</strong> L'abonnement peut être résilié à tout moment depuis le compte utilisateur, sans frais ni préavis.</p>
+    <p><strong>Droit applicable :</strong> Les présentes CGU sont soumises au droit français. Tout litige relève de la compétence des tribunaux français.</p>
+  `,
+  rgpd: `
+    <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 24px;">Politique de confidentialité</h2>
+    <p><strong>Données collectées :</strong> adresse email, documents générés, données de connexion.</p>
+    <p><strong>Finalité :</strong> fourniture du service, amélioration de la plateforme, envoi de communications liées au compte.</p>
+    <p><strong>Hébergement :</strong> serveurs européens (Railway). Aucune donnée n'est transmise à des tiers à des fins publicitaires.</p>
+    <p><strong>Durée de conservation :</strong> durée de l'abonnement actif + 30 jours après résiliation.</p>
+    <p><strong>Vos droits :</strong> vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Pour exercer ces droits : <a href="mailto:contact@legaldraft.fr">contact@legaldraft.fr</a></p>
+    <p><strong>Cookies :</strong> cookies essentiels au fonctionnement uniquement. Aucun cookie publicitaire ou de tracking tiers.</p>
+    <p style="font-size:12px;color:#94a3b8;margin-top:16px;">Conformément au Règlement Général sur la Protection des Données (RGPD — Règlement UE 2016/679).</p>
+  `
+};
+
+function showLegalModal(type) {
+  document.getElementById('legalModalContent').innerHTML = legalContent[type] || '';
+  document.getElementById('legalModal').style.display = 'block';
+  document.getElementById('legalModal').scrollTop = 0;
+}
+</script>
+
 </body>
 </html>
