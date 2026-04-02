@@ -2936,6 +2936,94 @@ function selectWelcomeProfile(type, btn) {
     </div>
   </section>
 
+  <!-- Section OHADA -->
+  <section id="ohada-section" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:80px 24px;color:#fff;">
+    <div style="max-width:1000px;margin:0 auto;">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;" class="ohada-grid">
+
+        <!-- Colonne gauche -->
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);border-radius:20px;padding:5px 16px;font-size:.78rem;font-weight:700;color:#f5c842;letter-spacing:.06em;margin-bottom:20px;">
+            🌍 DROIT OHADA
+          </div>
+          <h2 style="font-size:2rem;font-weight:800;line-height:1.2;margin-bottom:16px;">
+            Le seul outil IA qui couvre<br>les <span style="color:#f5c842;">18 États OHADA</span>
+          </h2>
+          <p style="color:#94a3b8;line-height:1.7;margin-bottom:28px;font-size:.97rem;">
+            Bénin, Burkina Faso, Cameroun, Centrafrique, Comores, Congo, Côte d'Ivoire, Gabon, Guinée, Guinée-Bissau, Guinée équatoriale, Mali, Niger, RDC, Sénégal, Tchad, Togo, Union des Comores.
+          </p>
+
+          <!-- Actes uniformes couverts -->
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+            <div style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#64748b;margin-bottom:4px;">Actes Uniformes couverts</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#e2e8f0;">⚖️ Droit commercial général</div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#e2e8f0;">🏢 Droit des sociétés (AUSCGIE)</div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#e2e8f0;">📦 Sûretés (AUVE)</div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#e2e8f0;">⚡ Voies d'exécution</div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#e2e8f0;">📋 Contrats commerciaux (AUDC)</div>
+              <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;font-size:.82rem;color:#e2e8f0;">💰 Arbitrage (AUA)</div>
+            </div>
+          </div>
+
+          <button class="lh-cta" onclick="enterApp();localStorage.setItem('ld_profile','ohada');showModule('avocat')" style="font-size:.9rem;padding:13px 24px;display:inline-flex;">
+            🌍 Accéder aux actes OHADA <i class="fa-solid fa-arrow-right" style="margin-left:8px;"></i>
+          </button>
+          <div style="color:#64748b;font-size:.75rem;margin-top:10px;">1 document gratuit inclus · Aucune carte requise</div>
+        </div>
+
+        <!-- Colonne droite : stats + témoignage -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <!-- Stats -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:20px 18px;text-align:center;">
+              <div style="font-size:2rem;font-weight:800;color:#f5c842;">18</div>
+              <div style="color:#94a3b8;font-size:.8rem;margin-top:4px;">États membres</div>
+            </div>
+            <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:20px 18px;text-align:center;">
+              <div style="font-size:2rem;font-weight:800;color:#f5c842;">350M</div>
+              <div style="color:#94a3b8;font-size:.8rem;margin-top:4px;">habitants couverts</div>
+            </div>
+            <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:20px 18px;text-align:center;">
+              <div style="font-size:2rem;font-weight:800;color:#f5c842;">10</div>
+              <div style="color:#94a3b8;font-size:.8rem;margin-top:4px;">Actes Uniformes</div>
+            </div>
+            <div style="background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:20px 18px;text-align:center;">
+              <div style="font-size:2rem;font-weight:800;color:#f5c842;">2 min</div>
+              <div style="color:#94a3b8;font-size:.8rem;margin-top:4px;">par document OHADA</div>
+            </div>
+          </div>
+
+          <!-- Témoignage OHADA -->
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:24px;">
+            <div style="color:#cbd5e1;font-style:italic;line-height:1.7;font-size:.9rem;margin-bottom:16px;">
+              «&nbsp;Le module OHADA couvre vraiment les Actes Uniformes. J'ai testé sur un contrat de vente commerciale franco-sénégalais — le document était juridiquement solide et conforme. Rien de comparable n'existait en français.&nbsp;»
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f5c842,#d97706);display:flex;align-items:center;justify-content:center;font-weight:700;color:#0f172a;font-size:.9rem;">A</div>
+              <div>
+                <div style="font-weight:600;font-size:.88rem;color:#f1f5f9;">Aminata K.</div>
+                <div style="font-size:.75rem;color:#64748b;">Juriste — Dakar, Sénégal</div>
+              </div>
+              <div style="margin-left:auto;background:rgba(245,200,66,.15);color:#f5c842;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid rgba(245,200,66,.3);">✓ Bêta testeur</div>
+            </div>
+          </div>
+
+          <!-- CCJA mention -->
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;">
+            <span style="font-size:1.4rem;">🏛️</span>
+            <div style="font-size:.8rem;color:#94a3b8;line-height:1.5;">Référencé sur la jurisprudence CCJA (Cour Commune de Justice et d'Arbitrage) et les Actes Uniformes en vigueur au 01/01/2024.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <style>
+  @media(max-width:700px){.ohada-grid{grid-template-columns:1fr !important;gap:32px !important;}}
+  </style>
+
   <!-- Testimonials -->
   <section class="landing-testimonials">
     <div class="lsec-tag">Bêta testeurs</div>
