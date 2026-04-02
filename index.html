@@ -3241,6 +3241,9 @@ function selectWelcomeProfile(type, btn) {
 <nav class="modules-nav">
   <!-- Ligne 1 : onglets standards -->
   <div class="modules-nav-inner">
+    <button class="mod-btn" id="nav-accueil" onclick="showModule('accueil')" style="background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.2);">
+      <i class="fa-solid fa-house"></i> Accueil
+    </button>
     <button class="mod-btn active" id="nav-contrats" onclick="showModule('contrats')">
       <i class="fa-solid fa-file-contract"></i> Contrats
     </button>
@@ -3294,6 +3297,70 @@ function selectWelcomeProfile(type, btn) {
     </button>
   </div>
 </nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODULE: ACCUEIL — Dashboard personnalisé
+══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod-accueil" style="padding:32px 24px;max-width:860px;">
+
+  <!-- Greeting -->
+  <div style="margin-bottom:28px;">
+    <h2 id="dashGreeting" style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Bonjour 👋</h2>
+    <p id="dashSub" style="color:#64748b;margin:0;font-size:14px;">Que souhaitez-vous faire aujourd'hui ?</p>
+  </div>
+
+  <!-- Plan status -->
+  <div id="dashPlanBar" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="dashPlanDot" style="width:10px;height:10px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>
+      <span id="dashPlanLabel" style="font-weight:700;color:#0f172a;font-size:14px;">Plan Gratuit</span>
+      <span id="dashPlanDetail" style="font-size:13px;color:#64748b;"></span>
+    </div>
+    <button id="dashUpgradeBtn" onclick="openModal('modalPaywall')" style="display:none;background:#2563eb;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">
+      Passer Pro →
+    </button>
+  </div>
+
+  <!-- Actions rapides -->
+  <h3 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;">Actions rapides</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:32px;">
+    <button onclick="showModule('contrats')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e2e8f0'">
+      <div style="font-size:22px;margin-bottom:6px;">📄</div>
+      <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Contrats</div>
+      <div style="color:#94a3b8;font-size:11px;">CDI, NDA, statuts…</div>
+    </button>
+    <button onclick="showModule('lettres')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e2e8f0'">
+      <div style="font-size:22px;margin-bottom:6px;">✉️</div>
+      <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Lettres</div>
+      <div style="color:#94a3b8;font-size:11px;">Mise en demeure, licenciement…</div>
+    </button>
+    <button onclick="showModule('calculateurs')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e2e8f0'">
+      <div style="font-size:22px;margin-bottom:6px;">🧮</div>
+      <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Calculateurs</div>
+      <div style="color:#94a3b8;font-size:11px;">Préavis, indemnités…</div>
+    </button>
+    <button onclick="showModule('assistant')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#e2e8f0'">
+      <div style="font-size:22px;margin-bottom:6px;">🤖</div>
+      <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Assistant IA</div>
+      <div style="color:#94a3b8;font-size:11px;">Posez une question juridique</div>
+    </button>
+    <button onclick="showModule('coffre')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e2e8f0'">
+      <div style="font-size:22px;margin-bottom:6px;">📁</div>
+      <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Mes documents</div>
+      <div style="color:#94a3b8;font-size:11px;">Historique & coffre-fort</div>
+    </button>
+    <button onclick="showModule('avocat')" style="padding:18px 14px;border:1.5px solid rgba(212,175,55,.3);border-radius:12px;background:rgba(212,175,55,.04);cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#d4af37'" onmouseout="this.style.borderColor='rgba(212,175,55,.3)'">
+      <div style="font-size:22px;margin-bottom:6px;">⚖️</div>
+      <div style="font-weight:700;color:#92400e;font-size:13px;margin-bottom:2px;">Espace Pro</div>
+      <div style="color:#94a3b8;font-size:11px;">Avocats & juristes</div>
+    </button>
+  </div>
+
+  <!-- Derniers documents -->
+  <h3 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;">Derniers documents générés</h3>
+  <div id="dashRecentDocs"></div>
+
+</div>
 
 <!-- ══════════════════════════════════════════════════════════
      MODULE: CONTRATS (existing)
@@ -7788,6 +7855,7 @@ function _activateModule(id) {
   document.getElementById('mod-' + id)?.classList.add('active');
   document.getElementById('nav-' + id)?.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'accueil') setTimeout(renderDashboard, 50);
   if (id === 'coffre') refreshVault();
   if (id === 'veille') renderVeille('all');
   if (id === 'dictionnaire') renderDico(DICO_DATA);
@@ -10825,10 +10893,73 @@ function enterApp() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
   window.scrollTo({ top: 0 });
+  // Afficher le dashboard d'accueil
+  _activateModule('accueil');
   // ── Onboarding premier lancement ─────────────────────
   if (!localStorage.getItem('ld_welcomed')) {
     setTimeout(() => openModal('modalWelcome'), 400);
   }
+}
+
+function renderDashboard() {
+  // Greeting personnalisé
+  const user = getAuthUser();
+  const profile = localStorage.getItem('ld_profile');
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
+  const name = user?.email?.split('@')[0] || '';
+
+  const profileLabels = { avocat:'Espace Avocat', rh:'Espace DRH', juriste:'Espace Juriste', ohada:'Espace OHADA' };
+  const sub = profile ? `Profil : ${profileLabels[profile] || profile}` : 'Que souhaitez-vous faire aujourd\'hui ?';
+
+  document.getElementById('dashGreeting').textContent = `${greeting}${name ? ' ' + name : ''} 👋`;
+  document.getElementById('dashSub').textContent = sub;
+
+  // Plan status
+  const plan = getPlanData?.() || {};
+  const planLabel = document.getElementById('dashPlanLabel');
+  const planDot   = document.getElementById('dashPlanDot');
+  const planDetail = document.getElementById('dashPlanDetail');
+  const upgradeBtn = document.getElementById('dashUpgradeBtn');
+
+  if (plan.type === 'pro' || plan.type === 'monthly' || plan.type === 'cabinet') {
+    planLabel.textContent = plan.type === 'cabinet' ? 'Plan Cabinet' : 'Plan Pro';
+    planDot.style.background = '#16a34a';
+    planDetail.textContent = plan.trialEnd ? `Essai jusqu'au ${new Date(plan.trialEnd).toLocaleDateString('fr-FR')}` : 'Accès illimité';
+    upgradeBtn.style.display = 'none';
+  } else {
+    planLabel.textContent = 'Plan Gratuit';
+    planDot.style.background = '#94a3b8';
+    planDetail.textContent = user?.freeDocUsed ? '· Document gratuit utilisé' : '· 1 document gratuit disponible';
+    upgradeBtn.style.display = 'block';
+  }
+
+  // Derniers documents
+  const vault = getVault().slice(0, 3);
+  const container = document.getElementById('dashRecentDocs');
+  if (!vault.length) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:28px;background:#f8fafc;border-radius:12px;border:1px dashed #e2e8f0;">
+        <div style="font-size:28px;margin-bottom:8px;">📄</div>
+        <p style="color:#94a3b8;margin:0;font-size:13px;">Vos documents apparaîtront ici après génération</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = vault.map(doc => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px;background:white;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:20px;">${doc.emoji || '📄'}</span>
+        <div>
+          <p style="margin:0;font-weight:600;color:#0f172a;font-size:13px;">${doc.typeLabel || doc.type}</p>
+          <p style="margin:0;color:#94a3b8;font-size:11px;">${doc.date || ''} · Réf. ${doc.ref || doc.id}</p>
+        </div>
+      </div>
+      <button onclick="openFromVault('${doc.id}')"
+              style="padding:5px 12px;background:#f1f5f9;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:#334155;">
+        Ouvrir
+      </button>
+    </div>
+  `).join('');
 }
 
 /** Ancien alias — conservé pour compatibilité mais ne fait plus rien de spécial */
