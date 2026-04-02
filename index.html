@@ -2080,10 +2080,24 @@ function selectWelcomeProfile(type, btn) {
   <div class="modal-box" style="max-width:480px;">
     <button class="modal-close" onclick="closeModal('modalPaywall')"><i class="fa-solid fa-xmark"></i></button>
     <div class="pw-header">
-      <div class="pw-emoji" id="pwEmoji">📄</div>
-      <div class="pw-title">Générer ce document</div>
-      <div class="pw-sub" id="pwLabel">Choisissez votre offre pour télécharger le PDF</div>
+      <div class="pw-emoji" id="pwEmoji">🔓</div>
+      <div class="pw-title">Ce document est inclus dans Pro</div>
+      <div class="pw-sub" id="pwLabel">Accès illimité à tous les documents · Sans engagement</div>
     </div>
+
+    <!-- Ce que ça débloque -->
+    <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+      <p style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px;">Ce que vous débloquez :</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <span style="font-size:13px;color:#334155;">✅ 17 types de contrats</span>
+        <span style="font-size:13px;color:#334155;">✅ Droit OHADA (18 pays)</span>
+        <span style="font-size:13px;color:#334155;">✅ Assistant IA juridique</span>
+        <span style="font-size:13px;color:#334155;">✅ Export Word modifiable</span>
+        <span style="font-size:13px;color:#334155;">✅ Historique documents</span>
+        <span style="font-size:13px;color:#334155;">✅ Calculateurs RH</span>
+      </div>
+    </div>
+
     <div class="pw-offers">
       <div class="pw-offer active" id="pwOffer-unit" onclick="selectPaywallOffer('unit',this)">
         <div class="pw-offer-price"><sup>€</sup>9</div>
@@ -2100,9 +2114,10 @@ function selectWelcomeProfile(type, btn) {
       </div>
     </div>
     <button class="btn-primary" id="btnPaywall" onclick="processPaywall()" style="width:100%;">
-      <span class="btn-label"><i class="fa-solid fa-lock-open"></i>&nbsp; Payer et générer le document</span>
+      <span class="btn-label"><i class="fa-solid fa-lock-open"></i>&nbsp; Accéder et générer le document</span>
       <span class="spinner"></span>
     </button>
+    <p style="text-align:center;font-size:11px;color:#94a3b8;margin:8px 0 12px;">Sans engagement · Annulation en 1 clic</p>
     <hr class="pw-divider">
     <div class="pw-free-note" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
       <span><strong><i class="fa-solid fa-check"></i> Gratuit :</strong> calculateurs, assistant IA, audit RGPD</span>
@@ -3161,8 +3176,8 @@ function selectWelcomeProfile(type, btn) {
     <p class="lsec-sub-light">17 contrats · 15 lettres · 10 calculateurs · Dictionnaire · Comparateur · Espace Pro Avocat<br>Droit français &amp; OHADA — tout est inclus, disponible immédiatement.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
       <button class="lh-cta" onclick="enterApp()">
-        <i class="fa-solid fa-scale-balanced"></i>
-        Accéder à la plateforme
+        <i class="fa-solid fa-rocket"></i>
+        Démarrer mon essai gratuit
         <i class="fa-solid fa-arrow-right"></i>
       </button>
       <button class="lh-cta" style="background:transparent;border:2px solid rgba(255,255,255,.3);color:#fff;" onclick="enterApp();showModule('avocat')">
@@ -3170,10 +3185,11 @@ function selectWelcomeProfile(type, btn) {
         Espace Pro Avocat
       </button>
     </div>
-    <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:3rem;opacity:.6;font-size:.85rem;color:#fff;">
-      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>Aucune inscription requise</span>
-      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>Données dans votre navigateur</span>
-      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>Références juridiques citées</span>
+    <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;opacity:.75;font-size:.85rem;color:#fff;">
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>Sans carte bancaire</span>
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>1 document gratuit inclus</span>
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>Annulation en 1 clic</span>
+      <span><i class="fa-solid fa-check" style="color:var(--gold);margin-right:.4rem;"></i>Résultat en 60 secondes</span>
     </div>
   </section>
 
