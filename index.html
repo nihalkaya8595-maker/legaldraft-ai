@@ -8150,15 +8150,37 @@ function selectLetter(card) {
   document.getElementById('letterFormPanel').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
+// Tooltips juridiques par champ
+const FIELD_TOOLTIPS = {
+  juridiction:       'Choisissez "France" pour le droit français. "OHADA" pour les 18 États membres (Côte d\'Ivoire, Sénégal, Cameroun…).',
+  preavis:           'Le préavis légal dépend de la convention collective et de l\'ancienneté. Utilisez le Calculateur RH pour le calculer automatiquement.',
+  clause_nc:         'La clause de non-concurrence doit être limitée dans le temps (max 2 ans), dans l\'espace, et prévoir une contrepartie financière (jurisprudence Cass. soc.).',
+  indemnite:         'L\'indemnité légale de licenciement est de 1/4 de mois de salaire par année d\'ancienneté pour les 10 premières années (art. R.1234-2 CT).',
+  tribunal:          'Pour un litige commercial B2B, vous pouvez choisir le tribunal librement. Pour un consommateur, le tribunal de son domicile s\'impose.',
+  montant:           'Indiquez le montant en chiffres et en lettres pour éviter toute contestation.',
+  delai:             'Le délai de paiement légal entre professionnels est de 30 jours (art. L.441-10 C. com.), sauf accord contractuel (max 60 jours).',
+  objet:             'L\'objet du contrat doit être licite, possible et déterminé ou déterminable (art. 1128 C. civ.).',
+};
+
+function _getTooltip(fieldId) {
+  return FIELD_TOOLTIPS[fieldId] || null;
+}
+
+function _tooltipHtml(tip) {
+  if (!tip) return '';
+  return `<span class="ld-tooltip-wrap" title="${tip.replace(/"/g, '&quot;')}" style="cursor:help;margin-left:5px;display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e2e8f0;color:#64748b;font-size:10px;font-weight:700;vertical-align:middle;">?</span>`;
+}
+
 function renderLetterField(f) {
   const req = f.required ? '<span class="req">*</span>' : '';
   const ph = f.placeholder || '';
-  if (f.type === 'textarea') return `<div class="form-group"><label>${f.label} ${req}</label><textarea class="form-input" id="lf_${f.id}" placeholder="${ph}" rows="3"></textarea></div>`;
+  const tip = _tooltipHtml(_getTooltip(f.id));
+  if (f.type === 'textarea') return `<div class="form-group"><label>${f.label} ${req}${tip}</label><textarea class="form-input" id="lf_${f.id}" placeholder="${ph}" rows="3"></textarea></div>`;
   if (f.type === 'select') {
     const opts = f.options.map(o => `<option value="${o}">${o}</option>`).join('');
-    return `<div class="form-group"><label>${f.label} ${req}</label><select class="form-input" id="lf_${f.id}"><option value="">Choisir…</option>${opts}</select></div>`;
+    return `<div class="form-group"><label>${f.label} ${req}${tip}</label><select class="form-input" id="lf_${f.id}"><option value="">Choisir…</option>${opts}</select></div>`;
   }
-  return `<div class="form-group"><label>${f.label} ${req}</label><input type="${f.type||'text'}" class="form-input" id="lf_${f.id}" placeholder="${ph}"></div>`;
+  return `<div class="form-group"><label>${f.label} ${req}${tip}</label><input type="${f.type||'text'}" class="form-input" id="lf_${f.id}" placeholder="${ph}"></div>`;
 }
 
 function lv(id) {
