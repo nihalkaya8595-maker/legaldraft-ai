@@ -1986,6 +1986,17 @@
       </div>
     </div>
 
+    <!-- Sélection profil -->
+    <div style="margin-bottom:18px;">
+      <p style="font-size:.75rem;color:var(--warm-gray);margin-bottom:10px;">Vous êtes... ? <span style="color:#94a3b8;">(optionnel)</span></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onclick="selectWelcomeProfile('avocat',this)" class="welcome-profile-btn">⚖️ Avocat</button>
+        <button onclick="selectWelcomeProfile('rh',this)" class="welcome-profile-btn">👔 DRH / RH</button>
+        <button onclick="selectWelcomeProfile('juriste',this)" class="welcome-profile-btn">🏢 Juriste</button>
+        <button onclick="selectWelcomeProfile('ohada',this)" class="welcome-profile-btn">🌍 Droit OHADA</button>
+      </div>
+    </div>
+
     <button class="btn-primary" onclick="requestFreeDoc()" style="width:100%;margin-bottom:10px;">
       <span class="btn-label"><i class="fa-solid fa-rocket" style="margin-right:8px;"></i>Commencer — 1 document gratuit</span>
     </button>
@@ -1994,6 +2005,30 @@
     </button>
   </div>
 </div>
+
+<style>
+.welcome-profile-btn {
+  padding:9px 12px;
+  border:1.5px solid #e2e8f0;
+  border-radius:10px;
+  background:white;
+  cursor:pointer;
+  font-size:.78rem;
+  font-weight:600;
+  color:#334155;
+  transition:all .15s;
+}
+.welcome-profile-btn:hover { border-color:#2563eb; background:#eff6ff; }
+.welcome-profile-btn.selected { border-color:#2563eb; background:#eff6ff; color:#1d4ed8; }
+</style>
+
+<script>
+function selectWelcomeProfile(type, btn) {
+  document.querySelectorAll('.welcome-profile-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  localStorage.setItem('ld_profile', type);
+}
+</script>
 
 <!-- ══════════════════════════════════════════════════════════
      MODAL — PAYWALL
