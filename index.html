@@ -24,6 +24,49 @@
     /* ── Reset & Base ───────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── Polish Premium — transitions & interactions ─────────── */
+    button, a, .mod-btn, .testi-card, .feat-card {
+      transition: all 0.15s ease;
+    }
+    button:active { transform: scale(0.97); }
+    .mod-btn:hover { opacity: 0.85; }
+
+    /* Scrollbar premium */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Focus states accessibles */
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    /* Input focus premium */
+    .form-input:focus {
+      border-color: #2563eb !important;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.08) !important;
+    }
+
+    /* Animation entrée modules */
+    .module.active {
+      animation: moduleIn 0.25s ease both;
+    }
+    @keyframes moduleIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards hover */
+    .testi-card:hover {
+      box-shadow: 0 8px 28px rgba(0,0,0,.07);
+      transform: translateY(-2px);
+    }
+
     :root {
       --gold:       #bc993c;
       --gold-light: #d4b55a;
@@ -7029,7 +7072,7 @@ async function handleLogin() {
       body: JSON.stringify({ email, password: pwd }),
     });
     const data = await res.json();
-    if (!res.ok) { _showAuthError(data.error || 'Erreur de connexion.'); return; }
+    if (!res.ok) { _showAuthError(data.error || 'Email ou mot de passe incorrect.'); return; }
 
     setAuthUser(data.token, data.user);
     closeModal('modalLogin');
@@ -7038,7 +7081,7 @@ async function handleLogin() {
   } catch {
     _showAuthError(!_backendAvailable
       ? '⚠️ Service temporairement indisponible — réessayez dans quelques minutes.'
-      : 'Erreur réseau — vérifiez votre connexion et réessayez.');
+      : '⚠️ Problème de connexion — vérifiez votre réseau et réessayez.');
   } finally {
     btn.classList.remove('loading'); btn.disabled = false;
   }
@@ -7073,7 +7116,7 @@ async function handleRegister() {
   } catch {
     _showAuthError(!_backendAvailable
       ? '⚠️ Service temporairement indisponible — réessayez dans quelques minutes.'
-      : 'Erreur réseau — vérifiez votre connexion et réessayez.');
+      : '⚠️ Problème de connexion — vérifiez votre réseau et réessayez.');
   } finally {
     btn.classList.remove('loading'); btn.disabled = false;
   }
@@ -11467,7 +11510,7 @@ async function runImprove() {
       resultEl.style.display = 'block';
       document.getElementById('improveResultActions').style.display = 'flex';
     } else showToast('Erreur IA — réessayez.', 'warn');
-  } catch { showToast('Erreur réseau — réessayez.', 'warn'); }
+  } catch { showToast('⚠️ Problème de connexion — réessayez dans quelques secondes.', 'warn'); }
   btn.classList.remove('loading'); btn.disabled = false;
 }
 function copyImproveResult() {
@@ -11495,7 +11538,7 @@ async function runSummarize() {
       resultEl.style.display = 'block';
       document.getElementById('summarizeResultActions').style.display = 'flex';
     } else showToast('Erreur IA — réessayez.', 'warn');
-  } catch { showToast('Erreur réseau — réessayez.', 'warn'); }
+  } catch { showToast('⚠️ Problème de connexion — réessayez dans quelques secondes.', 'warn'); }
   btn.classList.remove('loading'); btn.disabled = false;
 }
 function copySummarizeResult() {
