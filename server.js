@@ -706,6 +706,51 @@ if (Sentry && process.env.SENTRY_DSN) {
 }
 
 /**
+ * GET /api/vault
+ * Retourne les documents du coffre-fort de l'utilisateur connecté.
+ */
+app.get('/api/vault', requireAuth, async (req, res) => {
+  try {
+    const docs = await db.getVaultDocs(req.user.id);
+    res.json({ docs });
+  } catch (err) {
+    console.error('GET /api/vault error:', err.message);
+    res.status(500).json({ error: 'Erreur lecture vault' });
+  }
+});
+
+/**
+ * POST /api/vault
+ * Sauvegarde ou met à jour un document dans le coffre-fort.
+ * Body: { id, type, typeLabel, content, createdAt, meta }
+ */
+app.post('/api/vault', requireAuth, async (req, res) => {
+  const { id, type, typeLabel, content, createdAt, meta } = req.body;
+  if (!id || !type || !content) return res.status(400).json({ error: 'id, type et content requis' });
+  try {
+    await db.saveVaultDoc(req.user.id, { id, type, typeLabel, content, createdAt, meta });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('POST /api/vault error:', err.message);
+    res.status(500).json({ error: 'Erreur sauvegarde vault' });
+  }
+});
+
+/**
+ * DELETE /api/vault/:docId
+ * Supprime un document du coffre-fort.
+ */
+app.delete('/api/vault/:docId', requireAuth, async (req, res) => {
+  try {
+    await db.deleteVaultDoc(req.user.id, req.params.docId);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('DELETE /api/vault error:', err.message);
+    res.status(500).json({ error: 'Erreur suppression vault' });
+  }
+});
+
+/**
  * POST /api/send-trial-warning
  * Envoie un email J+5 à un utilisateur en essai Pro (2 jours restants).
  * Appelé depuis le frontend quand trialData.endDate - now() <= 48h ET pas encore envoyé.

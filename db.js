@@ -49,6 +49,16 @@ if (USE_POSTGRES) {
       doc_type  TEXT NOT NULL,
       used_at   TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS vault_docs (
+      id          TEXT PRIMARY KEY,
+      user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      type        TEXT NOT NULL,
+      type_label  TEXT,
+      content     TEXT NOT NULL,
+      created_at  TEXT NOT NULL,
+      meta        JSONB
+    );
+    CREATE INDEX IF NOT EXISTS vault_docs_user_idx ON vault_docs(user_id);
   `).then(() => {
     console.log('✅ PostgreSQL — tables vérifiées/créées');
   }).catch(err => {
@@ -149,6 +159,50 @@ async function markFreeDocumentAsUsed(userId, docType) {
   return users[idx];
 }
 
+// ── VAULT DOCS ───────────────────────────────────────────────────────────────
+
+const VAULT_FILE = path.join(__dirname, 'legaldraft-vault.json');
+
+async function getVaultDocs(userId) {
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query(
+      'SELECT * FROM vault_docs WHERE user_id=$1 ORDER BY created_at DESC LIMIT 100',
+      [userId]
+    );
+    return rows;
+  }
+  const all = _read(VAULT_FILE);
+  return all.filter(d => d.user_id === userId).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 100);
+}
+
+async function saveVaultDoc(userId, doc) {
+  // doc: { id, type, typeLabel, content, createdAt, meta }
+  const now = doc.createdAt || new Date().toISOString();
+  if (USE_POSTGRES) {
+    await pool.query(
+      `INSERT INTO vault_docs (id, user_id, type, type_label, content, created_at, meta)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (id) DO UPDATE SET content=$5, type_label=$4, meta=$7`,
+      [doc.id, userId, doc.type, doc.typeLabel || null, doc.content, now, doc.meta ? JSON.stringify(doc.meta) : null]
+    );
+  } else {
+    const all = _read(VAULT_FILE);
+    const idx = all.findIndex(d => d.id === doc.id);
+    const entry = { id: doc.id, user_id: userId, type: doc.type, type_label: doc.typeLabel || null, content: doc.content, created_at: now, meta: doc.meta || null };
+    if (idx >= 0) all[idx] = entry; else all.push(entry);
+    _write(VAULT_FILE, all);
+  }
+}
+
+async function deleteVaultDoc(userId, docId) {
+  if (USE_POSTGRES) {
+    await pool.query('DELETE FROM vault_docs WHERE id=$1 AND user_id=$2', [docId, userId]);
+  } else {
+    const all = _read(VAULT_FILE);
+    _write(VAULT_FILE, all.filter(d => !(d.id === docId && d.user_id === userId)));
+  }
+}
+
 // ── ADMIN ────────────────────────────────────────────────────────────────────
 
 async function getAllUsers() {
@@ -183,4 +237,7 @@ module.exports = {
   markFreeDocumentAsUsed,
   getAllUsers,
   getFreeDocLog,
+  getVaultDocs,
+  saveVaultDoc,
+  deleteVaultDoc,
 };

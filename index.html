@@ -9415,8 +9415,49 @@ function saveToVault(doc) {
   const vault = getVault().filter(d => d.id !== doc.id);
   vault.unshift(doc);
   localStorage.setItem(VAULT_KEY, JSON.stringify(vault.slice(0, 100)));
+  // Sync serveur (fire-and-forget)
+  _vaultServerSave(doc);
   // Afficher la barre post-génération
   _showPostGenBanner(doc.typeLabel || doc.type, doc.id);
+}
+
+/** Sauvegarde un document vers l'API serveur si l'utilisateur est connecté. */
+function _vaultServerSave(doc) {
+  const token = localStorage.getItem('ld_token');
+  if (!token) return;
+  const apiBase = window.API_BASE || '';
+  fetch(`${apiBase}/api/vault`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({
+      id: doc.id, type: doc.type, typeLabel: doc.typeLabel || doc.type,
+      content: doc.html || doc.content || '', createdAt: doc.date || new Date().toISOString(),
+      meta: { label: doc.typeLabel || doc.type }
+    })
+  }).catch(() => {}); // silencieux — localStorage reste la source de vérité locale
+}
+
+/** Au login : charge le vault serveur et fusionne avec le localStorage (serveur prioritaire). */
+async function _syncVaultFromServer() {
+  const token = localStorage.getItem('ld_token');
+  if (!token) return;
+  try {
+    const apiBase = window.API_BASE || '';
+    const r = await fetch(`${apiBase}/api/vault`, { headers: { 'Authorization': `Bearer ${token}` } });
+    if (!r.ok) return;
+    const { docs } = await r.json();
+    if (!Array.isArray(docs) || docs.length === 0) return;
+    const local = getVault();
+    const localIds = new Set(local.map(d => d.id));
+    // Ajoute les docs serveur absents du local
+    const toMerge = docs
+      .filter(d => !localIds.has(d.id))
+      .map(d => ({ id: d.id, type: d.type, typeLabel: d.type_label || d.type, html: d.content, date: d.created_at }));
+    if (toMerge.length > 0) {
+      const merged = [...toMerge, ...local].slice(0, 100);
+      localStorage.setItem(VAULT_KEY, JSON.stringify(merged));
+    }
+  } catch (_) {}
 }
 
 function _showPostGenBanner(label, docId) {
@@ -11161,6 +11202,8 @@ function enterApp() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('app-shell').style.display = 'block';
   window.scrollTo({ top: 0 });
+  // Sync coffre-fort depuis le serveur (si connecté)
+  _syncVaultFromServer();
   // Afficher le dashboard d'accueil
   _activateModule('accueil');
   // ── Onboarding premier lancement ─────────────────────
