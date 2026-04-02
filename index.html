@@ -7794,7 +7794,65 @@ function _activateModule(id) {
   if (id === 'comparateur') renderComparateur('all');
   if (id === 'analytics') setTimeout(renderAnalytics, 50);
   if (id === 'signatures') setTimeout(renderSignRequests, 50);
+  // Auto-restore saved form fields
+  setTimeout(() => FormAutosave.restore(id), 100);
 }
+
+/* ── Auto-save formulaires ──────────────────────────────────
+   Sauvegarde automatiquement tous les champs input/select/textarea
+   dans localStorage, par module. Restaure à chaque activation.
+────────────────────────────────────────────────────────────── */
+const FormAutosave = {
+  save(moduleId) {
+    const module = document.getElementById('mod-' + moduleId);
+    if (!module) return;
+    const data = {};
+    module.querySelectorAll('input[name], select[name], textarea[name], input[id], select[id], textarea[id]').forEach(el => {
+      const key = el.name || el.id;
+      if (!key || el.type === 'password' || el.type === 'submit') return;
+      data[key] = el.type === 'checkbox' ? el.checked : el.value;
+    });
+    if (Object.keys(data).length > 0) {
+      localStorage.setItem('ld_form_' + moduleId, JSON.stringify(data));
+    }
+  },
+
+  restore(moduleId) {
+    const module = document.getElementById('mod-' + moduleId);
+    if (!module) return;
+    const saved = JSON.parse(localStorage.getItem('ld_form_' + moduleId) || '{}');
+    if (Object.keys(saved).length === 0) return;
+    Object.entries(saved).forEach(([key, value]) => {
+      const el = module.querySelector(`[name="${key}"], #${key}`);
+      if (!el) return;
+      if (el.type === 'checkbox') { el.checked = value; }
+      else if (el.tagName === 'SELECT') {
+        // Only restore if option exists
+        if ([...el.options].some(o => o.value === value)) el.value = value;
+      } else {
+        el.value = value;
+      }
+    });
+  },
+
+  clear(moduleId) {
+    localStorage.removeItem('ld_form_' + moduleId);
+  }
+};
+
+// Écouter tous les inputs dans l'app
+document.addEventListener('input', (e) => {
+  const module = e.target.closest('.module');
+  if (!module) return;
+  const id = module.id?.replace('mod-', '');
+  if (id) FormAutosave.save(id);
+});
+document.addEventListener('change', (e) => {
+  const module = e.target.closest('.module');
+  if (!module) return;
+  const id = module.id?.replace('mod-', '');
+  if (id) FormAutosave.save(id);
+});
 
 /* ═══════════════════════════════════════════════════════════
    MODULE: LETTRES JURIDIQUES
@@ -8999,6 +9057,48 @@ function saveToVault(doc) {
   const vault = getVault().filter(d => d.id !== doc.id);
   vault.unshift(doc);
   localStorage.setItem(VAULT_KEY, JSON.stringify(vault.slice(0, 100)));
+  // Afficher la barre post-génération
+  _showPostGenBanner(doc.typeLabel || doc.type, doc.id);
+}
+
+function _showPostGenBanner(label, docId) {
+  // Supprimer ancienne barre si présente
+  document.getElementById('postGenBanner')?.remove();
+
+  const banner = document.createElement('div');
+  banner.id = 'postGenBanner';
+  banner.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#0f172a;color:white;
+    border-radius:14px;padding:14px 20px;
+    display:flex;align-items:center;gap:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,.3);
+    z-index:9998;font-size:14px;
+    animation:slideUpIn .3s ease;
+    white-space:nowrap;
+  `;
+  banner.innerHTML = `
+    <span style="color:#4ade80;font-size:18px;">✅</span>
+    <span style="font-weight:600;">${label || 'Document'} généré</span>
+    <button onclick="showModule('coffre')"
+            style="background:#2563eb;color:white;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+      📁 Voir dans le coffre
+    </button>
+    <button onclick="document.getElementById('postGenBanner').remove()"
+            style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px;line-height:1;">✕</button>
+  `;
+  document.body.appendChild(banner);
+
+  // Disparaît automatiquement après 8s
+  setTimeout(() => banner?.remove(), 8000);
+}
+
+// Style animation
+if (!document.getElementById('postGenStyle')) {
+  const s = document.createElement('style');
+  s.id = 'postGenStyle';
+  s.textContent = '@keyframes slideUpIn { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }';
+  document.head.appendChild(s);
 }
 function deleteFromVault(id) {
   if (!confirm('Supprimer ce document du coffre-fort ?')) return;
