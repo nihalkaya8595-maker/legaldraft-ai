@@ -3061,6 +3061,83 @@ function selectWelcomeProfile(type, btn) {
     </div>
   </section>
 
+  <!-- ROI Calculator -->
+  <section id="roi-calc" style="padding:72px 24px;background:#f0f9ff;border-top:1px solid #e0f2fe;">
+    <div style="max-width:760px;margin:0 auto;text-align:center;">
+      <div class="lsec-tag">Calculateur</div>
+      <h2 class="lsec-title" style="margin-bottom:8px;">Combien vous coûte 1 document sans LegalDraft ?</h2>
+      <p style="color:#64748b;margin-bottom:40px;font-size:1rem;">Sélectionnez votre profil — le calcul se fait en temps réel.</p>
+
+      <!-- Profile selector -->
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;">
+        <button class="roi-profile-btn active" onclick="calcRoi('avocat',this)" style="padding:10px 22px;border-radius:8px;border:2px solid #2563eb;background:#2563eb;color:#fff;font-weight:600;cursor:pointer;transition:all .15s;">⚖️ Avocat</button>
+        <button class="roi-profile-btn" onclick="calcRoi('rh',this)" style="padding:10px 22px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;color:#334155;font-weight:600;cursor:pointer;transition:all .15s;">👔 DRH / RH</button>
+        <button class="roi-profile-btn" onclick="calcRoi('juriste',this)" style="padding:10px 22px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;color:#334155;font-weight:600;cursor:pointer;transition:all .15s;">🏢 Juriste</button>
+        <button class="roi-profile-btn" onclick="calcRoi('ohada',this)" style="padding:10px 22px;border-radius:8px;border:2px solid #e2e8f0;background:#fff;color:#334155;font-weight:600;cursor:pointer;transition:all .15s;">🌍 OHADA</button>
+      </div>
+
+      <!-- Result card -->
+      <div id="roiResult" style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(37,99,235,.08);padding:36px 32px;text-align:left;border:1px solid #bfdbfe;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;margin-bottom:28px;" id="roiGrid">
+          <div style="text-align:center;">
+            <div style="font-size:2rem;font-weight:800;color:#ef4444;" id="roiCostManual">750 €</div>
+            <div style="color:#64748b;font-size:.85rem;margin-top:4px;">Coût traditionnel<br>(avocat / cabinet)</div>
+          </div>
+          <div style="text-align:center;position:relative;">
+            <div style="font-size:2rem;font-weight:800;color:#2563eb;" id="roiCostLegal">29 €</div>
+            <div style="color:#64748b;font-size:.85rem;margin-top:4px;">Avec LegalDraft AI<br>(abonnement mensuel)</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:2rem;font-weight:800;color:#16a34a;" id="roiSaving">721 €</div>
+            <div style="color:#64748b;font-size:.85rem;margin-top:4px;">Économie réalisée<br>dès le 1er document</div>
+          </div>
+        </div>
+
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;">
+          <div style="font-size:1.5rem;flex-shrink:0;">💡</div>
+          <div>
+            <div style="font-weight:700;color:#15803d;margin-bottom:4px;" id="roiInsight">En 1 CDI généré, vous remboursez 25× l'abonnement mensuel.</div>
+            <div style="color:#64748b;font-size:.85rem;" id="roiDetail">Basé sur un tarif avocat de 150 €/h · 5h de rédaction traditionnelle.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;">
+        <button class="lh-cta" onclick="enterApp()" style="margin:0 auto;display:inline-flex;font-size:.95rem;padding:14px 28px;">
+          Démarrer mon essai gratuit — 0 € <i class="fa-solid fa-arrow-right" style="margin-left:8px;"></i>
+        </button>
+        <div style="color:#94a3b8;font-size:.8rem;margin-top:10px;">Sans carte bancaire · 7 jours d'accès complet</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  const ROI_DATA = {
+    avocat:  { manual: 750,  legal: 29, detail: "Basé sur un tarif avocat de 150 €/h · 5h de rédaction traditionnelle.", insight: "En 1 assignation générée, vous remboursez 25× l'abonnement mensuel." },
+    rh:      { manual: 420,  legal: 29, detail: "Basé sur un DRH facturé 60 €/h · 7h de rédaction CDI + annexes.", insight: "En 1 CDI généré avec ses annexes, vous économisez une journée de travail." },
+    juriste: { manual: 580,  legal: 29, detail: "Basé sur un juriste d'entreprise à 80 €/h · forfait cabinet externe.", insight: "En 1 contrat commercial, vous économisez l'équivalent de 19× l'abonnement." },
+    ohada:   { manual: 1200, legal: 29, detail: "Basé sur un acte OHADA rédigé par un cabinet local · frais de traduction inclus.", insight: "En 1 acte OHADA, vous réalisez 41× le prix de l'abonnement en économies." }
+  };
+
+  function calcRoi(profile, btn) {
+    document.querySelectorAll('.roi-profile-btn').forEach(b => {
+      b.style.background = '#fff'; b.style.color = '#334155'; b.style.borderColor = '#e2e8f0';
+    });
+    btn.style.background = '#2563eb'; btn.style.color = '#fff'; btn.style.borderColor = '#2563eb';
+    const d = ROI_DATA[profile];
+    const saving = d.manual - d.legal;
+    document.getElementById('roiCostManual').textContent = d.manual.toLocaleString('fr-FR') + ' €';
+    document.getElementById('roiCostLegal').textContent  = d.legal.toLocaleString('fr-FR') + ' €';
+    document.getElementById('roiSaving').textContent     = saving.toLocaleString('fr-FR') + ' €';
+    document.getElementById('roiInsight').textContent    = d.insight;
+    document.getElementById('roiDetail').textContent     = d.detail;
+    // Animate saving
+    const el = document.getElementById('roiSaving');
+    el.style.transform = 'scale(1.15)'; el.style.transition = 'transform .2s';
+    setTimeout(() => { el.style.transform = 'scale(1)'; }, 220);
+  }
+  </script>
+
   <!-- Pricing -->
   <section class="landing-pricing" id="pricing">
     <div class="lsec-tag">Tarifs</div>
