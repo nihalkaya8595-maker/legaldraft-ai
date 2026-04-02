@@ -4160,7 +4160,8 @@ function selectWelcomeProfile(type, btn) {
       <button class="btn-back" onclick="resetLetterSelection()">
         <i class="fa-solid fa-arrow-left"></i> Retour au choix
       </button>
-      <div id="letterFormTag" class="contract-tag" style="margin-bottom:24px;"></div>
+      <div id="letterFormTag" class="contract-tag" style="margin-bottom:16px;"></div>
+      <div id="letterContextTip" style="display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:.83rem;color:#1e40af;line-height:1.6;"></div>
       <div id="letterFormFields"></div>
       <button class="btn-primary gold" data-genbtn onclick="generateLetter()">
         <span class="btn-label"><i class="fa-solid fa-file-lines"></i> &nbsp;Générer ma lettre</span>
@@ -8612,6 +8613,23 @@ function selectLetter(card) {
     html += '</div>';
   });
   document.getElementById('letterFormFields').innerHTML = html;
+  // Tip contextuel selon le type de lettre
+  const _LETTER_TIPS = {
+    miseendemeure: '💡 <strong>Conseil :</strong> Précisez le numéro de facture et la date d\'échéance exacte pour renforcer votre demande. Joignez une copie de la facture à l\'envoi recommandé.',
+    licenciement:  '💡 <strong>Conseil :</strong> Vérifiez la convention collective applicable — le préavis légal peut être majoré. Pour un cadre, pensez à préciser l\'indemnité conventionnelle si elle est supérieure à l\'indemnité légale.',
+    rupture:       '💡 <strong>Conseil :</strong> La rupture conventionnelle requiert un entretien préalable et un délai de rétractation de 15 jours calendaires. Le formulaire Cerfa n°14598 doit être signé par les deux parties.',
+    demission:     '💡 <strong>Conseil :</strong> Calculez votre préavis selon votre contrat et votre ancienneté avant d\'envoyer. La date de départ effective court à compter de la réception de la lettre.',
+    resiliation:   '💡 <strong>Conseil :</strong> Vérifiez le délai de préavis prévu dans votre contrat. Pour un bail commercial, le préavis est de 6 mois avant la fin d\'une période triennale (art. L.145-4 C.com.).',
+    relance:       '💡 <strong>Conseil :</strong> Envoyez d\'abord une relance amiable. Sans réponse sous 8 jours, passez à la mise en demeure. Après 2 relances sans réponse, envisagez une procédure d\'injonction de payer.',
+    convocation:   '💡 <strong>Conseil :</strong> Le délai minimum de convocation à un entretien préalable est de 5 jours ouvrables. Indiquez l\'objet exact de l\'entretien sans préjuger de la décision.',
+    avertissement: '💡 <strong>Conseil :</strong> L\'avertissement doit être proportionné à la faute. Conservez une copie signée par le salarié. Un avertissement non contesté dans les 2 mois peut être utilisé en cas de récidive.',
+    resil_bail:    '💡 <strong>Conseil :</strong> Pour un bail d\'habitation, le préavis est de 3 mois (1 mois en zone tendue). Pour un bail commercial, respectez impérativement les délais triennaux.',
+    transaction_amiable: '💡 <strong>Conseil :</strong> La transaction a force de chose jugée (art. 2052 C.civ.) — elle éteint définitivement le litige. Faites-la relire par un avocat avant signature.',
+  };
+  const tipEl = document.getElementById('letterContextTip');
+  const tip = _LETTER_TIPS[selectedLetter];
+  if (tip && tipEl) { tipEl.innerHTML = tip; tipEl.style.display = 'block'; }
+  else if (tipEl) { tipEl.style.display = 'none'; }
   document.getElementById('letterFormPanel').style.display = 'block';
   document.getElementById('letterFormPanel').scrollIntoView({ behavior:'smooth', block:'start' });
 }
