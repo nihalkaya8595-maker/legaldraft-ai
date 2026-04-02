@@ -3219,6 +3219,8 @@ function selectWelcomeProfile(type, btn) {
   </div>
   <div class="header-actions">
     <span id="planStatusBadge" style="display:none;align-items:center;gap:5px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.35);border-radius:20px;padding:4px 12px;font-size:.68rem;font-weight:700;color:var(--gold);letter-spacing:.04em;cursor:default;white-space:nowrap;transition:opacity .3s;"></span>
+    <!-- Badge plan header -->
+    <span id="headerPlanBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;" onclick="showModule('accueil')"></span>
     <button class="btn-outline" onclick="openModal('modalLogin')">
       <i class="fa-regular fa-circle-question" style="margin-right:5px;"></i>Aide
     </button>
@@ -3231,6 +3233,15 @@ function selectWelcomeProfile(type, btn) {
 <!-- ══════════════════════════════════════════════════════════
      MODULE NAVIGATION
 ══════════════════════════════════════════════════════════ -->
+<!-- Upgrade banner (plan gratuit uniquement) -->
+<div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#1d4ed8,#2563eb);color:white;padding:10px 20px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;">
+  <span>🎁 <strong>Essai Pro 7 jours gratuit</strong> — Accès illimité à tous les documents, sans carte bancaire</span>
+  <button onclick="document.getElementById('upgradeBanner').style.display='none';openModal('modalPaywall');"
+          style="background:white;color:#1d4ed8;border:none;padding:6px 16px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap;">
+    Activer →
+  </button>
+</div>
+
 <!-- Backend down banner -->
 <div id="backendDownBanner" style="display:none;background:#fef3c7;border-bottom:2px solid #f59e0b;padding:10px 24px;text-align:center;font-size:.8rem;font-weight:600;color:#92400e;align-items:center;justify-content:center;gap:8px;z-index:900;position:sticky;top:0;">
   <i class="fa-solid fa-triangle-exclamation"></i>
@@ -7420,6 +7431,43 @@ function _updatePlanStatusBadge() {
     badge.style.display = 'inline-flex';
   } else {
     badge.style.display = 'none';
+  }
+
+  // ── Header plan badge + upgrade banner ───────────────────────
+  _updateHeaderPlanBadge();
+}
+
+function _updateHeaderPlanBadge() {
+  const hBadge = document.getElementById('headerPlanBadge');
+  const upgBanner = document.getElementById('upgradeBanner');
+  if (!hBadge) return;
+
+  const user = getAuthUser();
+  if (!user) {
+    hBadge.style.display = 'none';
+    if (upgBanner) upgBanner.style.display = 'none';
+    return;
+  }
+
+  const role = getUserRole();
+  const isPro = [PRO_ROLES.VERIFIED, PRO_ROLES.TRIAL_ACTIVE, PRO_ROLES.TRIAL_CANCEL_SCHEDULED].includes(role)
+    || ['monthly','cabinet'].includes(getPlanData().type);
+
+  if (isPro) {
+    hBadge.style.cssText += 'display:inline-flex;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.3);color:#15803d;';
+    const trial = role === PRO_ROLES.TRIAL_ACTIVE ? getTrialData() : null;
+    const daysLeft = trial ? Math.max(0, Math.ceil((new Date(trial.endDate) - Date.now()) / 86400000)) : null;
+    hBadge.innerHTML = daysLeft !== null
+      ? `🟢 Essai Pro · ${daysLeft}j restants`
+      : `🟢 Pro`;
+    if (upgBanner) upgBanner.style.display = 'none';
+  } else {
+    hBadge.style.cssText += 'display:inline-flex;background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;';
+    hBadge.innerHTML = '⚪ Gratuit';
+    // Afficher upgrade banner si connecté et plan gratuit
+    if (upgBanner && !sessionStorage.getItem('ld_banner_dismissed')) {
+      upgBanner.style.display = 'flex';
+    }
   }
 }
 
