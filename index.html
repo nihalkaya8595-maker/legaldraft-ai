@@ -6025,7 +6025,21 @@ function contractCSS() {
     .ln-text { flex: 1; color: #9ca3af; font-size: 7.5pt; line-height: 1.5; }
     .ln-ref  { color: #bc993c; font-size: 8pt; font-weight: 600; white-space: nowrap; letter-spacing: 0.4px; }
     .place-date  { text-align: right; margin-bottom: 1cm; font-style: italic; color: #444; }
-    @media print { .print-bar { display: none !important; } .page { padding: 0; } }
+    /* ── Numérotation articles automatique ── */
+    .contract-body { counter-reset: article-counter; }
+    .article-num[data-auto]::before { content: "Article " counter(article-counter) " — "; counter-increment: article-counter; }
+    /* ── Certification badge ── */
+    .cert-badge { display:inline-flex;align-items:center;gap:6px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:3px 12px;font-family:'Inter',sans-serif;font-size:7.5pt;color:#15803d;font-weight:600;margin-top:8px; }
+    /* ── Print premium ── */
+    @media print {
+      .print-bar { display: none !important; }
+      .page { padding: 0; max-width: 100%; }
+      body { font-size: 11pt; }
+      .legal-notice { break-inside: avoid; }
+      .signatures { break-inside: avoid; }
+      .article { break-inside: avoid; }
+      @page { size: A4; margin: 2.5cm 2.8cm 3cm; }
+    }
   `;
 }
 
@@ -6061,14 +6075,23 @@ function legalFooter(ref, lr) {
         ? `${lr.flag}&nbsp;Rédigé selon le Droit OHADA &mdash; ${lr.label}`
         : '🇫🇷&nbsp;Rédigé selon le droit français en vigueur')
     : 'Rédigé selon le droit applicable';
+  const now = new Date();
+  const genDate = now.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+  const genTime = now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
   return `
     <div class="legal-notice">
       <span class="ln-logo">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bc993c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         LegalDraft AI
       </span>
-      <span class="ln-text">Modèle de document juridique &nbsp;&bull;&nbsp; ${lawLine}</span>
-      <span class="ln-ref">R&eacute;f.&nbsp;${ref}</span>
+      <span class="ln-text">
+        Modèle de document juridique &nbsp;&bull;&nbsp; ${lawLine}<br>
+        <span style="font-size:7pt;opacity:.7;">Généré le ${genDate} à ${genTime} &nbsp;&bull;&nbsp; legaldraft.fr &nbsp;&bull;&nbsp; Document à valider selon votre situation</span>
+      </span>
+      <span class="ln-ref" style="text-align:right;">
+        R&eacute;f.&nbsp;${ref}<br>
+        <span class="cert-badge">✓ Certifié LegalDraft</span>
+      </span>
     </div>`;
 }
 
