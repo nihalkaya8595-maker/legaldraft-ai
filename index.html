@@ -3500,7 +3500,7 @@ function selectWelcomeProfile(type, btn) {
     </div>
   </div>
   <div class="header-actions">
-    <span id="planStatusBadge" style="display:none;align-items:center;gap:5px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.35);border-radius:20px;padding:4px 12px;font-size:.68rem;font-weight:700;color:var(--gold);letter-spacing:.04em;cursor:default;white-space:nowrap;transition:opacity .3s;"></span>
+    <span id="planStatusBadge" style="display:none;align-items:center;gap:5px;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.35);border-radius:20px;padding:4px 12px;font-size:.68rem;font-weight:700;color:var(--gold);letter-spacing:.04em;cursor:pointer;white-space:nowrap;transition:opacity .3s;" onclick="showModule('compte')"></span>
     <!-- Badge plan header -->
     <span id="headerPlanBadge" style="display:none;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;" onclick="showModule('accueil')"></span>
     <button class="btn-outline" onclick="openModal('modalLogin')">
@@ -3580,6 +3580,9 @@ function selectWelcomeProfile(type, btn) {
     <button class="mod-btn" id="nav-analytics" onclick="showModule('analytics')">
       <i class="fa-solid fa-chart-line"></i> Analytics
     </button>
+    <button class="mod-btn" id="nav-compte" onclick="showModule('compte')" style="margin-left:auto;border-color:rgba(212,175,55,.35);color:var(--gold);">
+      <i class="fa-solid fa-circle-user"></i> Mon compte
+    </button>
   </div>
   <!-- Ligne 2 : Espace Pro pleine largeur -->
   <div class="pro-nav-bar">
@@ -3655,6 +3658,19 @@ function selectWelcomeProfile(type, btn) {
   <h3 style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;">Derniers documents générés</h3>
   <div id="dashRecentDocs"></div>
 
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODULE: MON COMPTE
+══════════════════════════════════════════════════════════ -->
+<div class="module" id="mod-compte" style="padding:32px 24px;max-width:720px;">
+  <div style="margin-bottom:28px;">
+    <h2 style="font-size:22px;font-weight:800;color:#0f172a;margin:0 0 4px;">Mon compte</h2>
+    <p style="color:#64748b;margin:0;font-size:14px;">Gérez votre abonnement et vos préférences</p>
+  </div>
+  <div id="accountContent">
+    <!-- rendu par renderAccount() -->
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════
@@ -8439,6 +8455,7 @@ function _activateModule(id) {
   document.getElementById('nav-' + id)?.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (id === 'accueil') setTimeout(renderDashboard, 50);
+  if (id === 'compte')  setTimeout(renderAccount, 50);
   if (id === 'coffre') refreshVault();
   if (id === 'veille') renderVeille('all');
   if (id === 'dictionnaire') renderDico(DICO_DATA);
@@ -11736,6 +11753,233 @@ function renderDashboard() {
       </button>
     </div>
   `).join('');
+}
+
+// ─── Mon Compte ────────────────────────────────────────────────────────────
+function renderAccount() {
+  const el = document.getElementById('accountContent');
+  if (!el) return;
+
+  const role  = getUserRole();
+  const trial = (typeof getTrialData === 'function') ? getTrialData() : null;
+  const plan  = (typeof getPlanData  === 'function') ? getPlanData()  : {};
+  const user  = getAuthUser();
+  const fmt   = d => new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const daysLeft = () => {
+    if (!trial?.endDate) return 0;
+    return Math.max(0, Math.ceil((new Date(trial.endDate) - Date.now()) / 86400000));
+  };
+  const pctTrial = () => Math.min(100, Math.round(((7 - daysLeft()) / 7) * 100));
+
+  // ── Pro abonné (VERIFIED + non trial) ───────────────────────────────────
+  if (role === PRO_ROLES.VERIFIED && !trial) {
+    el.innerHTML = `
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:24px 28px;margin-bottom:20px;display:flex;align-items:center;gap:16px;">
+        <span style="font-size:32px;">✅</span>
+        <div>
+          <div style="font-weight:800;font-size:17px;color:#166534;margin-bottom:2px;">Espace Pro — Actif</div>
+          <div style="color:#16a34a;font-size:13px;">Accès illimité · tous les modules inclus</div>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;margin-bottom:16px;">
+        <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:16px;">Détails de l'abonnement</div>
+        <div style="display:grid;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+            <span style="color:#64748b;font-size:13px;">Plan</span>
+            <span style="font-weight:700;color:#0f172a;font-size:13px;">Espace Professionnel</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+            <span style="color:#64748b;font-size:13px;">Tarif</span>
+            <span style="font-weight:700;color:#0f172a;font-size:13px;">€99 / mois</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+            <span style="color:#64748b;font-size:13px;">Statut</span>
+            <span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">Actif</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;">
+        <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:12px;">Compte</div>
+        <div style="color:#64748b;font-size:13px;margin-bottom:16px;">${user?.email || '—'}</div>
+        <button onclick="clearProAccess();showModule('accueil');"
+          style="background:none;border:1px solid #e2e8f0;color:#94a3b8;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;">
+          Se déconnecter
+        </button>
+      </div>`;
+    return;
+  }
+
+  // ── Trial Actif ──────────────────────────────────────────────────────────
+  if (role === PRO_ROLES.TRIAL_ACTIVE) {
+    const days = daysLeft();
+    const pct  = pctTrial();
+    const barColor = days <= 1 ? '#ef4444' : days <= 3 ? '#f59e0b' : '#3b82f6';
+    const canCancel = trial?.endDate ? (new Date(trial.endDate) - Date.now()) > 24 * 3600 * 1000 : false;
+    el.innerHTML = `
+      <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd;border-radius:14px;padding:24px 28px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:28px;">🧪</span>
+            <div>
+              <div style="font-weight:800;font-size:17px;color:#1d4ed8;">Essai Pro en cours</div>
+              <div style="color:#3b82f6;font-size:13px;">${days > 0 ? `${days} jour${days > 1 ? 's' : ''} restant${days > 1 ? 's' : ''}` : 'Dernier jour'}</div>
+            </div>
+          </div>
+          <button onclick="openModal('modalPaywall')"
+            style="background:#2563eb;color:white;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;white-space:nowrap;">
+            Continuer avec Pro — €99/mois →
+          </button>
+        </div>
+        <div style="background:rgba(255,255,255,.5);border-radius:20px;height:8px;overflow:hidden;margin-bottom:6px;">
+          <div style="width:${pct}%;background:${barColor};height:100%;border-radius:20px;transition:width .4s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#3b82f6;">
+          <span>Début ${trial?.startDate ? fmt(trial.startDate) : '—'}</span>
+          <span>Fin ${trial?.endDate ? fmt(trial.endDate) : '—'}</span>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;margin-bottom:16px;">
+        <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:14px;">Ce qui est inclus dans l'Espace Pro</div>
+        <div style="display:grid;gap:8px;">
+          ${['Tous les modules professionnels','Export Word (contrats, lettres, actes)','Conventions collectives & droit OHADA','Analyse IA illimitée','Coffre-fort illimité','Support prioritaire'].map(f =>
+            `<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#334155;">
+              <span style="color:#16a34a;font-weight:700;">✓</span> ${f}
+            </div>`).join('')}
+        </div>
+      </div>
+      ${canCancel ? `
+      <div style="text-align:center;padding:12px;">
+        <button onclick="_openTrialCancelModal()"
+          style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline;">
+          Annuler mon essai
+        </button>
+      </div>` : ''}`;
+    return;
+  }
+
+  // ── Trial Annulation programmée ─────────────────────────────────────────
+  if (role === PRO_ROLES.TRIAL_CANCEL_SCHEDULED) {
+    const days = daysLeft();
+    el.innerHTML = `
+      <div style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fdba74;border-radius:14px;padding:24px 28px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <span style="font-size:28px;">⏸</span>
+          <div>
+            <div style="font-weight:800;font-size:17px;color:#c2410c;">Annulation programmée</div>
+            <div style="color:#ea580c;font-size:13px;">Votre accès Pro reste actif jusqu'au ${trial?.endDate ? fmt(trial.endDate) : '—'}</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.6);border-radius:10px;padding:12px 16px;font-size:12px;color:#9a3412;display:flex;gap:10px;align-items:flex-start;">
+          <span>ℹ️</span>
+          <span>Aucun débit ne sera effectué. Tous vos modules restent accessibles pendant ${days} jour${days > 1 ? 's' : ''} encore.</span>
+        </div>
+      </div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:8px;">💡</div>
+        <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:6px;">Vous changez d'avis ?</div>
+        <div style="color:#64748b;font-size:13px;margin-bottom:16px;">Souscrivez maintenant et gardez tous vos avantages sans interruption.</div>
+        <button onclick="openModal('modalPaywall')"
+          style="background:#2563eb;color:white;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;">
+          Souscrire à l'Espace Pro — €99/mois
+        </button>
+      </div>`;
+    return;
+  }
+
+  // ── Trial Expiré (sans souscription) ────────────────────────────────────
+  if (role === PRO_ROLES.TRIAL_EXPIRED || role === PRO_ROLES.TRIAL_READY) {
+    const isReady = role === PRO_ROLES.TRIAL_READY;
+    el.innerHTML = `
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;margin-bottom:20px;text-align:center;">
+        <span style="font-size:36px;display:block;margin-bottom:12px;">${isReady ? '🎯' : '💤'}</span>
+        <div style="font-weight:800;font-size:18px;color:#0f172a;margin-bottom:6px;">Votre essai est terminé</div>
+        <div style="color:#64748b;font-size:14px;margin-bottom:20px;">
+          ${isReady ? 'Votre annulation a bien été prise en compte.' : 'L\'essai de 7 jours a expiré.'}
+          Souscrivez pour retrouver l'accès complet.
+        </div>
+        <button onclick="openModal('modalPaywall')"
+          style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border:none;padding:12px 28px;border-radius:12px;font-weight:700;cursor:pointer;font-size:14px;width:100%;max-width:320px;">
+          🚀 Passer à l'Espace Pro — €99/mois
+        </button>
+      </div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;">
+        <div style="font-weight:700;color:#0f172a;font-size:15px;margin-bottom:14px;">Récapitulatif</div>
+        <div style="display:grid;gap:10px;font-size:13px;color:#64748b;">
+          <div style="display:flex;justify-content:space-between;">
+            <span>Essai démarré</span>
+            <span style="color:#0f172a;font-weight:600;">${trial?.startDate ? fmt(trial.startDate) : '—'}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span>Essai terminé</span>
+            <span style="color:#0f172a;font-weight:600;">${trial?.endDate ? fmt(trial.endDate) : '—'}</span>
+          </div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // ── Particulier (PUBLIC / PENDING / REJECTED — aucun trial) ─────────────
+  const q         = (typeof getParticulierQuota === 'function') ? getParticulierQuota() : { count:0 };
+  const used      = q.count || 0;
+  const quota     = (typeof PARTICULIER_MONTHLY_QUOTA !== 'undefined') ? PARTICULIER_MONTHLY_QUOTA : 2;
+  const remaining = Math.max(0, quota - used);
+  const isFull    = remaining === 0;
+  const pctQ      = Math.min(100, Math.round((used / quota) * 100));
+  const barColorQ = isFull ? '#ef4444' : used >= 1 ? '#f59e0b' : '#3b82f6';
+
+  el.innerHTML = `
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px 28px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+        <div>
+          <div style="font-weight:700;color:#0f172a;font-size:15px;">Plan Particulier</div>
+          <div style="color:#64748b;font-size:12px;margin-top:2px;">Gratuit · ${remaining} document${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''} ce mois</div>
+        </div>
+        <span style="background:${isFull ? '#fee2e2' : '#f1f5f9'};color:${isFull ? '#dc2626' : '#64748b'};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">
+          ${used}/${quota} doc${used > 1 ? 's' : ''}
+        </span>
+      </div>
+      <div style="background:#e2e8f0;border-radius:20px;height:6px;overflow:hidden;margin-bottom:6px;">
+        <div style="width:${pctQ}%;background:${barColorQ};height:100%;border-radius:20px;transition:width .4s;"></div>
+      </div>
+      <div style="font-size:11px;color:#94a3b8;text-align:right;">Réinitialisation le 1er du mois</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#eff6ff,#f5f3ff);border:1px solid #c4b5fd;border-radius:14px;padding:24px 28px;margin-bottom:16px;">
+      <div style="font-weight:800;font-size:16px;color:#4c1d95;margin-bottom:4px;">🚀 Espace Professionnel</div>
+      <div style="color:#7c3aed;font-size:13px;margin-bottom:16px;">7 jours gratuits · €99/mois ensuite · sans carte requise</div>
+      <div style="display:grid;gap:8px;margin-bottom:18px;">
+        ${[
+          ['✓','Tous les modules Pro (avocat, RH, OHADA, IA…)','#16a34a'],
+          ['✓','Export Word pour chaque document','#16a34a'],
+          ['✓','Conventions collectives & droit OHADA','#16a34a'],
+          ['✓','Coffre-fort illimité','#16a34a'],
+          ['✕','Documents limités à 2/mois (Particulier)','#94a3b8'],
+        ].map(([icon, text, col]) =>
+          `<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#334155;">
+            <span style="color:${col};font-weight:700;">${icon}</span> ${text}
+          </div>`).join('')}
+      </div>
+      <button onclick="openModal('modalPaywall')"
+        style="width:100%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border:none;padding:12px 0;border-radius:11px;font-weight:700;cursor:pointer;font-size:14px;">
+        Démarrer mon essai gratuit — 7 jours →
+      </button>
+    </div>
+    ${user ? `
+    <div style="background:white;border:1px solid #e2e8f0;border-radius:14px;padding:20px 28px;">
+      <div style="font-weight:700;color:#0f172a;font-size:14px;margin-bottom:8px;">Compte</div>
+      <div style="color:#64748b;font-size:13px;">${user.email}</div>
+    </div>` : ''}`;
+}
+
+// ── helper: ouvrir la modal d'annulation trial depuis Mon Compte ──────────
+function _openTrialCancelModal() {
+  const trial = (typeof getTrialData === 'function') ? getTrialData() : null;
+  const el = document.getElementById('trialCancelEndDate');
+  if (el && trial?.endDate) {
+    el.textContent = new Date(trial.endDate).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+  }
+  openModal('modalTrialCancel');
 }
 
 /** Ancien alias — conservé pour compatibilité mais ne fait plus rien de spécial */
