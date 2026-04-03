@@ -109,7 +109,7 @@ Objet : Droit OHADA intégré — outil de rédaction
 >
 > Nihal
 > Fondateur, LegalDraft AI
-> https://cute-bombolone-d4793a.netlify.app
+> https://legaldraft.fr
 
 ---
 

@@ -104,7 +104,7 @@ async function sendActivationEmail(userEmail) {
           <div style="margin-bottom:8px;">🧮 <strong>Un calcul d'indemnité</strong> de licenciement précis</div>
           <div>🤖 <strong>Une analyse de contrat</strong> avec score de conformité</div>
         </div>
-        <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
+        <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
           Générer mon document gratuit →
         </a>
         <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">Des questions ? Répondez directement à cet email.</p>
@@ -146,7 +146,7 @@ async function sendValueEmail(userEmail) {
             <p style="color:#64748b;margin:4px 0 0;font-size:.85rem;">SAS vs SARL vs SASU — 9 critères comparés côte à côte, droit français et OHADA.</p>
           </div>
         </div>
-        <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#1e293b;color:#f5c842;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
+        <a href="https://legaldraft.fr" style="display:inline-block;background:#1e293b;color:#f5c842;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
           Accéder à ma plateforme →
         </a>
         <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Documents juridiques en 2 minutes. Droit français &amp; OHADA.</p>
@@ -171,14 +171,14 @@ async function sendConversionEmail(userEmail) {
           <div style="font-size:.7rem;font-weight:700;color:#1d4ed8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Le plus populaire</div>
           <div style="font-size:1.8rem;font-weight:800;color:#1e293b;">9€ <span style="font-size:.9rem;font-weight:400;color:#64748b;">/ document</span></div>
           <div style="color:#64748b;font-size:.85rem;margin:8px 0 16px;">Ou <strong>25€ le pack 5 documents</strong> — économisez 20€</div>
-          <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Acheter maintenant →</a>
+          <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Acheter maintenant →</a>
         </div>
         <div style="background:#1e293b;border-radius:12px;padding:20px;margin:16px 0;text-align:center;">
           <div style="font-size:.7rem;font-weight:700;color:#f5c842;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Espace Pro — Avocats &amp; Juristes</div>
           <div style="font-size:1.8rem;font-weight:800;color:#fff;">99€<span style="font-size:.9rem;font-weight:400;color:#94a3b8;">/mois</span></div>
           <div style="color:#94a3b8;font-size:.85rem;margin:8px 0 4px;">Usage illimité · Actes de procédure · Conventions collectives</div>
           <div style="color:#64748b;font-size:.75rem;margin-bottom:16px;">7 jours gratuits — aucune CB requise</div>
-          <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Démarrer l'essai gratuit →</a>
+          <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">Démarrer l'essai gratuit →</a>
         </div>
         <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;text-align:center;">Des questions ? Écrivez-nous à <a href="mailto:contact@legaldraft.ai" style="color:#f5c842;">contact@legaldraft.ai</a></p>
       </div>
@@ -198,7 +198,7 @@ async function sendTrialExpiryEmail(userEmail, daysLeft) {
         </div>
         <h2 style="color:#1e293b;">Votre essai expire ${daysLeft === 1 ? 'demain' : 'dans 2 jours'}</h2>
         <p style="color:#475569;">Votre accès Pro gratuit se termine bientôt. Pour continuer à bénéficier de toutes les fonctionnalités, souscrivez à l'Espace Pro.</p>
-        <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
+        <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
           Continuer avec LegalDraft Pro →
         </a>
         <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">Vous pouvez annuler à tout moment depuis votre espace.</p>
@@ -325,7 +325,7 @@ app.post('/auth/register', async (req, res) => {
           <h2 style="color:#1e293b;">Bienvenue ${email} !</h2>
           <p style="color:#475569;">Votre compte LegalDraft AI a été créé avec succès.</p>
           <p style="color:#475569;">Vous pouvez maintenant accéder à la plateforme et générer vos premiers documents juridiques.</p>
-          <a href="https://cute-bombolone-d4793a.netlify.app" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
+          <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
             Accéder à la plateforme →
           </a>
           <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Droit français & OHADA. Les documents générés sont des modèles indicatifs.</p>
