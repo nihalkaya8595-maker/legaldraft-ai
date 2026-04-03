@@ -9421,6 +9421,24 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshVault();
   // Init veille
   renderVeille('all');
+
+  // ── Vérification email — paramètre URL ?email_verified=1 ─────────────────
+  (() => {
+    const params = new URLSearchParams(window.location.search);
+    const ev = params.get('email_verified');
+    if (ev === '1') {
+      setTimeout(() => showToast('✅ Email confirmé ! Bienvenue sur LegalDraft AI.', 'success'), 600);
+      // Nettoyer l'URL sans rechargement
+      const clean = window.location.pathname;
+      history.replaceState(null, '', clean);
+    } else if (ev === 'invalid') {
+      setTimeout(() => showToast('❌ Lien de vérification invalide ou expiré.', 'error'), 600);
+      history.replaceState(null, '', window.location.pathname);
+    } else if (ev === 'error') {
+      setTimeout(() => showToast('⚠️ Erreur lors de la vérification — contactez le support.', 'error'), 600);
+      history.replaceState(null, '', window.location.pathname);
+    }
+  })();
 });
 
 function showCalcResult(id, main, detail) {

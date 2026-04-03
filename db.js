@@ -61,6 +61,8 @@ if (USE_POSTGRES) {
       meta        JSONB
     );
     CREATE INDEX IF NOT EXISTS vault_docs_user_idx ON vault_docs(user_id);
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT;
   `).then(() => {
     console.log('✅ PostgreSQL — tables vérifiées/créées');
   }).catch(err => {
@@ -218,6 +220,45 @@ async function deleteVaultDoc(userId, docId) {
   }
 }
 
+// ── EMAIL VERIFICATION ───────────────────────────────────────────────────────
+
+async function setVerificationToken(userId, token) {
+  if (USE_POSTGRES) {
+    await pool.query('UPDATE users SET verification_token=$1 WHERE id=$2', [token, userId]);
+  } else {
+    const users = _read(USERS_FILE);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx >= 0) { users[idx].verification_token = token; _write(USERS_FILE, users); }
+  }
+}
+
+async function getUserByVerificationToken(token) {
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query('SELECT * FROM users WHERE verification_token=$1', [token]);
+    return rows[0] || null;
+  }
+  const users = _read(USERS_FILE);
+  return users.find(u => u.verification_token === token) || null;
+}
+
+async function markEmailVerified(userId) {
+  if (USE_POSTGRES) {
+    await pool.query(
+      'UPDATE users SET email_verified=TRUE, verification_token=NULL, updated_at=$1 WHERE id=$2',
+      [new Date().toISOString(), userId]
+    );
+  } else {
+    const users = _read(USERS_FILE);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx >= 0) {
+      users[idx].email_verified = true;
+      users[idx].verification_token = null;
+      users[idx].updated_at = new Date().toISOString();
+      _write(USERS_FILE, users);
+    }
+  }
+}
+
 // ── ADMIN ────────────────────────────────────────────────────────────────────
 
 async function getAllUsers() {
@@ -256,4 +297,7 @@ module.exports = {
   saveVaultDoc,
   deleteVaultDoc,
   updateUserProfile,
+  setVerificationToken,
+  getUserByVerificationToken,
+  markEmailVerified,
 };

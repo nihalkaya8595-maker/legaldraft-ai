@@ -35,6 +35,7 @@ try {
 const cors     = require('cors');
 const bcrypt   = require('bcryptjs');
 const jwt      = require('jsonwebtoken');
+const crypto   = require('crypto');
 const db       = require('./db');
 
 // Stripe — initialisation défensive (ne crash pas si la clé est absente au démarrage)
@@ -306,16 +307,21 @@ app.post('/auth/register', async (req, res) => {
     const user = await db.createUser(emailClean, hash);
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
 
+    // Génération du token de vérification email
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    await db.setVerificationToken(user.id, verifyToken);
+    const verifyUrl = `https://legaldraft-ai-production.up.railway.app/auth/verify-email?token=${verifyToken}`;
+
     console.log(`✅ Nouveau compte : ${user.email}`);
     res.status(201).json({
       token,
       user: { id: user.id, email: user.email, freeDocUsed: user.free_doc_used },
     });
 
-    // Email de bienvenue (J+0)
+    // Email de bienvenue (J+0) + lien de vérification
     sendEmail({
       to: email,
-      subject: 'Bienvenue sur LegalDraft AI 🎉',
+      subject: 'Bienvenue sur LegalDraft AI 🎉 — Confirmez votre email',
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
           <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
@@ -323,12 +329,16 @@ app.post('/auth/register', async (req, res) => {
             <p style="color:#94a3b8;margin:8px 0 0;font-size:0.85rem;">Intelligence Juridique</p>
           </div>
           <h2 style="color:#1e293b;">Bienvenue ${email} !</h2>
-          <p style="color:#475569;">Votre compte LegalDraft AI a été créé avec succès.</p>
-          <p style="color:#475569;">Vous pouvez maintenant accéder à la plateforme et générer vos premiers documents juridiques.</p>
-          <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
-            Accéder à la plateforme →
+          <p style="color:#475569;">Votre compte LegalDraft AI a été créé avec succès. Une dernière étape : confirmez votre adresse email.</p>
+          <div style="background:#fefce8;border:1px solid #fde047;border-radius:8px;padding:16px;margin:16px 0;">
+            <p style="color:#713f12;margin:0;font-size:0.9rem;">📧 Cliquez sur le bouton ci-dessous pour vérifier votre adresse email et activer pleinement votre compte.</p>
+          </div>
+          <a href="${verifyUrl}" style="display:inline-block;background:#f5c842;color:#1e293b;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;font-size:1rem;">
+            ✅ Confirmer mon email →
           </a>
-          <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Droit français & OHADA. Les documents générés sont des modèles indicatifs.</p>
+          <p style="color:#94a3b8;font-size:0.8rem;margin-top:8px;">Ce lien est valide 7 jours. Si vous n'avez pas créé de compte, ignorez cet email.</p>
+          <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;">
+          <p style="color:#94a3b8;font-size:0.75rem;">LegalDraft AI — Droit français & OHADA. Les documents générés sont des modèles indicatifs.</p>
         </div>
       `
     });
@@ -341,6 +351,25 @@ app.post('/auth/register', async (req, res) => {
   } catch (err) {
     console.error('Register error:', err.message);
     res.status(500).json({ error: 'Erreur serveur — réessayez.' });
+  }
+});
+
+/**
+ * GET /auth/verify-email?token=xxx
+ * Confirme l'email → redirige vers https://legaldraft.fr?email_verified=1
+ */
+app.get('/auth/verify-email', async (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.redirect('https://legaldraft.fr?email_verified=error');
+  try {
+    const user = await db.getUserByVerificationToken(token);
+    if (!user) return res.redirect('https://legaldraft.fr?email_verified=invalid');
+    await db.markEmailVerified(user.id);
+    console.log(`✅ Email vérifié : ${user.email}`);
+    return res.redirect('https://legaldraft.fr?email_verified=1');
+  } catch (err) {
+    console.error('Verify email error:', err.message);
+    return res.redirect('https://legaldraft.fr?email_verified=error');
   }
 });
 
