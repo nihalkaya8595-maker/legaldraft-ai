@@ -10534,8 +10534,18 @@ async function processPaywall() {
   btn.classList.add('loading'); btn.disabled = true;
 
   try {
-    // ── Vérification auth ────────────────────────────────────
     const user = getAuthUser();
+
+    // ── Backend down → essai direct sans authentification ───
+    if (!_backendAvailable) {
+      setTimeout(() => {
+        btn.classList.remove('loading'); btn.disabled = false;
+        _startTrialDirectly();
+      }, 600);
+      return;
+    }
+
+    // ── Non connecté → demander la connexion/inscription ────
     if (!user) {
       btn.classList.remove('loading'); btn.disabled = false;
       closeModal('modalPaywall');
@@ -10544,7 +10554,7 @@ async function processPaywall() {
       return;
     }
 
-    // ── Utilisateur connecté → essai activé directement ─────
+    // ── Connecté → essai activé directement ─────────────────
     setTimeout(() => {
       btn.classList.remove('loading'); btn.disabled = false;
       _startTrialDirectly();
