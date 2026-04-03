@@ -5995,6 +5995,11 @@ function renderOrderSummary() {
     else if (plan.type === 'pack')     planLabel = `Pack — ${plan.docsRemaining} doc${plan.docsRemaining!==1?'s':''} restant${plan.docsRemaining!==1?'s':''}`;
     else if (plan.type === 'unit')     planLabel = 'Plan unitaire — 1 document';
     else if (plan.type === 'cabinet')  planLabel = 'Plan Cabinet — illimité';
+    else if (check.particulier) {
+      const q = getParticulierQuota();
+      const rem = Math.max(0, PARTICULIER_MONTHLY_QUOTA - (q.count || 0));
+      planLabel = `Plan Particulier — ${rem} document${rem !== 1 ? 's' : ''} restant${rem !== 1 ? 's' : ''} ce mois`;
+    }
     planBadgeHtml = `
       <div style="background:rgba(22,163,74,.08);border:1.5px solid rgba(22,163,74,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;font-size:.82rem;color:#16a34a;font-weight:600;">
         <i class="fa-solid fa-circle-check"></i>
@@ -6002,12 +6007,13 @@ function renderOrderSummary() {
       </div>`;
   }
 
+  const price = (state.selectedPrice != null) ? Number(state.selectedPrice) : 0;
   document.getElementById('orderSummary').innerHTML = `
     ${planBadgeHtml}
     <div class="order-summary-title">Récapitulatif de la commande</div>
     <div class="order-line">
       <span class="label">${state.selectedEmoji} ${state.selectedLabel}</span>
-      <span class="value">${check.ok ? '<span style="text-decoration:line-through;opacity:.4">' + state.selectedPrice.toFixed(2) + ' €</span> <span style="color:#16a34a;font-weight:700;margin-left:6px;">Inclus</span>' : state.selectedPrice.toFixed(2) + ' € TTC'}</span>
+      <span class="value">${check.ok ? '<span style="text-decoration:line-through;opacity:.4">' + price.toFixed(2) + ' €</span> <span style="color:#16a34a;font-weight:700;margin-left:6px;">Inclus</span>' : price.toFixed(2) + ' € TTC'}</span>
     </div>
     <div class="order-line" style="font-size:.75rem;color:var(--warm-gray);">
       <span class="label">TVA incluse</span>
@@ -6015,7 +6021,7 @@ function renderOrderSummary() {
     </div>
     <div class="order-line total">
       <span class="label">Total à payer</span>
-      <span class="value">${check.ok ? '<span style="color:#16a34a;font-weight:700;">0,00 €</span>' : state.selectedPrice.toFixed(2) + ' € TTC'}</span>
+      <span class="value">${check.ok ? '<span style="color:#16a34a;font-weight:700;">0,00 €</span>' : price.toFixed(2) + ' € TTC'}</span>
     </div>`;
 }
 
@@ -6031,7 +6037,8 @@ function processPayment() {
     setTimeout(() => {
       btn.classList.remove('loading');
       btn.disabled = false;
-      consumeDocCredit();
+      if (check.particulier) incrementParticulierQuota();
+      else consumeDocCredit();
       renderSuccessPage();
       goToStep(4);
     }, 800);
@@ -7830,7 +7837,12 @@ function canGenerateDocument() {
   // Trial actif → accès illimité
   if (role === PRO_ROLES.TRIAL_ACTIVE || role === PRO_ROLES.TRIAL_CANCEL_SCHEDULED) return { ok: true };
   const plan = getPlanData();
-  if (plan.type === PLAN_TYPES.NONE) return { ok: false, reason: 'no_plan' };
+  // Particulier (plan gratuit) → quota 2 docs/mois
+  if (plan.type === PLAN_TYPES.NONE) {
+    const q = getParticulierQuota();
+    if ((q.count || 0) < PARTICULIER_MONTHLY_QUOTA) return { ok: true, particulier: true };
+    return { ok: false, reason: 'quota_exceeded' };
+  }
   if ((plan.type === PLAN_TYPES.MONTHLY || plan.type === PLAN_TYPES.CABINET) && plan.expiresAt) {
     if (new Date() > new Date(plan.expiresAt)) return { ok: false, reason: 'expired' };
   }
@@ -10458,35 +10470,16 @@ function requirePay(emoji, label, cb) {
   // Si l'utilisateur a déjà un plan valide avec des crédits, exécuter directement
   const check = canGenerateDocument();
   if (check.ok) {
-    consumeDocCredit();
+    if (check.particulier) {
+      incrementParticulierQuota(); // consomme 1 quota mensuel Particulier
+    } else {
+      consumeDocCredit();
+    }
     if (cb) cb();
     return;
   }
 
-  // ── Gate free doc pour PUBLIC sans plan ───────────────
-  if (check.reason === 'no_plan' && getUserRole() === PRO_ROLES.PUBLIC) {
-    const user = getAuthUser();
-    if (!user) {
-      // Non connecté → auth gate, puis relancer la génération
-      _pendingAuthCallback = (loggedUser) => {
-        if (loggedUser && !loggedUser.freeDocUsed) {
-          _claimAndGenerate(emoji, label, cb);
-        } else {
-          requirePay(emoji, label, cb); // repassera par le paywall
-        }
-      };
-      openAuthModal('free_doc_gate');
-      return;
-    }
-    if (!user.freeDocUsed) {
-      // Connecté + eligible → claim backend + générer
-      _claimAndGenerate(emoji, label, cb);
-      return;
-    }
-    // Connecté + déjà utilisé → paywall avec message adapté
-    label = 'Vous avez déjà utilisé votre document gratuit. Choisissez une offre pour continuer.';
-  }
-
+  // quota_exceeded pour PUBLIC → tombe dans le paywall contextualisé ci-dessous
   _pwCallback = () => { consumeDocCredit(); if (cb) cb(); };
   _pwOffer    = 'pro';
   document.getElementById('pwEmoji').textContent = emoji;
