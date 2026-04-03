@@ -3186,11 +3186,11 @@ function selectWelcomeProfile(type, btn) {
             <div style="color:#64748b;font-size:.85rem;margin-top:4px;">Coût traditionnel<br>(avocat / cabinet)</div>
           </div>
           <div style="text-align:center;position:relative;">
-            <div style="font-size:2rem;font-weight:800;color:#2563eb;" id="roiCostLegal">29 €</div>
+            <div style="font-size:2rem;font-weight:800;color:#2563eb;" id="roiCostLegal">99 €</div>
             <div style="color:#64748b;font-size:.85rem;margin-top:4px;">Avec LegalDraft AI<br>(abonnement mensuel)</div>
           </div>
           <div style="text-align:center;">
-            <div style="font-size:2rem;font-weight:800;color:#16a34a;" id="roiSaving">721 €</div>
+            <div style="font-size:2rem;font-weight:800;color:#16a34a;" id="roiSaving">651 €</div>
             <div style="color:#64748b;font-size:.85rem;margin-top:4px;">Économie réalisée<br>dès le 1er document</div>
           </div>
         </div>
@@ -3198,7 +3198,7 @@ function selectWelcomeProfile(type, btn) {
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px 20px;display:flex;align-items:flex-start;gap:14px;">
           <div style="font-size:1.5rem;flex-shrink:0;">💡</div>
           <div>
-            <div style="font-weight:700;color:#15803d;margin-bottom:4px;" id="roiInsight">En 1 CDI généré, vous remboursez 25× l'abonnement mensuel.</div>
+            <div style="font-weight:700;color:#15803d;margin-bottom:4px;" id="roiInsight">En 1 assignation générée, vous remboursez 7× l'abonnement Pro mensuel.</div>
             <div style="color:#64748b;font-size:.85rem;" id="roiDetail">Basé sur un tarif avocat de 150 €/h · 5h de rédaction traditionnelle.</div>
           </div>
         </div>
@@ -3225,7 +3225,7 @@ function selectWelcomeProfile(type, btn) {
     document.querySelectorAll('.roi-profile-btn').forEach(b => {
       b.style.background = '#fff'; b.style.color = '#334155'; b.style.borderColor = '#e2e8f0';
     });
-    btn.style.background = '#2563eb'; btn.style.color = '#fff'; btn.style.borderColor = '#2563eb';
+    if (btn) { btn.style.background = '#2563eb'; btn.style.color = '#fff'; btn.style.borderColor = '#2563eb'; }
     const d = ROI_DATA[profile];
     const saving = d.manual - d.legal;
     document.getElementById('roiCostManual').textContent = d.manual.toLocaleString('fr-FR') + ' €';
@@ -3238,6 +3238,11 @@ function selectWelcomeProfile(type, btn) {
     el.style.transform = 'scale(1.15)'; el.style.transition = 'transform .2s';
     setTimeout(() => { el.style.transform = 'scale(1)'; }, 220);
   }
+  // Init au chargement avec le profil par défaut
+  document.addEventListener('DOMContentLoaded', () => {
+    const defaultBtn = document.querySelector('.roi-profile-btn.active');
+    calcRoi('avocat', defaultBtn);
+  });
   </script>
 
   <!-- Pricing -->
