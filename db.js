@@ -163,6 +163,38 @@ async function markFreeDocumentAsUsed(userId, docType) {
   return users[idx];
 }
 
+// ── USER PLAN ────────────────────────────────────────────────────────────────
+
+/**
+ * Met à jour le plan courant de l'utilisateur.
+ * @param {string} userId
+ * @param {string} plan  — 'unit' | 'pack' | 'monthly' | 'pro' | 'none'
+ * @param {object} meta  — données supplémentaires (stripeCustomerId, subscriptionId, expiresAt…)
+ */
+async function updateUserPlan(userId, plan, meta = {}) {
+  const now = new Date().toISOString();
+  if (USE_POSTGRES) {
+    // On stocke le plan dans current_plan et les métadonnées Stripe dans profile (JSON)
+    const { rows } = await pool.query('SELECT profile FROM users WHERE id=$1', [userId]);
+    const existing = rows[0]?.profile ? JSON.parse(rows[0].profile) : {};
+    const merged   = JSON.stringify({ ...existing, stripe: meta });
+    await pool.query(
+      'UPDATE users SET current_plan=$1, profile=$2, updated_at=$3 WHERE id=$4',
+      [plan, merged, now, userId]
+    );
+  } else {
+    const users = _read(USERS_FILE);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx >= 0) {
+      users[idx].current_plan = plan;
+      const existing = users[idx].profile ? JSON.parse(users[idx].profile) : {};
+      users[idx].profile = JSON.stringify({ ...existing, stripe: meta });
+      users[idx].updated_at = now;
+      _write(USERS_FILE, users);
+    }
+  }
+}
+
 // ── USER PROFILE ─────────────────────────────────────────────────────────────
 
 async function updateUserProfile(userId, profile) {
@@ -300,4 +332,5 @@ module.exports = {
   setVerificationToken,
   getUserByVerificationToken,
   markEmailVerified,
+  updateUserPlan,
 };

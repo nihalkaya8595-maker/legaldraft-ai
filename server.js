@@ -44,6 +44,10 @@ try {
   if (process.env.STRIPE_SECRET_KEY) {
     stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     console.log('✅ Stripe initialisé');
+    if (!process.env.STRIPE_WEBHOOK_SECRET)
+      console.warn('⚠️  STRIPE_WEBHOOK_SECRET manquant — webhooks désactivés (ajoutez-le dans Railway)');
+    if (!process.env.STRIPE_SUBSCRIPTION_PRICE_ID)
+      console.warn('⚠️  STRIPE_SUBSCRIPTION_PRICE_ID manquant — abonnements mensuels désactivés');
   } else {
     console.warn('⚠️  STRIPE_SECRET_KEY manquant — paiements désactivés');
     stripe = { paymentIntents: { create: async () => { throw new Error('Stripe non configuré'); } },
@@ -208,6 +212,80 @@ async function sendTrialExpiryEmail(userEmail, daysLeft) {
   });
 }
 
+// ── Email confirmation paiement ──────────────────────────────────────────────
+async function sendPaymentConfirmEmail(userEmail, { amount, plan, invoiceUrl }) {
+  const planLabels = { unit:'Document unitaire', pack:'Pack 5 documents', monthly:'Abonnement mensuel (15 docs/mois)', pro:'Espace Pro' };
+  const label = planLabels[plan] || plan;
+  await sendEmail({
+    to: userEmail,
+    subject: '✅ Paiement confirmé — LegalDraft AI',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;font-size:1.5rem;">⚖️ LegalDraft AI</h1>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:20px;margin-bottom:20px;">
+          <h2 style="color:#15803d;margin:0 0 8px;">✅ Paiement confirmé</h2>
+          <p style="color:#166534;margin:0;">Merci pour votre achat. Votre accès est immédiatement actif.</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+          <tr><td style="padding:8px;color:#64748b;font-size:.85rem;">Plan</td><td style="padding:8px;font-weight:600;">${label}</td></tr>
+          <tr style="background:#f8fafc;"><td style="padding:8px;color:#64748b;font-size:.85rem;">Montant</td><td style="padding:8px;font-weight:600;">${(amount/100).toFixed(2)} €</td></tr>
+        </table>
+        ${invoiceUrl ? `<a href="${invoiceUrl}" style="display:inline-block;background:#1e293b;color:#f5c842;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.85rem;margin-bottom:16px;">📄 Voir la facture →</a>` : ''}
+        <a href="https://legaldraft.fr" style="display:block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;text-align:center;">
+          Accéder à LegalDraft AI →
+        </a>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Questions ? Répondez à cet email.</p>
+      </div>
+    `
+  });
+}
+
+async function sendPaymentFailedEmail(userEmail) {
+  await sendEmail({
+    to: userEmail,
+    subject: '⚠️ Problème de paiement — LegalDraft AI',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;font-size:1.5rem;">⚖️ LegalDraft AI</h1>
+        </div>
+        <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:20px;margin-bottom:20px;">
+          <h2 style="color:#dc2626;margin:0 0 8px;">⚠️ Paiement non abouti</h2>
+          <p style="color:#991b1b;margin:0;">Votre paiement n'a pas pu être traité. Aucun débit n'a été effectué.</p>
+        </div>
+        <p style="color:#475569;">Vérifiez vos informations de carte bancaire et réessayez depuis la plateforme.</p>
+        <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
+          Réessayer →
+        </a>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Si le problème persiste, contactez-nous.</p>
+      </div>
+    `
+  });
+}
+
+async function sendSubscriptionCancelledEmail(userEmail) {
+  await sendEmail({
+    to: userEmail,
+    subject: '💤 Abonnement annulé — LegalDraft AI',
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px;background:#f8fafc;">
+        <div style="background:#1e293b;padding:24px;border-radius:12px;text-align:center;margin-bottom:24px;">
+          <h1 style="color:#f5c842;margin:0;font-size:1.5rem;">⚖️ LegalDraft AI</h1>
+        </div>
+        <h2 style="color:#1e293b;">Votre abonnement est annulé</h2>
+        <p style="color:#475569;">Votre abonnement LegalDraft AI a bien été annulé. Votre accès reste actif jusqu'à la fin de la période payée.</p>
+        <p style="color:#475569;">Vous pouvez vous réabonner à tout moment.</p>
+        <a href="https://legaldraft.fr" style="display:inline-block;background:#f5c842;color:#1e293b;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin:16px 0;">
+          Revenir sur LegalDraft AI →
+        </a>
+        <p style="color:#94a3b8;font-size:0.75rem;margin-top:24px;">LegalDraft AI — Nous espérons vous revoir bientôt.</p>
+      </div>
+    `
+  });
+}
+
 const app        = express();
 const PORT       = process.env.PORT || 4242;
 const JWT_SECRET = process.env.JWT_SECRET || 'ld-dev-secret-CHANGE-IN-PROD';
@@ -231,7 +309,7 @@ app.use(cors({
     if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return cb(null, true);
     cb(new Error(`CORS: origin non autorisée — ${origin}`));
   },
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key'],
 }));
 
@@ -721,47 +799,136 @@ app.post('/webhook', (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // ── Gérez ici les événements utiles ──────────────────────────────────────
-  switch (event.type) {
+  // ── Handlers Stripe ──────────────────────────────────────────────────────
+  // Tous les handlers sont async — on les fire-and-forget pour répondre 200 immédiatement
+  (async () => {
+    try {
+      switch (event.type) {
 
-    case 'payment_intent.succeeded': {
-      const pi = event.data.object;
-      console.log(`✅ Paiement réussi : ${pi.id} — ${pi.amount / 100} ${pi.currency.toUpperCase()}`);
-      // TODO: enregistrer en base de données, envoyer un email de confirmation, etc.
-      break;
+        // ── Paiement one-shot confirmé (unit / pack) ─────────────────────
+        case 'payment_intent.succeeded': {
+          const pi     = event.data.object;
+          const offer  = pi.metadata?.offer || 'unit'; // 'unit' | 'pack'
+          const email  = pi.receipt_email || pi.metadata?.email;
+          const amount = pi.amount;
+          console.log(`✅ PaymentIntent réussi : ${pi.id} — ${amount/100}€ — offre: ${offer}`);
+
+          // Mettre à jour le plan en DB si on a l'email
+          if (email) {
+            const user = await db.getUserByEmail(email);
+            if (user) {
+              // Calcul des crédits selon l'offre
+              const docsMap = { unit: 1, pack: 5 };
+              const docs    = docsMap[offer] || 1;
+              await db.updateUserPlan(user.id, offer, {
+                stripePaymentIntentId: pi.id,
+                docsRemaining: docs,
+                paidAt: new Date().toISOString(),
+              });
+              console.log(`📦 Plan "${offer}" (${docs} doc${docs>1?'s':''}) activé pour ${email}`);
+            }
+            await sendPaymentConfirmEmail(email, { amount, plan: offer, invoiceUrl: null });
+          }
+          break;
+        }
+
+        // ── Paiement échoué ──────────────────────────────────────────────
+        case 'payment_intent.payment_failed': {
+          const pi    = event.data.object;
+          const email = pi.receipt_email || pi.metadata?.email;
+          console.warn(`❌ PaymentIntent échoué : ${pi.id} — ${email || 'email inconnu'}`);
+          if (email) await sendPaymentFailedEmail(email);
+          break;
+        }
+
+        // ── Abonnement mensuel créé ou mis à jour ────────────────────────
+        case 'customer.subscription.created':
+        case 'customer.subscription.updated': {
+          const sub = event.data.object;
+          console.log(`🔄 Abonnement ${event.type} : ${sub.id} — statut: ${sub.status}`);
+          if (sub.status === 'active' || sub.status === 'trialing') {
+            // Retrouver l'utilisateur via le customer Stripe
+            const customer = await stripe.customers.retrieve(sub.customer);
+            const email    = customer.email;
+            if (email) {
+              const user = await db.getUserByEmail(email);
+              if (user) {
+                const expiresAt = new Date(sub.current_period_end * 1000).toISOString();
+                await db.updateUserPlan(user.id, 'monthly', {
+                  stripeSubscriptionId: sub.id,
+                  stripeCustomerId:     sub.customer,
+                  expiresAt,
+                  monthlyCount: 0,
+                  status: sub.status,
+                });
+                console.log(`📅 Abonnement mensuel activé pour ${email} jusqu'au ${expiresAt}`);
+              }
+            }
+          }
+          break;
+        }
+
+        // ── Abonnement annulé ────────────────────────────────────────────
+        case 'customer.subscription.deleted': {
+          const sub      = event.data.object;
+          const customer = await stripe.customers.retrieve(sub.customer);
+          const email    = customer.email;
+          console.log(`🚫 Abonnement annulé : ${sub.id} — ${email || 'email inconnu'}`);
+          if (email) {
+            const user = await db.getUserByEmail(email);
+            if (user) {
+              await db.updateUserPlan(user.id, 'none', {
+                stripeSubscriptionId: sub.id,
+                cancelledAt: new Date().toISOString(),
+              });
+              console.log(`🔒 Accès révoqué pour ${email}`);
+            }
+            await sendSubscriptionCancelledEmail(email);
+          }
+          break;
+        }
+
+        // ── Facture payée (renouvellement mensuel) ───────────────────────
+        case 'invoice.payment_succeeded': {
+          const inv = event.data.object;
+          // Uniquement les renouvellements (billing_reason = 'subscription_cycle')
+          if (inv.billing_reason === 'subscription_cycle') {
+            const email = inv.customer_email;
+            console.log(`🔄 Renouvellement mensuel : ${inv.id} — ${email}`);
+            if (email) {
+              const user = await db.getUserByEmail(email);
+              if (user) {
+                // Reset du compteur mensuel
+                const sub = await stripe.subscriptions.retrieve(inv.subscription);
+                const expiresAt = new Date(sub.current_period_end * 1000).toISOString();
+                await db.updateUserPlan(user.id, 'monthly', {
+                  stripeSubscriptionId: inv.subscription,
+                  stripeCustomerId: inv.customer,
+                  expiresAt,
+                  monthlyCount: 0,
+                  renewedAt: new Date().toISOString(),
+                });
+              }
+              await sendPaymentConfirmEmail(email, {
+                amount: inv.amount_paid,
+                plan: 'monthly',
+                invoiceUrl: inv.hosted_invoice_url || null,
+              });
+            }
+          }
+          break;
+        }
+
+        default:
+          // Événement non géré — silencieux
+          break;
+      }
+    } catch (handlerErr) {
+      console.error(`Webhook handler error [${event.type}]:`, handlerErr.message);
     }
+  })();
 
-    case 'payment_intent.payment_failed': {
-      const pi = event.data.object;
-      console.warn(`❌ Paiement échoué : ${pi.id}`);
-      break;
-    }
-
-    case 'customer.subscription.created':
-    case 'customer.subscription.updated': {
-      const sub = event.data.object;
-      console.log(`🔄 Abonnement ${event.type} : ${sub.id} — statut : ${sub.status}`);
-      break;
-    }
-
-    case 'customer.subscription.deleted': {
-      const sub = event.data.object;
-      console.log(`🚫 Abonnement annulé : ${sub.id}`);
-      // TODO: révoquer l'accès utilisateur
-      break;
-    }
-
-    case 'invoice.payment_succeeded': {
-      const inv = event.data.object;
-      console.log(`🧾 Facture payée : ${inv.id}`);
-      break;
-    }
-
-    default:
-      // Événement non géré — silencieux
-      break;
-  }
-
+  // Répondre immédiatement à Stripe (avant que les handlers async se terminent)
   res.json({ received: true });
 });
 
