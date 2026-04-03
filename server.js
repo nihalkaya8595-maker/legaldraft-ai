@@ -312,7 +312,7 @@ app.post('/auth/register', async (req, res) => {
       user: { id: user.id, email: user.email, freeDocUsed: user.free_doc_used },
     });
 
-    // Email de bienvenue
+    // Email de bienvenue (J+0)
     sendEmail({
       to: email,
       subject: 'Bienvenue sur LegalDraft AI 🎉',
@@ -332,6 +332,12 @@ app.post('/auth/register', async (req, res) => {
         </div>
       `
     });
+
+    // Séquence onboarding — fire & forget (annulée si redémarrage serveur)
+    setTimeout(() => sendActivationEmail(emailClean), 24 * 3600 * 1000);       // J+1
+    setTimeout(() => sendValueEmail(emailClean),      3  * 24 * 3600 * 1000);  // J+3
+    setTimeout(() => sendConversionEmail(emailClean), 7  * 24 * 3600 * 1000);  // J+7
+    console.log(`📧 Séquence onboarding planifiée pour ${emailClean} (J+1, J+3, J+7)`);
   } catch (err) {
     console.error('Register error:', err.message);
     res.status(500).json({ error: 'Erreur serveur — réessayez.' });
