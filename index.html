@@ -7854,6 +7854,8 @@ function incrementParticulierQuota() {
   // Refresh dashboard bar si visible
   const bar = document.getElementById('dashPlanBar');
   if (bar && document.getElementById('mod-accueil')?.classList.contains('active')) renderDashboard();
+  // Refresh les badges sur tous les boutons Générer
+  _refreshGenerateButtons();
   return q;
 }
 
@@ -8049,7 +8051,22 @@ function _refreshGenerateButtons() {
     return;
   }
 
-  // No plan — hide badges
+  // Plan Particulier (gratuit) — affiche quota 2 docs/mois
+  if (plan.type === PLAN_TYPES.NONE) {
+    const q = getParticulierQuota();
+    const used = q.count || 0;
+    const rem  = Math.max(0, PARTICULIER_MONTHLY_QUOTA - used);
+    if (rem === 0) {
+      html = '⚠️ Quota atteint';
+      tags.forEach(t => { t.innerHTML = html; t.style.cssText = styleWarn; });
+    } else {
+      html = `<i class="fa-solid fa-file" style="font-size:.72em;"></i>&thinsp;${rem}/${PARTICULIER_MONTHLY_QUOTA} doc${rem > 1 ? 's' : ''} gratuit${rem > 1 ? 's' : ''}`;
+      tags.forEach(t => { t.innerHTML = html; t.style.cssText = styleOk; });
+    }
+    return;
+  }
+
+  // Aucun plan connu — cacher
   tags.forEach(t => { t.innerHTML = ''; t.style.cssText = ''; });
 }
 
@@ -10183,11 +10200,73 @@ function appendChatMsg(msg, role) {
 }
 
 function formatAIResponse(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n•/g, '<br>•')
-    .replace(/\n\n/g, '<br><br>')
-    .replace(/\n/g, '<br>');
+  if (!text) return '';
+  const lines = text.split('\n');
+  let html = '';
+  let inList = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Titres ###
+    if (/^### (.+)/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<h4 style="margin:16px 0 6px;color:var(--dark);font-size:.93rem;font-weight:700;">${line.replace(/^### /, '')}</h4>`;
+      continue;
+    }
+    if (/^## (.+)/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<h3 style="margin:18px 0 8px;color:var(--dark);font-size:1rem;font-weight:700;">${line.replace(/^## /, '')}</h3>`;
+      continue;
+    }
+    if (/^# (.+)/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += `<h2 style="margin:20px 0 10px;color:var(--dark);font-size:1.1rem;font-weight:700;">${line.replace(/^# /, '')}</h2>`;
+      continue;
+    }
+
+    // Séparateurs ---
+    if (/^---+$/.test(line.trim())) {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += '<hr style="border:none;border-top:1px solid var(--divider);margin:14px 0;">';
+      continue;
+    }
+
+    // Items liste - ou •
+    if (/^[-•*] (.+)/.test(line)) {
+      if (!inList) { html += '<ul style="margin:6px 0 6px 18px;padding:0;list-style:disc;">'; inList = true; }
+      const content = line.replace(/^[-•*] /, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html += `<li style="margin-bottom:4px;font-size:.85rem;line-height:1.6;">${content}</li>`;
+      continue;
+    }
+
+    // Items numérotés 1. 2. etc.
+    if (/^\d+\. (.+)/.test(line)) {
+      if (inList) { html += '</ul>'; inList = false; }
+      if (i === 0 || !/^\d+\. /.test(lines[i-1])) html += '<ol style="margin:6px 0 6px 18px;padding:0;">';
+      const content = line.replace(/^\d+\. /, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html += `<li style="margin-bottom:4px;font-size:.85rem;line-height:1.6;">${content}</li>`;
+      if (i === lines.length-1 || !/^\d+\. /.test(lines[i+1])) html += '</ol>';
+      continue;
+    }
+
+    // Ligne vide
+    if (line.trim() === '') {
+      if (inList) { html += '</ul>'; inList = false; }
+      html += '<br>';
+      continue;
+    }
+
+    // Paragraphe normal
+    if (inList) { html += '</ul>'; inList = false; }
+    const formatted = line
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html += `<p style="margin:4px 0;font-size:.85rem;line-height:1.7;">${formatted}</p>`;
+  }
+
+  if (inList) html += '</ul>';
+  return html;
 }
 
 /* ═══════════════════════════════════════════════════════════
