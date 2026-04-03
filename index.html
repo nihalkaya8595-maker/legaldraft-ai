@@ -2488,31 +2488,39 @@ function selectWelcomeProfile(type, btn) {
     <h2 style="font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--dark);line-height:1.3;margin-bottom:7px;">Bienvenue dans l'Espace Pro !</h2>
     <p style="font-size:.81rem;color:var(--warm-gray);line-height:1.65;margin-bottom:18px;">Votre essai de <strong>7 jours</strong> est actif. Explorez sans limite l'intégralité de l'Espace Pro.</p>
 
-    <div style="background:rgba(96,165,250,.06);border:1.5px solid rgba(96,165,250,.18);border-radius:11px;padding:13px 16px;margin-bottom:16px;text-align:left;">
-      <div style="font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1d4ed8;margin-bottom:9px;">Récapitulatif de votre essai</div>
-      <div style="display:flex;justify-content:space-between;font-size:.79rem;padding:5px 0;border-bottom:1px solid rgba(96,165,250,.12);">
-        <span style="color:var(--warm-gray);">Début</span><span id="trialConfirmStart" style="font-weight:600;color:var(--dark);">—</span>
+    <!-- Features débloquées -->
+    <div style="background:#f0fdf4;border:1.5px solid rgba(22,163,74,.2);border-radius:11px;padding:14px 16px;margin-bottom:16px;text-align:left;">
+      <div style="font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#16a34a;margin-bottom:10px;">✅ Accès complet débloqué</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <span style="font-size:.8rem;color:#166534;">✓ Tous les modules pro</span>
+        <span style="font-size:.8rem;color:#166534;">✓ Export Word (.docx)</span>
+        <span style="font-size:.8rem;color:#166534;">✓ Conventions collectives</span>
+        <span style="font-size:.8rem;color:#166534;">✓ OHADA — 18 États</span>
+        <span style="font-size:.8rem;color:#166534;">✓ Assistant IA juridique</span>
+        <span style="font-size:.8rem;color:#166534;">✓ Coffre-fort illimité</span>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:.79rem;padding:5px 0;border-bottom:1px solid rgba(96,165,250,.12);">
-        <span style="color:var(--warm-gray);">Fin de l'essai</span><span id="trialConfirmEnd" style="font-weight:600;color:var(--dark);">—</span>
+    </div>
+
+    <!-- Dates essai -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:12px 16px;margin-bottom:16px;text-align:left;">
+      <div style="display:flex;justify-content:space-between;font-size:.79rem;padding:4px 0;border-bottom:1px solid #f1f5f9;">
+        <span style="color:var(--warm-gray);">Début de l'essai</span>
+        <span id="trialConfirmStart" style="font-weight:600;color:var(--dark);">—</span>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:.79rem;padding:5px 0;">
-        <span style="color:var(--warm-gray);">Carte enregistrée</span><span id="trialConfirmCard" style="font-weight:600;color:var(--dark);">•••• ????</span>
+      <div style="display:flex;justify-content:space-between;font-size:.79rem;padding:4px 0;">
+        <span style="color:var(--warm-gray);">Fin de l'essai</span>
+        <span id="trialConfirmEnd" style="font-weight:600;color:var(--dark);">—</span>
       </div>
     </div>
 
     <div style="background:#fffbeb;border:1.5px solid rgba(212,175,55,.3);border-radius:9px;padding:10px 13px;margin-bottom:18px;font-size:.73rem;color:#78716c;text-align:left;line-height:1.55;">
       <i class="fa-solid fa-circle-info" style="color:var(--gold);margin-right:6px;"></i>
-      Pensez à <strong>annuler avant le <span id="trialConfirmEndReminder">—</span></strong> pour éviter tout débit futur. L'annulation conserve votre accès jusqu'à la fin de l'essai.
+      Aucune carte requise pendant l'essai. À l'issue des 7 jours, votre accès revient automatiquement au plan Particulier — <strong>sans débit, sans surprise</strong>.
+      <span id="trialConfirmEndReminder" style="display:none;"></span>
     </div>
 
-    <div class="trial-test-notice" style="text-align:left;">
-      <i class="fa-solid fa-lock"></i>
-      <span><strong>MODE TEST actif</strong> — Aucun paiement réel n'a été effectué. Vos informations de carte sont simulées.</span>
-    </div>
-
-    <button class="btn-primary gold" style="width:100%;" onclick="closeModal('modalTrialActivated');enterApp();showModule('avocat');">
-      <span class="btn-label"><i class="fa-solid fa-gavel" style="margin-right:8px;"></i>Accéder à l'Espace Pro</span>
+    <button class="btn-primary gold" style="width:100%;" onclick="closeModal('modalTrialActivated');enterApp();showModule('accueil');">
+      <span class="btn-label"><i class="fa-solid fa-rocket" style="margin-right:8px;"></i>Découvrir l'Espace Professionnel</span>
       <span class="btn-arrow"><i class="fa-solid fa-arrow-right"></i></span>
     </button>
   </div>
@@ -7272,8 +7280,13 @@ function openAuthModal(ctx) {
   const banner = document.getElementById('authContextBanner');
   if (ctx === 'free_doc_gate') {
     banner.style.display = 'flex';
-    document.getElementById('authContextTitle').textContent = 'Créez votre compte pour activer votre document gratuit';
-    document.getElementById('authContextSub').textContent   = 'Votre premier document est offert. Inscription gratuite, sans carte bancaire.';
+    document.getElementById('authContextTitle').textContent  = 'Créez votre compte pour activer votre document gratuit';
+    document.getElementById('authContextSub').textContent    = 'Votre premier document est offert. Inscription gratuite, sans carte bancaire.';
+    document.getElementById('authModalSubtitle').textContent = 'Créer un compte ou se connecter';
+  } else if (ctx === 'trial_gate') {
+    banner.style.display = 'flex';
+    document.getElementById('authContextTitle').textContent  = 'Créez votre compte pour démarrer votre essai Pro';
+    document.getElementById('authContextSub').textContent    = '7 jours gratuits · accès complet · sans carte bancaire.';
     document.getElementById('authModalSubtitle').textContent = 'Créer un compte ou se connecter';
   } else {
     banner.style.display = 'none';
@@ -7622,6 +7635,37 @@ function processTrialActivation() {
     openModal('modalTrialActivated');
     showToast('🚀 Essai Pro activé — 7 jours d\'accès complet !', 'success');
   }, 1600);
+}
+
+/**
+ * Démarre l'essai Pro directement (sans carte, sans Stripe).
+ * Appelé après auth confirmée ou si déjà connecté.
+ */
+function _startTrialDirectly() {
+  const now     = new Date();
+  const endDate = new Date(now.getTime() + 7 * 24 * 3600 * 1000);
+
+  setTrialData({
+    startDate:       now.toISOString(),
+    endDate:         endDate.toISOString(),
+    cancelScheduled: false,
+    paymentMethod:   { noCard: true }
+  });
+  setUserRole(PRO_ROLES.TRIAL_ACTIVE);
+
+  // Remplir les dates dans le modal de confirmation
+  const fmt = d => new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+  const el  = id => document.getElementById(id);
+  if (el('trialConfirmStart'))       el('trialConfirmStart').textContent       = fmt(now.toISOString());
+  if (el('trialConfirmEnd'))         el('trialConfirmEnd').textContent         = fmt(endDate.toISOString());
+  if (el('trialConfirmEndReminder')) el('trialConfirmEndReminder').textContent = fmt(endDate.toISOString());
+
+  // Exécuter le callback en attente (déverrouille le module gate)
+  if (_pwCallback) { _pwCallback(); _pwCallback = null; }
+
+  closeModal('modalPaywall');
+  openModal('modalTrialActivated');
+  showToast('🚀 Essai Pro activé — 7 jours d\'accès complet !', 'success');
 }
 
 /** Renvoie true si l'utilisateur peut encore annuler (>24h avant endDate). */
@@ -10373,55 +10417,27 @@ async function processPaywall() {
   const btn = document.getElementById('btnPaywall');
   btn.classList.add('loading'); btn.disabled = true;
 
-  // If backend unavailable, show warning
-  if (!_backendAvailable) {
-    btn.classList.remove('loading'); btn.disabled = false;
-    showToast('⚠️ Paiement impossible — service temporairement indisponible.', 'warn');
-    return;
-  }
-
   try {
-    // 1. Create PaymentIntent on backend
-    const piRes = await fetch(API_BASE + '/create-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ offer: 'sub', currency: 'eur' }),
-    });
-    if (!piRes.ok) throw new Error('PaymentIntent failed');
-    const { clientSecret } = await piRes.json();
-
-    // 2. Confirm payment with Stripe.js
-    const stripeObj = window.Stripe ? Stripe(STRIPE_PK) : null;
-    if (!stripeObj) throw new Error('Stripe.js not loaded');
-
-    // Use the card number/expiry/cvc from the paywall modal step
-    // Redirect to Stripe-hosted page for simplicity + PCI compliance
-    const { error } = await stripeObj.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: { token: 'tok_visa' }, // TEST: use test token
-        billing_details: {},
-      },
-    });
-
-    if (error) {
-      showToast('❌ Paiement refusé : ' + error.message, 'error');
+    // ── Vérification auth ────────────────────────────────────
+    const user = getAuthUser();
+    if (!user) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      closeModal('modalPaywall');
+      _pendingAuthCallback = () => { _startTrialDirectly(); };
+      openAuthModal('trial_gate');
       return;
     }
 
-    // 3. Payment confirmed
-    activatePlan('monthly');
-    closeModal('modalPaywall');
-    showToast('✅ Essai Pro activé — document en cours de génération !', 'success');
-    if (_pwCallback) { _pwCallback(); _pwCallback = null; }
+    // ── Utilisateur connecté → essai activé directement ─────
+    setTimeout(() => {
+      btn.classList.remove('loading'); btn.disabled = false;
+      _startTrialDirectly();
+    }, 600);
 
   } catch (err) {
-    // Fallback: if Stripe or backend fails in test mode, still allow
-    console.warn('Stripe payment error:', err.message, '— falling back to test mode');
-    activatePlan('monthly');
-    closeModal('modalPaywall');
-    if (_pwCallback) { _pwCallback(); _pwCallback = null; }
-  } finally {
+    console.warn('processPaywall error:', err.message);
     btn.classList.remove('loading'); btn.disabled = false;
+    showToast('❌ Erreur — réessayez.', 'error');
   }
 }
 
