@@ -7429,15 +7429,15 @@ function setUserRole(role) {
   if (typeof _checkCurrentModuleAccess === 'function') _checkCurrentModuleAccess();
 }
 function _checkCurrentModuleAccess() {
-  const role = getUserRole();
-  const proEligible = [PRO_ROLES.VERIFIED, PRO_ROLES.TRIAL_ACTIVE, PRO_ROLES.TRIAL_CANCEL_SCHEDULED];
-  if (proEligible.includes(role)) return;
-  // If on a Pro-only module, redirect to contrats
-  const proModules = ['mod-avocat', 'mod-signatures', 'mod-analytics'];
-  const activeProModule = proModules.find(m => document.getElementById(m)?.classList.contains('active'));
-  if (activeProModule && typeof showModule === 'function') {
-    showModule('contrats');
-  }
+  if (typeof isProUser === 'function' && isProUser()) return;
+  // Si l'utilisateur est sur un module pro sans accès → afficher le gate
+  if (typeof PRO_MODULES === 'undefined') return;
+  PRO_MODULES.forEach(function(mid) {
+    const panel = document.getElementById('mod-' + mid);
+    if (panel && panel.classList.contains('active') && !panel.querySelector('.pro-module-gate')) {
+      _showProGate(mid);
+    }
+  });
 }
 function getUserProData() {
   try { return JSON.parse(localStorage.getItem('ld_pro_data') || '{}'); } catch { return {}; }
@@ -8205,9 +8205,79 @@ function _devPanel_trial_ready() {
 /* ═══════════════════════════════════════════════════════════
    MODULE NAVIGATION
 ═══════════════════════════════════════════════════════════ */
+// ── Modules réservés à l'Espace Professionnel ──────────────
+const PRO_MODULES = new Set(['avocat','analyse','conformite','veille','signatures','analytics','dossier','assistant']);
+
+const PRO_MODULE_META = {
+  avocat:     { icon:'⚖️', label:'Espace Pro — Avocats & Juristes',     desc:'Assignations, actes de procédure, conventions collectives, dossiers judiciaires et actes OHADA.' },
+  analyse:    { icon:'🔍', label:'Analyse juridique IA',                 desc:'Analyse automatique de contrats, détection de clauses abusives, scoring juridique.' },
+  conformite: { icon:'🛡️', label:'Conformité & RGPD',                   desc:'Audit RGPD, mentions légales, registre de traitement — prêt à utiliser.' },
+  veille:     { icon:'📡', label:'Veille juridique',                     desc:'Actualités légales filtrées par domaine, alertes jurisprudentielles en temps réel.' },
+  signatures: { icon:'✍️', label:'Signatures électroniques',             desc:'Envoi et suivi des demandes de signature avec valeur légale.' },
+  analytics:  { icon:'📊', label:'Analytiques & statistiques',           desc:'Tableau de bord de vos usages, documents générés, économies réalisées.' },
+  dossier:    { icon:'📁', label:'Dossiers clients',                     desc:'Gestion multi-documents par client, archivage structuré, export complet.' },
+  assistant:  { icon:'🤖', label:'Assistant IA juridique',               desc:'Reformulation, correction et amélioration de clauses juridiques par IA.' },
+};
+
+// Vrai si l'utilisateur a un accès Pro actif (essai, abonnement, cabinet)
+function isProUser() {
+  const role = getUserRole();
+  if ([PRO_ROLES.VERIFIED, PRO_ROLES.TRIAL_ACTIVE, PRO_ROLES.TRIAL_CANCEL_SCHEDULED].includes(role)) return true;
+  const plan = getPlanData();
+  return plan.type === PLAN_TYPES.CABINET;
+}
+
+// Écran de conversion injecté dans le panel du module
+function _showProGate(moduleId) {
+  const meta = PRO_MODULE_META[moduleId] || { icon:'🔒', label:'Module Professionnel', desc:'Ce module est réservé à l\'Espace Professionnel.' };
+  const panel = document.getElementById('mod-' + moduleId);
+  if (!panel) return;
+  panel.querySelector('.pro-module-gate')?.remove();
+  panel.style.position = 'relative';
+  const gate = document.createElement('div');
+  gate.className = 'pro-module-gate';
+  gate.style.cssText = 'position:absolute;inset:0;background:#fff;z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:48px 24px;overflow-y:auto;';
+  gate.innerHTML = `
+    <div style="max-width:460px;width:100%;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:14px;">${meta.icon}</div>
+      <div style="display:inline-block;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.35);border-radius:20px;padding:4px 14px;font-size:.68rem;font-weight:700;letter-spacing:.09em;color:#92700f;margin-bottom:16px;">ESPACE PROFESSIONNEL</div>
+      <h2 style="font-size:1.25rem;font-weight:800;color:#0f172a;margin:0 0 10px;line-height:1.3;">${meta.label}</h2>
+      <p style="color:#64748b;font-size:.88rem;line-height:1.65;margin:0 0 24px;">${meta.desc}</p>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:24px;text-align:left;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:10px;">Inclus dans l'Espace Professionnel</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <span style="font-size:.8rem;color:#334155;">✅ Tous les modules pro</span>
+          <span style="font-size:.8rem;color:#334155;">✅ Export Word (.docx)</span>
+          <span style="font-size:.8rem;color:#334155;">✅ Conventions collectives</span>
+          <span style="font-size:.8rem;color:#334155;">✅ OHADA — 18 États</span>
+          <span style="font-size:.8rem;color:#334155;">✅ Assistant IA juridique</span>
+          <span style="font-size:.8rem;color:#334155;">✅ Coffre-fort illimité</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:center;gap:5px;margin-bottom:20px;">
+        <span style="font-size:2rem;font-weight:800;color:#0f172a;">€99</span>
+        <span style="font-size:.82rem;color:#64748b;">/mois · après 7 jours gratuits</span>
+      </div>
+      <button onclick="(function(){ var mid='${moduleId}'; _pwCallback=function(){ document.getElementById('mod-'+mid)?.querySelector('.pro-module-gate')?.remove(); _activateModule(mid); }; openModal('modalPaywall'); })()"
+        style="width:100%;padding:14px 20px;background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;">
+        <i class="fa-solid fa-rocket"></i> Démarrer mon essai — 7 jours gratuits
+      </button>
+      <p style="font-size:.7rem;color:#94a3b8;margin:0 0 16px;">Sans carte · sans engagement · annulation en 1 clic</p>
+      <button onclick="showModule('accueil')" style="background:none;border:none;color:#94a3b8;font-size:.8rem;cursor:pointer;text-decoration:underline;">← Retour au tableau de bord</button>
+    </div>
+  `;
+  panel.appendChild(gate);
+}
+
 function showModule(id) {
-  // ── Pro access gate ──────────────────────────────────────
-  if (id === 'avocat') {
+  // ── Gate : module pro + utilisateur non pro ───────────────
+  if (PRO_MODULES.has(id) && !isProUser()) {
+    _activateModule(id);
+    _showProGate(id);
+    return;
+  }
+  // ── Disclaimer pro pour les utilisateurs pro vérifié / essai
+  if (id === 'avocat' && isProUser()) {
     requireProAccess('Espace Pro — Avocats & Juristes', () => {
       _activateModule('avocat');
     });
