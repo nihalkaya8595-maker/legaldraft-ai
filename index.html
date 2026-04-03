@@ -2645,7 +2645,7 @@ function selectWelcomeProfile(type, btn) {
       </button>
       <button class="lh-cta" style="background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);" onclick="enterApp();showModule('avocat')">
         <i class="fa-solid fa-gavel"></i>
-        Espace Pro Avocat
+        Espace Professionnel
       </button>
     </div>
     <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:18px;opacity:.65;font-size:.75rem;">
@@ -2886,7 +2886,7 @@ function selectWelcomeProfile(type, btn) {
       </div>
       <div class="feat-card feat-card-pro">
         <div class="feat-icon"><i class="fa-solid fa-gavel"></i></div>
-        <div class="feat-name">Espace Pro Avocat</div>
+        <div class="feat-name">Espace Professionnel</div>
         <div class="feat-desc">Dossiers judiciaires, actes de procédure, CCN, clauses pro, procédures guidées — Droit FR &amp; OHADA.</div>
         <div class="feat-pro-badge">⚖️ PRO</div>
       </div>
@@ -3220,10 +3220,10 @@ function selectWelcomeProfile(type, btn) {
 
   <script>
   const ROI_DATA = {
-    avocat:  { manual: 750,  legal: 29, detail: "Basé sur un tarif avocat de 150 €/h · 5h de rédaction traditionnelle.", insight: "En 1 assignation générée, vous remboursez 25× l'abonnement mensuel." },
-    rh:      { manual: 420,  legal: 29, detail: "Basé sur un DRH facturé 60 €/h · 7h de rédaction CDI + annexes.", insight: "En 1 CDI généré avec ses annexes, vous économisez une journée de travail." },
-    juriste: { manual: 580,  legal: 29, detail: "Basé sur un juriste d'entreprise à 80 €/h · forfait cabinet externe.", insight: "En 1 contrat commercial, vous économisez l'équivalent de 19× l'abonnement." },
-    ohada:   { manual: 1200, legal: 29, detail: "Basé sur un acte OHADA rédigé par un cabinet local · frais de traduction inclus.", insight: "En 1 acte OHADA, vous réalisez 41× le prix de l'abonnement en économies." }
+    avocat:  { manual: 750,  legal: 99, detail: "Basé sur un tarif avocat de 150 €/h · 5h de rédaction traditionnelle.", insight: "En 1 assignation générée, vous remboursez 7× l'abonnement Pro mensuel." },
+    rh:      { manual: 420,  legal: 99, detail: "Basé sur un DRH facturé 60 €/h · 7h de rédaction CDI + annexes.", insight: "En 1 CDI généré avec ses annexes, vous économisez 4× le prix de l'abonnement." },
+    juriste: { manual: 580,  legal: 99, detail: "Basé sur un juriste d'entreprise à 80 €/h · forfait cabinet externe.", insight: "En 1 contrat commercial, vous économisez 5× le prix de l'abonnement Pro." },
+    ohada:   { manual: 1200, legal: 99, detail: "Basé sur un acte OHADA rédigé par un cabinet local · frais de traduction inclus.", insight: "En 1 acte OHADA, vous réalisez 12× le prix de l'abonnement en économies." }
   };
 
   function calcRoi(profile, btn) {
@@ -3249,101 +3249,63 @@ function selectWelcomeProfile(type, btn) {
   <section class="landing-pricing" id="pricing">
     <div class="lsec-tag">Tarifs</div>
     <h2 class="lsec-title">Simple et transparent</h2>
-    <p class="lsec-sub">Trois niveaux d'accès pour tous les besoins juridiques — particuliers, professionnels, cabinets.</p>
-    <div class="pricing-grid-3col">
+    <p class="lsec-sub">Deux offres claires — commencez gratuitement, passez Pro quand vous êtes prêt.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:760px;margin:40px auto 0;">
 
       <!-- ── Colonne 1 : Grand Public ── -->
-      <div class="price-card price-card-public">
+      <div class="price-card price-card-public" style="display:flex;flex-direction:column;">
         <div class="price-tier-label">Grand Public</div>
         <div class="price-name">Documents juridiques</div>
-        <div style="margin:18px 0 10px;">
-          <div class="price-subplan price-subplan-active" onclick="_selectSubplan(this,'unit')" id="sp-unit" style="cursor:pointer;">
-            <div>
-              <div style="font-weight:700;font-size:.88rem;color:var(--text);">Document unitaire</div>
-              <div style="font-size:.72rem;color:var(--warm-gray);margin-top:2px;">1 contrat ou lettre</div>
-            </div>
-            <div style="font-weight:800;font-size:1.15rem;color:var(--gold);white-space:nowrap;">€9 <span style="font-size:.65rem;font-weight:500;color:var(--warm-gray);">TTC</span></div>
-          </div>
-          <div class="price-subplan" onclick="_selectSubplan(this,'pack')" id="sp-pack" style="cursor:pointer;position:relative;">
-            <div class="pw-offer-pop" style="top:-9px;right:8px;font-size:.58rem;">Populaire</div>
-            <div>
-              <div style="font-weight:700;font-size:.88rem;color:var(--text);">Pack 5 documents</div>
-              <div style="font-size:.72rem;color:var(--warm-gray);margin-top:2px;">Économisez 20 €</div>
-            </div>
-            <div style="font-weight:800;font-size:1.15rem;color:var(--gold);white-space:nowrap;">€25 <span style="font-size:.65rem;font-weight:500;color:var(--warm-gray);">TTC</span></div>
-          </div>
-          <div class="price-subplan" onclick="_selectSubplan(this,'monthly')" id="sp-monthly" style="cursor:pointer;">
-            <div>
-              <div style="font-weight:700;font-size:.88rem;color:var(--text);">Abonnement mensuel</div>
-              <div style="font-size:.72rem;color:var(--warm-gray);margin-top:2px;">15 documents / mois · sans engagement</div>
-            </div>
-            <div style="font-weight:800;font-size:1.15rem;color:var(--gold);white-space:nowrap;">€29 <span style="font-size:.65rem;font-weight:500;color:var(--warm-gray);">/mois</span></div>
-          </div>
+        <div style="margin:20px 0 6px;display:flex;align-items:baseline;justify-content:center;gap:6px;">
+          <span style="font-size:2rem;font-weight:800;color:var(--text);">€29</span>
+          <span style="font-size:.8rem;color:var(--warm-gray);">/mois</span>
         </div>
-        <ul class="price-features">
-          <li><i class="fa-solid fa-check"></i> Contrats, lettres, clauses — tous types</li>
+        <div style="font-size:.72rem;color:var(--warm-gray);text-align:center;margin-bottom:18px;">1 document gratuit inclus · sans engagement</div>
+        <ul class="price-features" style="flex:1;">
+          <li><i class="fa-solid fa-check"></i> Contrats, lettres — tous types</li>
           <li><i class="fa-solid fa-check"></i> Droit français &amp; OHADA</li>
-          <li><i class="fa-solid fa-check"></i> PDF immédiat + coffre-fort numérique</li>
+          <li><i class="fa-solid fa-check"></i> PDF immédiat + coffre-fort</li>
           <li><i class="fa-solid fa-check"></i> Calculateurs juridiques inclus</li>
         </ul>
-        <button class="price-btn primary" id="btnLandingPublic" onclick="enterApp()">
+        <button class="price-btn primary" id="btnLandingPublic" onclick="enterApp()" style="margin-top:auto;">
           Commencer — 1 doc gratuit
         </button>
       </div>
 
-      <!-- ── Colonne 2 : Espace Pro ── -->
-      <div class="price-card featured pro-plan" style="position:relative;">
-        <div class="price-popular">⚖️ Professionnels du droit</div>
-        <div class="price-plan-badge" style="font-size:.6rem;">AVOCAT · JURISTE · NOTAIRE</div>
-        <div class="price-name" style="margin-top:8px;">Espace Pro</div>
-        <!-- Trial offer -->
+      <!-- ── Colonne 2 : Espace Pro (offre principale) ── -->
+      <div class="price-card featured pro-plan" style="position:relative;display:flex;flex-direction:column;">
+        <div class="price-popular">⭐ Offre recommandée</div>
+        <div class="price-plan-badge" style="font-size:.6rem;">AVOCAT · JURISTE · DRH · OHADA</div>
+        <div class="price-name" style="margin-top:8px;">Espace Professionnel</div>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;">
           <span style="background:rgba(29,78,216,.1);border:1.5px solid rgba(29,78,216,.25);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700;color:#1d4ed8;letter-spacing:.04em;">🎁 7 jours gratuits</span>
         </div>
         <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;margin:6px 0 0;">
-          <span style="font-size:2rem;font-weight:800;color:var(--text);">€0</span>
-          <span style="font-size:.8rem;color:var(--warm-gray);">pendant 7 jours</span>
+          <span style="font-size:2rem;font-weight:800;color:var(--text);">€99</span>
+          <span style="font-size:.8rem;color:var(--warm-gray);">/mois</span>
         </div>
-        <div style="font-size:.68rem;color:var(--warm-gray);text-align:center;margin:2px 0 14px;">puis €99/mois · sans engagement</div>
-        <ul class="price-features">
+        <div style="font-size:.68rem;color:var(--warm-gray);text-align:center;margin:2px 0 14px;">sans engagement · annulation en 1 clic</div>
+        <ul class="price-features" style="flex:1;">
           <li><i class="fa-solid fa-check"></i> Usage illimité (usage raisonnable)</li>
-          <li><i class="fa-solid fa-check"></i> Dossiers juridiques complets (PDF + Word)</li>
-          <li><i class="fa-solid fa-check"></i> Assignations, conclusions, actes de procédure</li>
+          <li><i class="fa-solid fa-check"></i> Dossiers complets (PDF + Word)</li>
+          <li><i class="fa-solid fa-check"></i> Assignations, actes de procédure, OHADA</li>
           <li><i class="fa-solid fa-check"></i> 15 conventions collectives détaillées</li>
-          <li><i class="fa-solid fa-check"></i> Statuts SAS/SARL, PV AG, accords d'entreprise</li>
           <li><i class="fa-solid fa-check"></i> Export Word (.docx) professionnel</li>
-          <li><i class="fa-solid fa-check"></i> Vérification KYC identité professionnelle</li>
+          <li><i class="fa-solid fa-check"></i> Assistant IA juridique dédié</li>
         </ul>
-        <button class="price-btn primary" onclick="enterApp();showModule('avocat')">
-          <i class="fa-solid fa-rocket" style="margin-right:7px;"></i>Démarrer l'essai gratuit — 7 jours
+        <button class="price-btn primary" onclick="enterApp();showModule('avocat')" style="margin-top:auto;">
+          <i class="fa-solid fa-rocket" style="margin-right:7px;"></i>Démarrer l'essai — 7 jours gratuits
         </button>
         <div style="font-size:.62rem;color:var(--warm-gray);text-align:center;margin-top:8px;line-height:1.5;">
-          Aucune carte requise pour commencer · Accès réservé aux professionnels vérifiés
+          Aucune carte requise pour commencer
         </div>
       </div>
 
-      <!-- ── Colonne 3 : Cabinet ── -->
-      <div class="price-card price-card-cabinet" style="position:relative;">
-        <div class="price-tier-label" style="background:rgba(99,102,241,.15);color:#818cf8;border-color:rgba(99,102,241,.3);">Cabinet &amp; Entreprise</div>
-        <div class="price-name">Plan Cabinet</div>
-        <div class="price-amount"><sup>€</sup>299</div>
-        <div class="price-period">par mois · TTC · sans engagement</div>
-        <ul class="price-features">
-          <li><i class="fa-solid fa-check"></i> <strong>5 utilisateurs simultanés</strong></li>
-          <li><i class="fa-solid fa-check"></i> Code d'accès partagé (multi-utilisateurs)</li>
-          <li><i class="fa-solid fa-check"></i> Toutes les fonctionnalités Pro incluses</li>
-          <li><i class="fa-solid fa-check"></i> Usage illimité pour toute l'équipe</li>
-          <li><i class="fa-solid fa-check"></i> Export Word professionnel</li>
-          <li><i class="fa-solid fa-check"></i> Support dédié prioritaire</li>
-        </ul>
-        <button class="price-btn" style="background:linear-gradient(135deg,#4f46e5,#818cf8);border:none;color:#fff;" onclick="openCabinetModal()">Activer avec mon code</button>
-        <div style="margin-top:10px;text-align:center;">
-          <a href="mailto:contact@legaldraft.ai" style="font-size:.72rem;color:var(--warm-gray);text-decoration:none;border-bottom:1px dotted;">
-            <i class="fa-solid fa-envelope" style="margin-right:4px;"></i>Souscrire — nous contacter
-          </a>
-        </div>
-      </div>
-
+    </div>
+    <div style="text-align:center;margin-top:20px;">
+      <a href="mailto:contact@legaldraft.fr" style="font-size:.78rem;color:var(--warm-gray);text-decoration:none;">
+        🏢 Cabinet ou équipe ? <span style="color:var(--gold);border-bottom:1px dotted;">Contactez-nous pour une offre sur mesure →</span>
+      </a>
     </div>
   </section>
 
@@ -3363,7 +3325,7 @@ function selectWelcomeProfile(type, btn) {
     const FAQS = [
       {
         q: "Les documents sont-ils juridiquement valables en France ?",
-        a: "Oui. Chaque modèle est basé sur le Code civil, le Code du travail et la jurisprudence récente. Pour les actes OHADA, nous suivons le Traité de Port-Louis et ses Actes uniformes. Les documents générés sont des bases solides à adapter à votre situation — comme tout contrat type fourni par un cabinet."
+        a: "Oui. Les documents générés par LegalDraft AI s'appuient sur des bases juridiques fiables (Code civil, Code du travail, jurisprudence récente et textes OHADA).\n\nIl s'agit de modèles structurés et adaptés aux pratiques professionnelles.\n\nToutefois, LegalDraft AI est un outil d'assistance : une relecture ou validation par un professionnel du droit reste recommandée selon la complexité de votre situation."
       },
       {
         q: "Puis-je annuler à tout moment sans frais ?",
@@ -3420,7 +3382,7 @@ function selectWelcomeProfile(type, btn) {
   <section class="landing-cta-section">
     <div class="lsec-tag" style="color:var(--gold);">Prêt à commencer ?</div>
     <h2 class="lsec-title lsec-title-light">L'outil de rédaction juridique<br>le plus complet en français</h2>
-    <p class="lsec-sub-light">17 contrats · 15 lettres · 10 calculateurs · Dictionnaire · Comparateur · Espace Pro Avocat<br>Droit français &amp; OHADA — tout est inclus, disponible immédiatement.</p>
+    <p class="lsec-sub-light">17 contrats · 15 lettres · 10 calculateurs · Dictionnaire · Comparateur · Espace Professionnel<br>Droit français &amp; OHADA — tout est inclus, disponible immédiatement.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
       <button class="lh-cta" onclick="enterApp()">
         <i class="fa-solid fa-rocket"></i>
@@ -3429,7 +3391,7 @@ function selectWelcomeProfile(type, btn) {
       </button>
       <button class="lh-cta" style="background:transparent;border:2px solid rgba(255,255,255,.3);color:#fff;" onclick="enterApp();showModule('avocat')">
         <i class="fa-solid fa-gavel"></i>
-        Espace Pro Avocat
+        Espace Professionnel
       </button>
     </div>
     <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;opacity:.75;font-size:.85rem;color:#fff;">
