@@ -3747,118 +3747,151 @@ function selectWelcomeProfile(type, btn) {
       <p>Sélectionnez le document juridique dont vous avez besoin</p>
     </div>
 
-    <div class="contracts-grid" id="contractsGrid">
+    <div id="contractsGrid">
 
-      <div class="contract-card" data-type="prestation" data-label="Prestation de Services" data-emoji="📋" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">📋</div>
-        <div class="card-title">Prestation de Services</div>
-        <div class="card-desc">Freelance, consultant, agence</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
+      <!-- ── Section Particulier — Accès libre ── -->
+      <div style="margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#16a34a;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:20px;padding:3px 10px;">✓ Particulier — Accès libre</span>
+        </div>
+        <div class="contracts-grid">
+
+          <div class="contract-card" data-type="bail_hab" data-label="Bail d'Habitation" data-emoji="🏠" data-price="9.00" onclick="selectContract(this)">
+            <div class="card-icon">🏠</div>
+            <div class="card-title">Bail d'Habitation</div>
+            <div class="card-desc">Location résidentielle, meublé ou vide</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
+
+          <div class="contract-card" data-type="reconnaissance_dette" data-label="Reconnaissance de Dette" data-emoji="📝" data-price="9.00" onclick="selectContract(this)">
+            <div class="card-icon">📝</div>
+            <div class="card-title">Reconnaissance de Dette</div>
+            <div class="card-desc">Prêt entre particuliers</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
+
+          <div class="contract-card" data-type="prestation" data-label="Prestation de Services" data-emoji="📋" data-price="9.00" onclick="selectContract(this)">
+            <div class="card-icon">📋</div>
+            <div class="card-title">Prestation de Services</div>
+            <div class="card-desc">Freelance, consultant, mission simple</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
+
+          <div class="contract-card" data-type="stage" data-label="Convention de Stage" data-emoji="🎓" data-price="9.00" onclick="selectContract(this)">
+            <div class="card-icon">🎓</div>
+            <div class="card-title">Convention de Stage</div>
+            <div class="card-desc">Stage école, université</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
+
+        </div>
       </div>
 
-      <div class="contract-card" data-type="nda" data-label="NDA / Confidentialité" data-emoji="🔒" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🔒</div>
-        <div class="card-title">NDA / Confidentialité</div>
-        <div class="card-desc">Protégez vos informations sensibles</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+      <!-- ── Section Professionnelle — Espace Pro ── -->
+      <div style="margin-top:24px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#92400e;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);border-radius:20px;padding:3px 10px;">Espace Professionnel 🔒</span>
+          <span style="font-size:.72rem;color:#94a3b8;">7 jours gratuits · sans carte</span>
+        </div>
+        <div class="contracts-grid">
 
-      <div class="contract-card" data-type="cgv" data-label="Conditions Générales de Vente" data-emoji="🛒" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🛒</div>
-        <div class="card-title">CGV</div>
-        <div class="card-desc">E-commerce, vente en ligne</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="travail" data-label="Contrat de Travail" data-emoji="💼" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">💼</div>
+            <div class="card-title">Contrat de Travail</div>
+            <div class="card-desc">CDI, CDD, alternance, intérim</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="travail" data-label="Contrat de Travail" data-emoji="💼" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">💼</div>
-        <div class="card-title">Contrat de Travail</div>
-        <div class="card-desc">CDI, CDD, apprentissage, professionnalisation, intérim…</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="nda" data-label="NDA / Confidentialité" data-emoji="🔐" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🔐</div>
+            <div class="card-title">NDA / Confidentialité</div>
+            <div class="card-desc">Informations sensibles, secrets d'affaires</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="partenariat" data-label="Accord de Partenariat" data-emoji="🤝" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🤝</div>
-        <div class="card-title">Partenariat</div>
-        <div class="card-desc">Association, joint-venture</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="cgv" data-label="Conditions Générales de Vente" data-emoji="🛒" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🛒</div>
+            <div class="card-title">CGV</div>
+            <div class="card-desc">E-commerce, vente en ligne</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="bail" data-label="Bail Commercial" data-emoji="🏢" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🏢</div>
-        <div class="card-title">Bail Commercial</div>
-        <div class="card-desc">Location de locaux professionnels (3/6/9)</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="partenariat" data-label="Accord de Partenariat" data-emoji="🤝" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🤝</div>
+            <div class="card-title">Partenariat</div>
+            <div class="card-desc">Association, joint-venture</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="stage" data-label="Convention de Stage" data-emoji="🎓" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🎓</div>
-        <div class="card-title">Convention de Stage</div>
-        <div class="card-desc">Stage école, université, alternance</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="bail" data-label="Bail Commercial" data-emoji="🏢" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🏢</div>
+            <div class="card-title">Bail Commercial</div>
+            <div class="card-desc">Locaux professionnels (3/6/9)</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="soustraitance" data-label="Sous-traitance" data-emoji="🔧" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🔧</div>
-        <div class="card-title">Sous-traitance</div>
-        <div class="card-desc">Donneur d'ordre / sous-traitant</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="soustraitance" data-label="Sous-traitance" data-emoji="🔧" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🔧</div>
+            <div class="card-title">Sous-traitance</div>
+            <div class="card-desc">Donneur d'ordre / sous-traitant</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="cession" data-label="Cession de Droits d'Auteur" data-emoji="✍️" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">✍️</div>
-        <div class="card-title">Cession de Droits</div>
-        <div class="card-desc">Droits d'auteur, propriété intellectuelle</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="cession" data-label="Cession de Droits d'Auteur" data-emoji="✍️" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">✍️</div>
+            <div class="card-title">Cession de Droits</div>
+            <div class="card-desc">Droits d'auteur, propriété intellectuelle</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="mandat" data-label="Mandat Commercial" data-emoji="📊" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">📊</div>
-        <div class="card-title">Mandat Commercial</div>
-        <div class="card-desc">Agent commercial, représentant</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="mandat" data-label="Mandat Commercial" data-emoji="📊" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">📊</div>
+            <div class="card-title">Mandat Commercial</div>
+            <div class="card-desc">Agent commercial, représentant</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="bail_hab" data-label="Bail d'Habitation" data-emoji="🏠" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🏠</div>
-        <div class="card-title">Bail d'Habitation</div>
-        <div class="card-desc">Location résidentielle, meublé ou vide</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="franchise" data-label="Contrat de Franchise" data-emoji="🏪" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🏪</div>
+            <div class="card-title">Franchise</div>
+            <div class="card-desc">Franchiseur / franchisé, enseigne</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="franchise" data-label="Contrat de Franchise" data-emoji="🏪" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🏪</div>
-        <div class="card-title">Franchise</div>
-        <div class="card-desc">Franchiseur / franchisé, enseigne</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="distribution" data-label="Distribution Exclusive" data-emoji="📦" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">📦</div>
+            <div class="card-title">Distribution Exclusive</div>
+            <div class="card-desc">Réseau de distribution, territoire</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="reconnaissance_dette" data-label="Reconnaissance de Dette" data-emoji="📝" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">📝</div>
-        <div class="card-title">Reconnaissance de Dette</div>
-        <div class="card-desc">Prêt entre particuliers ou entreprises</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="portage" data-label="Portage Salarial" data-emoji="🧳" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🧳</div>
+            <div class="card-title">Portage Salarial</div>
+            <div class="card-desc">Consultant porté, société de portage</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="distribution" data-label="Distribution Exclusive" data-emoji="📦" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">📦</div>
-        <div class="card-title">Distribution Exclusive</div>
-        <div class="card-desc">Réseau de distribution, territoire exclusif</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
+          <div class="contract-card" data-type="pacte_associes" data-label="Pacte d'Associés" data-emoji="🤲" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="card-icon">🤲</div>
+            <div class="card-title">Pacte d'Associés</div>
+            <div class="card-desc">Gouvernance, préemption, anti-dilution</div>
+            <div class="card-check"><i class="fa-solid fa-check"></i></div>
+          </div>
 
-      <div class="contract-card" data-type="portage" data-label="Portage Salarial" data-emoji="🧳" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🧳</div>
-        <div class="card-title">Portage Salarial</div>
-        <div class="card-desc">Consultant porté, société de portage</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
-      </div>
-
-      <div class="contract-card" data-type="pacte_associes" data-label="Pacte d'Associés" data-emoji="🤲" data-price="9.00" onclick="selectContract(this)">
-        <div class="card-icon">🤲</div>
-        <div class="card-title">Pacte d'Associés</div>
-        <div class="card-desc">Gouvernance, préemption, anti-dilution</div>
-        <div class="card-check"><i class="fa-solid fa-check"></i></div>
+        </div>
       </div>
 
     </div>
@@ -5806,6 +5839,17 @@ function goToStep(n) {
 
 /* ── Contract selection ──────────────────────────────────── */
 function selectContract(card) {
+  // ── Gate : contrat pro + utilisateur non pro ────────────
+  if (card.dataset.pro === 'true' && typeof isProUser === 'function' && !isProUser()) {
+    // Feedback visuel bref sur la carte
+    card.style.transform = 'scale(.97)';
+    setTimeout(() => { card.style.transform = ''; }, 200);
+    // Ouvrir le paywall Pro directement
+    _pwCallback = null;
+    openModal('modalPaywall');
+    return;
+  }
+
   document.querySelectorAll('.contract-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   state.selectedType  = card.dataset.type;
