@@ -3624,17 +3624,19 @@ function selectWelcomeProfile(type, btn) {
       <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Calculateurs</div>
       <div style="color:#94a3b8;font-size:11px;">Préavis, indemnités…</div>
     </button>
-    <button onclick="showModule('assistant')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#e2e8f0'">
+    <button onclick="showModule('assistant')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;position:relative;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#e2e8f0'">
+      <div style="position:absolute;top:8px;right:8px;background:#f1f5f9;border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;color:#64748b;letter-spacing:.04em;">PRO 🔒</div>
       <div style="font-size:22px;margin-bottom:6px;">🤖</div>
       <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Assistant IA</div>
-      <div style="color:#94a3b8;font-size:11px;">Posez une question juridique</div>
+      <div style="color:#94a3b8;font-size:11px;">Réservé Pro</div>
     </button>
     <button onclick="showModule('coffre')" style="padding:18px 14px;border:1.5px solid #e2e8f0;border-radius:12px;background:white;cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#2563eb'" onmouseout="this.style.borderColor='#e2e8f0'">
       <div style="font-size:22px;margin-bottom:6px;">📁</div>
       <div style="font-weight:700;color:#0f172a;font-size:13px;margin-bottom:2px;">Mes documents</div>
       <div style="color:#94a3b8;font-size:11px;">Historique & coffre-fort</div>
     </button>
-    <button onclick="showModule('avocat')" style="padding:18px 14px;border:1.5px solid rgba(212,175,55,.3);border-radius:12px;background:rgba(212,175,55,.04);cursor:pointer;text-align:left;transition:all .15s;" onmouseover="this.style.borderColor='#d4af37'" onmouseout="this.style.borderColor='rgba(212,175,55,.3)'">
+    <button onclick="showModule('avocat')" style="padding:18px 14px;border:1.5px solid rgba(212,175,55,.3);border-radius:12px;background:rgba(212,175,55,.04);cursor:pointer;text-align:left;transition:all .15s;position:relative;" onmouseover="this.style.borderColor='#d4af37'" onmouseout="this.style.borderColor='rgba(212,175,55,.3)'">
+      <div style="position:absolute;top:8px;right:8px;background:rgba(212,175,55,.15);border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;color:#92400e;letter-spacing:.04em;">PRO 🔒</div>
       <div style="font-size:22px;margin-bottom:6px;">⚖️</div>
       <div style="font-weight:700;color:#92400e;font-size:13px;margin-bottom:2px;">Espace Pro</div>
       <div style="color:#94a3b8;font-size:11px;">Avocats & juristes</div>
@@ -7663,6 +7665,33 @@ function setPlanData(data) {
   _updatePlanStatusBadge();
   _refreshGenerateButtons();
 }
+// ── Quota Particulier : 2 documents / mois, reset le 1er ────
+const PARTICULIER_MONTHLY_QUOTA = 2;
+
+function getParticulierQuota() {
+  try {
+    const currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+    const stored = localStorage.getItem('ld_part_quota');
+    const data = stored ? JSON.parse(stored) : null;
+    if (!data || data.month !== currentMonth) {
+      const fresh = { count: 0, month: currentMonth };
+      localStorage.setItem('ld_part_quota', JSON.stringify(fresh));
+      return fresh;
+    }
+    return data;
+  } catch { return { count: 0, month: new Date().toISOString().slice(0, 7) }; }
+}
+
+function incrementParticulierQuota() {
+  const q = getParticulierQuota();
+  q.count = (q.count || 0) + 1;
+  localStorage.setItem('ld_part_quota', JSON.stringify(q));
+  // Refresh dashboard bar si visible
+  const bar = document.getElementById('dashPlanBar');
+  if (bar && document.getElementById('mod-accueil')?.classList.contains('active')) renderDashboard();
+  return q;
+}
+
 function canGenerateDocument() {
   const role = getUserRole();
   // Trial actif → accès illimité
@@ -9700,6 +9729,44 @@ function _showPostGenBanner(label, docId) {
   `;
   document.body.appendChild(banner);
 
+  // ── Nudge quota pour les utilisateurs Particulier ────────
+  if (typeof isProUser === 'function' && !isProUser()) {
+    const q = incrementParticulierQuota();
+    const used      = q.count || 0;
+    const remaining = Math.max(0, PARTICULIER_MONTHLY_QUOTA - used);
+    const isFull    = remaining === 0;
+
+    // Injecter ligne quota sous la bannière principale
+    setTimeout(() => {
+      const quotaNudge = document.createElement('div');
+      quotaNudge.style.cssText = `
+        position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+        background:${isFull ? '#fef2f2' : '#f0f9ff'};
+        border-top:2px solid ${isFull ? '#ef4444' : '#3b82f6'};
+        padding:10px 20px;
+        display:flex;align-items:center;justify-content:center;gap:14px;
+        font-size:12px;color:${isFull ? '#991b1b' : '#1e40af'};
+        z-index:9997;width:100%;max-width:680px;border-radius:0 0 14px 14px;
+        box-shadow:0 4px 16px rgba(0,0,0,.08);
+      `;
+      quotaNudge.innerHTML = isFull
+        ? `<span>⚠️ <strong>Quota atteint</strong> — ${used}/${PARTICULIER_MONTHLY_QUOTA} documents utilisés ce mois. Passez Pro pour continuer sans limite.</span>
+           <button onclick="openModal('modalPaywall');this.closest('div').remove();"
+             style="background:#ef4444;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">
+             🚀 Passer Pro →
+           </button>`
+        : `<span>📊 <strong>${used}/${PARTICULIER_MONTHLY_QUOTA}</strong> documents utilisés ce mois — ${remaining} restant${remaining > 1 ? 's' : ''}.</span>
+           <button onclick="openModal('modalPaywall');this.closest('div').remove();"
+             style="background:#2563eb;color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">
+             Essai Pro gratuit →
+           </button>
+           <button onclick="this.closest('div').remove()"
+             style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;">✕</button>`;
+      document.body.appendChild(quotaNudge);
+      setTimeout(() => quotaNudge?.remove(), 10000);
+    }, 400);
+  }
+
   // Disparaît automatiquement après 8s
   setTimeout(() => banner?.remove(), 8000);
 }
@@ -11486,23 +11553,64 @@ function renderDashboard() {
   document.getElementById('dashGreeting').textContent = `${greeting}${name ? ' ' + name : ''} 👋`;
   document.getElementById('dashSub').textContent = sub;
 
-  // Plan status
+  // ── Plan status bar ─────────────────────────────────────
   const plan = getPlanData?.() || {};
-  const planLabel = document.getElementById('dashPlanLabel');
-  const planDot   = document.getElementById('dashPlanDot');
-  const planDetail = document.getElementById('dashPlanDetail');
-  const upgradeBtn = document.getElementById('dashUpgradeBtn');
-
-  if (plan.type === 'pro' || plan.type === 'monthly' || plan.type === 'cabinet') {
-    planLabel.textContent = plan.type === 'cabinet' ? 'Plan Cabinet' : 'Plan Pro';
-    planDot.style.background = '#16a34a';
-    planDetail.textContent = plan.trialEnd ? `Essai jusqu'au ${new Date(plan.trialEnd).toLocaleDateString('fr-FR')}` : 'Accès illimité';
-    upgradeBtn.style.display = 'none';
-  } else {
-    planLabel.textContent = 'Plan Gratuit';
-    planDot.style.background = '#94a3b8';
-    planDetail.textContent = user?.freeDocUsed ? '· Document gratuit utilisé' : '· 1 document gratuit disponible';
-    upgradeBtn.style.display = 'block';
+  const bar  = document.getElementById('dashPlanBar');
+  if (bar) {
+    if (typeof isProUser === 'function' && isProUser()) {
+      const role = getUserRole();
+      const isTrial = [PRO_ROLES.TRIAL_ACTIVE, PRO_ROLES.TRIAL_CANCEL_SCHEDULED].includes(role);
+      const trial = isTrial ? (typeof getTrialData === 'function' ? getTrialData() : null) : null;
+      const daysLeft = trial ? Math.max(0, Math.ceil((new Date(trial.endDate) - Date.now()) / 86400000)) : 0;
+      const planName = plan.type === 'cabinet' ? 'Cabinet'
+                     : isTrial ? 'Espace Pro · Essai' : 'Espace Professionnel';
+      const detail   = (isTrial && daysLeft > 0) ? `${daysLeft} jours restants` : 'Accès illimité · tous les modules';
+      bar.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#16a34a;flex-shrink:0;display:inline-block;"></span>
+          <span style="font-weight:700;color:#0f172a;font-size:14px;">${planName}</span>
+          <span style="font-size:13px;color:#64748b;">${detail}</span>
+        </div>`;
+    } else {
+      // Particulier — barre de quota
+      const q         = getParticulierQuota();
+      const used      = q.count || 0;
+      const quota     = PARTICULIER_MONTHLY_QUOTA;
+      const remaining = Math.max(0, quota - used);
+      const isFull    = remaining === 0;
+      const pct       = Math.min(100, (used / quota) * 100);
+      const barColor  = isFull ? '#ef4444' : used >= 1 ? '#f59e0b' : '#3b82f6';
+      bar.innerHTML = `
+        <div style="width:100%;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="width:10px;height:10px;border-radius:50%;background:${isFull ? '#ef4444' : '#f59e0b'};flex-shrink:0;display:inline-block;"></span>
+              <span style="font-weight:700;color:#0f172a;font-size:14px;">Particulier</span>
+              <span style="font-size:13px;color:${isFull ? '#ef4444' : '#64748b'};">
+                ${isFull ? '· Quota mensuel atteint' : `· ${remaining} document${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''} ce mois`}
+              </span>
+            </div>
+            <button onclick="openModal('modalPaywall')"
+              style="background:${isFull ? '#ef4444' : '#2563eb'};color:white;border:none;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px;white-space:nowrap;">
+              ${isFull ? '🚀 Passer Pro →' : 'Essai Pro gratuit →'}
+            </button>
+          </div>
+          <div style="background:#e2e8f0;border-radius:20px;height:6px;overflow:hidden;">
+            <div style="width:${pct}%;background:${barColor};height:100%;border-radius:20px;transition:width .4s;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:#94a3b8;">
+            <span>${used}/${quota} document${used > 1 ? 's' : ''} utilisé${used > 1 ? 's' : ''} ce mois</span>
+            ${isFull
+              ? '<span style="color:#ef4444;font-weight:600;">Limite atteinte — passez Pro pour continuer</span>'
+              : '<span>Réinitialisation le 1er du mois</span>'}
+          </div>
+          ${!isFull ? `
+          <div style="margin-top:12px;padding:10px 14px;background:rgba(37,99,235,.05);border:1px solid rgba(37,99,235,.12);border-radius:8px;font-size:12px;color:#334155;display:flex;align-items:center;gap:8px;">
+            <span>💡</span>
+            <span>L'<strong>Espace Professionnel</strong> donne accès à tous les modules, l'export Word, les conventions collectives et OHADA — <strong>7 jours gratuits, sans carte.</strong></span>
+          </div>` : ''}
+        </div>`;
+    }
   }
 
   // Derniers documents
