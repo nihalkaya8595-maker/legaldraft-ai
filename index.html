@@ -10536,16 +10536,7 @@ async function processPaywall() {
   try {
     const user = getAuthUser();
 
-    // ── Backend down → essai direct sans authentification ───
-    if (!_backendAvailable) {
-      setTimeout(() => {
-        btn.classList.remove('loading'); btn.disabled = false;
-        _startTrialDirectly();
-      }, 600);
-      return;
-    }
-
-    // ── Non connecté → demander la connexion/inscription ────
+    // ── Non connecté → connexion / inscription obligatoire ──
     if (!user) {
       btn.classList.remove('loading'); btn.disabled = false;
       closeModal('modalPaywall');
