@@ -2019,22 +2019,17 @@
       </div>
     </div>
 
-    <!-- 3 tiers résumés -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;text-align:center;">
+    <!-- 2 espaces résumés -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;text-align:center;">
       <div style="border:1px solid rgba(212,175,55,.25);border-radius:10px;padding:12px 8px;">
         <div style="font-size:1.1rem;margin-bottom:4px;">📄</div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--text);margin-bottom:3px;">Grand Public</div>
-        <div style="font-size:.65rem;color:var(--warm-gray);">À partir de €9/doc</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--text);margin-bottom:3px;">Particulier</div>
+        <div style="font-size:.65rem;color:var(--warm-gray);">Gratuit · 2 docs/mois</div>
       </div>
       <div style="border:1.5px solid var(--gold);border-radius:10px;padding:12px 8px;background:rgba(212,175,55,.05);">
         <div style="font-size:1.1rem;margin-bottom:4px;">⚖️</div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--gold);margin-bottom:3px;">Espace Pro</div>
-        <div style="font-size:.65rem;color:var(--warm-gray);">€99/mois · illimité</div>
-      </div>
-      <div style="border:1px solid rgba(99,102,241,.3);border-radius:10px;padding:12px 8px;">
-        <div style="font-size:1.1rem;margin-bottom:4px;">🏢</div>
-        <div style="font-size:.72rem;font-weight:700;color:#818cf8;margin-bottom:3px;">Cabinet</div>
-        <div style="font-size:.65rem;color:var(--warm-gray);">€299/mois · 5 users</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--gold);margin-bottom:3px;">Professionnel</div>
+        <div style="font-size:.65rem;color:var(--warm-gray);">€99/mois · 7j gratuits</div>
       </div>
     </div>
 
@@ -2104,39 +2099,33 @@ function selectWelcomeProfile(type, btn) {
       <div class="pw-sub" id="pwLabel">Accès illimité à tous les documents · Sans engagement</div>
     </div>
 
-    <!-- Ce que ça débloque -->
-    <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-      <p style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px;">Ce que vous débloquez :</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-        <span style="font-size:13px;color:#334155;">✅ 17 types de contrats</span>
-        <span style="font-size:13px;color:#334155;">✅ Droit OHADA (18 pays)</span>
-        <span style="font-size:13px;color:#334155;">✅ Assistant IA juridique</span>
-        <span style="font-size:13px;color:#334155;">✅ Export Word modifiable</span>
-        <span style="font-size:13px;color:#334155;">✅ Historique documents</span>
-        <span style="font-size:13px;color:#334155;">✅ Calculateurs RH</span>
+    <!-- Offre Pro unique -->
+    <div style="background:linear-gradient(135deg,#f8faff 0%,#eff6ff 100%);border:1.5px solid rgba(37,99,235,.2);border-radius:12px;padding:18px 20px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#2563eb;margin-bottom:4px;">Espace Professionnel</div>
+          <div style="display:flex;align-items:baseline;gap:4px;">
+            <span style="font-size:1.7rem;font-weight:800;color:#0f172a;">€99</span>
+            <span style="font-size:.78rem;color:#64748b;">/mois</span>
+          </div>
+        </div>
+        <span style="background:rgba(29,78,216,.1);border:1.5px solid rgba(29,78,216,.25);border-radius:20px;padding:4px 12px;font-size:.7rem;font-weight:700;color:#1d4ed8;">🎁 7 jours gratuits</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+        <span style="font-size:12px;color:#334155;">✅ Tous les modules RH &amp; actes</span>
+        <span style="font-size:12px;color:#334155;">✅ Droit OHADA (18 États)</span>
+        <span style="font-size:12px;color:#334155;">✅ Export Word modifiable</span>
+        <span style="font-size:12px;color:#334155;">✅ Conventions collectives</span>
+        <span style="font-size:12px;color:#334155;">✅ Assistant IA juridique</span>
+        <span style="font-size:12px;color:#334155;">✅ Coffre-fort illimité</span>
       </div>
     </div>
 
-    <div class="pw-offers">
-      <div class="pw-offer active" id="pwOffer-unit" onclick="selectPaywallOffer('unit',this)">
-        <div class="pw-offer-price"><sup>€</sup>9</div>
-        <div class="pw-offer-label">1 document · TTC</div>
-      </div>
-      <div class="pw-offer" id="pwOffer-pack" onclick="selectPaywallOffer('pack',this)" style="position:relative;">
-        <div class="pw-offer-pop">Populaire</div>
-        <div class="pw-offer-price"><sup>€</sup>25</div>
-        <div class="pw-offer-label">5 documents · TTC</div>
-      </div>
-      <div class="pw-offer" id="pwOffer-monthly" onclick="selectPaywallOffer('monthly',this)">
-        <div class="pw-offer-price"><sup>€</sup>29</div>
-        <div class="pw-offer-label">/ mois · 15 docs</div>
-      </div>
-    </div>
     <button class="btn-primary" id="btnPaywall" onclick="processPaywall()" style="width:100%;">
-      <span class="btn-label"><i class="fa-solid fa-lock-open"></i>&nbsp; Accéder et générer le document</span>
+      <span class="btn-label"><i class="fa-solid fa-rocket"></i>&nbsp; Démarrer mon essai — 7 jours gratuits</span>
       <span class="spinner"></span>
     </button>
-    <p style="text-align:center;font-size:11px;color:#94a3b8;margin:8px 0 12px;">Sans engagement · Annulation en 1 clic</p>
+    <p style="text-align:center;font-size:11px;color:#94a3b8;margin:8px 0 12px;">Sans engagement · annulation en 1 clic · sans carte requise</p>
     <hr class="pw-divider">
     <div class="pw-free-note" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
       <span><strong><i class="fa-solid fa-check"></i> Gratuit :</strong> calculateurs, assistant IA, audit RGPD</span>
@@ -2172,11 +2161,9 @@ function selectWelcomeProfile(type, btn) {
     </button>
     <hr class="pw-divider">
     <div style="text-align:center;font-size:.72rem;color:var(--warm-gray);line-height:1.6;">
-      Vous souhaitez souscrire au plan Cabinet (€299/mois · 5 utilisateurs) ?
+      Vous souhaitez un accès pour votre cabinet ou votre équipe ?
       <br>
-      <a href="#pricing" onclick="closeModal('modalCabinet');goToLanding();" style="color:var(--gold);font-weight:600;">Voir les tarifs</a>
-      &nbsp;·&nbsp;
-      <a href="mailto:contact@legaldraft.ai" style="color:var(--gold);font-weight:600;">Nous contacter</a>
+      <a href="mailto:contact@legaldraft.ai" style="color:var(--gold);font-weight:600;">Contactez-nous pour une offre sur mesure →</a>
     </div>
     <!-- demo codes removed from UI for security -->
   </div>
@@ -3124,8 +3111,8 @@ function selectWelcomeProfile(type, btn) {
         <div class="faq-a">L'Espace Pro est conçu pour les avocats, juristes et professionnels du droit. Il donne accès à des outils avancés : dossiers judiciaires, actes de procédure, conventions collectives, bibliothèque de clauses et procédures guidées pas à pas. Il peut également être utilisé par des directions juridiques d'entreprises.</div>
       </div>
       <div class="faq-item" onclick="this.classList.toggle('open')">
-        <div class="faq-q">Quelle est la différence entre un document unitaire et l'abonnement ? <i class="fa-solid fa-chevron-down"></i></div>
-        <div class="faq-a">Le document unitaire (9€) vous donne accès à un seul document au choix. Le Pack 5 documents (25€) est idéal pour une utilisation ponctuelle. L'abonnement mensuel Grand Public (29€/mois) donne accès illimité à tous les modules : contrats, lettres, calculateurs, analyse IA, conformité RGPD, veille juridique. L'abonnement Espace Pro (99€/mois) inclut en plus tous les outils professionnels dédiés aux avocats et juristes.</div>
+        <div class="faq-q">Quelle est la différence entre le plan Particulier et l'Espace Professionnel ? <i class="fa-solid fa-chevron-down"></i></div>
+        <div class="faq-a">Le plan Particulier (gratuit, 2 documents/mois) est conçu pour les besoins personnels : bail, résiliation, lettres simples. Il ne donne pas accès aux modules professionnels. L'Espace Professionnel (99€/mois, 7 jours gratuits) est l'outil de travail complet : tous les modules RH et entreprise, export Word, conventions collectives, OHADA, assistant IA et coffre-fort illimité. Il est pensé pour les avocats, DRH, juristes et dirigeants qui rédigent des documents à valeur professionnelle.</div>
       </div>
     </div>
   </section>
@@ -3250,32 +3237,45 @@ function selectWelcomeProfile(type, btn) {
     <div class="lsec-tag">Tarifs</div>
     <h2 class="lsec-title">Simple et transparent</h2>
     <p class="lsec-sub">Deux offres claires — commencez gratuitement, passez Pro quand vous êtes prêt.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:760px;margin:40px auto 0;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:800px;margin:40px auto 0;">
 
-      <!-- ── Colonne 1 : Grand Public ── -->
+      <!-- ── Colonne 1 : Particulier (Gratuit) ── -->
       <div class="price-card price-card-public" style="display:flex;flex-direction:column;">
-        <div class="price-tier-label">Grand Public</div>
-        <div class="price-name">Documents juridiques</div>
-        <div style="margin:20px 0 6px;display:flex;align-items:baseline;justify-content:center;gap:6px;">
-          <span style="font-size:2rem;font-weight:800;color:var(--text);">€29</span>
-          <span style="font-size:.8rem;color:var(--warm-gray);">/mois</span>
+        <div class="price-tier-label">Particulier</div>
+        <div class="price-name">Usage personnel</div>
+        <div style="margin:20px 0 4px;display:flex;align-items:baseline;justify-content:center;gap:6px;">
+          <span style="font-size:2rem;font-weight:800;color:var(--text);">Gratuit</span>
         </div>
-        <div style="font-size:.72rem;color:var(--warm-gray);text-align:center;margin-bottom:18px;">1 document gratuit inclus · sans engagement</div>
-        <ul class="price-features" style="flex:1;">
-          <li><i class="fa-solid fa-check"></i> Contrats, lettres — tous types</li>
-          <li><i class="fa-solid fa-check"></i> Droit français &amp; OHADA</li>
-          <li><i class="fa-solid fa-check"></i> PDF immédiat + coffre-fort</li>
-          <li><i class="fa-solid fa-check"></i> Calculateurs juridiques inclus</li>
+        <div style="font-size:.72rem;color:var(--warm-gray);text-align:center;margin-bottom:18px;">2 documents / mois · PDF uniquement</div>
+
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);margin-bottom:8px;">Inclus</div>
+        <ul class="price-features" style="margin-bottom:14px;">
+          <li><i class="fa-solid fa-check"></i> Bail, résiliation, mise en demeure</li>
+          <li><i class="fa-solid fa-check"></i> Lettres personnelles & modèles de base</li>
+          <li><i class="fa-solid fa-check"></i> Téléchargement PDF immédiat</li>
+          <li><i class="fa-solid fa-check"></i> Coffre-fort (5 documents)</li>
         </ul>
-        <button class="price-btn primary" id="btnLandingPublic" onclick="enterApp()" style="margin-top:auto;">
-          Commencer — 1 doc gratuit
+
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:8px;">Non disponible</div>
+        <ul style="list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:5px;flex:1;">
+          <li style="font-size:.82rem;color:#94a3b8;display:flex;align-items:center;gap:8px;"><span style="color:#f87171;font-size:.9rem;">✕</span> Export Word (.docx)</li>
+          <li style="font-size:.82rem;color:#94a3b8;display:flex;align-items:center;gap:8px;"><span style="color:#f87171;font-size:.9rem;">✕</span> Modules RH / entreprise (CDI, CDD…)</li>
+          <li style="font-size:.82rem;color:#94a3b8;display:flex;align-items:center;gap:8px;"><span style="color:#f87171;font-size:.9rem;">✕</span> Conventions collectives</li>
+          <li style="font-size:.82rem;color:#94a3b8;display:flex;align-items:center;gap:8px;"><span style="color:#f87171;font-size:.9rem;">✕</span> Droit OHADA</li>
+          <li style="font-size:.82rem;color:#94a3b8;display:flex;align-items:center;gap:8px;"><span style="color:#f87171;font-size:.9rem;">✕</span> Assistant IA juridique</li>
+          <li style="font-size:.82rem;color:#94a3b8;display:flex;align-items:center;gap:8px;"><span style="color:#f87171;font-size:.9rem;">✕</span> Usage professionnel</li>
+        </ul>
+
+        <button class="price-btn" onclick="enterApp()" style="margin-top:auto;border:1.5px solid var(--border);background:#fff;color:var(--text);font-weight:600;">
+          Créer mon accès gratuit
         </button>
+        <div style="font-size:.62rem;color:var(--warm-gray);text-align:center;margin-top:8px;">Aucune carte requise</div>
       </div>
 
-      <!-- ── Colonne 2 : Espace Pro (offre principale) ── -->
+      <!-- ── Colonne 2 : Espace Professionnel ── -->
       <div class="price-card featured pro-plan" style="position:relative;display:flex;flex-direction:column;">
-        <div class="price-popular">⭐ Offre recommandée</div>
-        <div class="price-plan-badge" style="font-size:.6rem;">AVOCAT · JURISTE · DRH · OHADA</div>
+        <div class="price-popular">⭐ Outil de travail</div>
+        <div class="price-plan-badge" style="font-size:.6rem;">AVOCAT · DRH · JURISTE · OHADA</div>
         <div class="price-name" style="margin-top:8px;">Espace Professionnel</div>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px;">
           <span style="background:rgba(29,78,216,.1);border:1.5px solid rgba(29,78,216,.25);border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700;color:#1d4ed8;letter-spacing:.04em;">🎁 7 jours gratuits</span>
@@ -3285,28 +3285,34 @@ function selectWelcomeProfile(type, btn) {
           <span style="font-size:.8rem;color:var(--warm-gray);">/mois</span>
         </div>
         <div style="font-size:.68rem;color:var(--warm-gray);text-align:center;margin:2px 0 14px;">sans engagement · annulation en 1 clic</div>
+
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);margin-bottom:8px;">Tout inclus</div>
         <ul class="price-features" style="flex:1;">
-          <li><i class="fa-solid fa-check"></i> Usage illimité (usage raisonnable)</li>
-          <li><i class="fa-solid fa-check"></i> Dossiers complets (PDF + Word)</li>
-          <li><i class="fa-solid fa-check"></i> Assignations, actes de procédure, OHADA</li>
+          <li><i class="fa-solid fa-check"></i> Tous les modules — RH, contrats, actes juridiques</li>
+          <li><i class="fa-solid fa-check"></i> Export Word (.docx) modifiable</li>
           <li><i class="fa-solid fa-check"></i> 15 conventions collectives détaillées</li>
-          <li><i class="fa-solid fa-check"></i> Export Word (.docx) professionnel</li>
-          <li><i class="fa-solid fa-check"></i> Assistant IA juridique dédié</li>
+          <li><i class="fa-solid fa-check"></i> Actes OHADA — 18 États membres</li>
+          <li><i class="fa-solid fa-check"></i> Assistant IA juridique intégré</li>
+          <li><i class="fa-solid fa-check"></i> Coffre-fort illimité</li>
+          <li><i class="fa-solid fa-check"></i> Usage professionnel autorisé</li>
+          <li><i class="fa-solid fa-check"></i> Support prioritaire</li>
         </ul>
-        <button class="price-btn primary" onclick="enterApp();showModule('avocat')" style="margin-top:auto;">
-          <i class="fa-solid fa-rocket" style="margin-right:7px;"></i>Démarrer l'essai — 7 jours gratuits
+
+        <button class="price-btn primary" onclick="enterApp();showModule('avocat')" style="margin-top:20px;">
+          <i class="fa-solid fa-rocket" style="margin-right:7px;"></i>Démarrer mon essai — 7 jours gratuits
         </button>
         <div style="font-size:.62rem;color:var(--warm-gray);text-align:center;margin-top:8px;line-height:1.5;">
-          Aucune carte requise pour commencer
+          Sans carte · annulation en 1 clic
         </div>
       </div>
 
     </div>
-    <div style="text-align:center;margin-top:20px;">
-      <a href="mailto:contact@legaldraft.fr" style="font-size:.78rem;color:var(--warm-gray);text-decoration:none;">
-        🏢 Cabinet ou équipe ? <span style="color:var(--gold);border-bottom:1px dotted;">Contactez-nous pour une offre sur mesure →</span>
-      </a>
-    </div>
+
+    <!-- Phrase de séparation -->
+    <p style="text-align:center;max-width:620px;margin:28px auto 0;font-size:.82rem;color:#64748b;line-height:1.7;padding:0 16px;">
+      Le plan Particulier couvre vos besoins personnels.<br>
+      Pour tout usage professionnel, seul l'<strong>Espace Professionnel</strong> donne accès aux modules entreprise, conventions collectives et OHADA.
+    </p>
   </section>
 
   <!-- FAQ Objections Prix -->
@@ -10167,7 +10173,7 @@ document.head.appendChild(dynStyle);
 
 /* ── Paywall ─────────────────────────────────────────────── */
 let _pwCallback = null;
-let _pwOffer    = 'unit';
+let _pwOffer    = 'pro';
 
 function requirePay(emoji, label, cb) {
   // Si l'utilisateur a déjà un plan valide avec des crédits, exécuter directement
@@ -10203,27 +10209,17 @@ function requirePay(emoji, label, cb) {
   }
 
   _pwCallback = () => { consumeDocCredit(); if (cb) cb(); };
-  _pwOffer    = 'unit';
+  _pwOffer    = 'pro';
   document.getElementById('pwEmoji').textContent = emoji;
 
   // ── Message contextuel selon raison du blocage ────────
-  const plan = getPlanData();
   const contextMsgs = {
-    no_docs:        plan.type === 'pack'
-                      ? `Votre pack est épuisé — rechargez pour continuer :`
-                      : `Votre document gratuit a été utilisé — choisissez une offre :`,
-    quota_exceeded: `Vous avez atteint vos 15 documents ce mois — renouvelez :`,
-    expired:        `Votre abonnement a expiré — renouvelez pour continuer :`,
+    no_docs:        `Votre document gratuit a été utilisé — démarrez l'Espace Professionnel :`,
+    quota_exceeded: `Votre quota mensuel est atteint — continuez avec l'Espace Professionnel :`,
+    expired:        `Votre essai a expiré — activez l'Espace Professionnel pour continuer :`,
     no_plan:        label,
   };
   document.getElementById('pwLabel').textContent = contextMsgs[check.reason] || label;
-
-  // Pré-sélectionner l'offre la plus pertinente selon le contexte
-  const suggestedOffer = (check.reason === 'quota_exceeded' || check.reason === 'expired')
-    ? 'monthly' : 'unit';
-  _pwOffer = suggestedOffer;
-  document.querySelectorAll('.pw-offer').forEach(o => o.classList.remove('active'));
-  document.getElementById('pwOffer-' + suggestedOffer)?.classList.add('active');
 
   const btn = document.getElementById('btnPaywall');
   btn.classList.remove('loading'); btn.disabled = false;
@@ -10252,7 +10248,7 @@ async function processPaywall() {
     const piRes = await fetch(API_BASE + '/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ offer: _pwOffer === 'monthly' ? 'sub' : _pwOffer, currency: 'eur' }),
+      body: JSON.stringify({ offer: 'sub', currency: 'eur' }),
     });
     if (!piRes.ok) throw new Error('PaymentIntent failed');
     const { clientSecret } = await piRes.json();
@@ -10276,15 +10272,15 @@ async function processPaywall() {
     }
 
     // 3. Payment confirmed
-    activatePlan(_pwOffer === 'monthly' ? 'monthly' : (_pwOffer === 'pack' ? 'pack' : 'unit'));
+    activatePlan('monthly');
     closeModal('modalPaywall');
-    showToast('✅ Paiement confirmé — document en cours de génération !', 'success');
+    showToast('✅ Essai Pro activé — document en cours de génération !', 'success');
     if (_pwCallback) { _pwCallback(); _pwCallback = null; }
 
   } catch (err) {
     // Fallback: if Stripe or backend fails in test mode, still allow
     console.warn('Stripe payment error:', err.message, '— falling back to test mode');
-    activatePlan(_pwOffer === 'monthly' ? 'monthly' : (_pwOffer === 'pack' ? 'pack' : 'unit'));
+    activatePlan('monthly');
     closeModal('modalPaywall');
     if (_pwCallback) { _pwCallback(); _pwCallback = null; }
   } finally {
@@ -11531,12 +11527,10 @@ async function _claimAndGenerate(emoji, label, cb) {
         if (u) { u.freeDocUsed = true; setAuthUser(token, u); }
         // Afficher le paywall avec message adapté
         document.getElementById('pwLabel').textContent =
-          'Vous avez déjà utilisé votre document gratuit. Choisissez une offre pour continuer.';
+          'Votre document gratuit a été utilisé — démarrez l\'Espace Professionnel pour continuer.';
         document.getElementById('pwEmoji').textContent = emoji;
         _pwCallback = () => { consumeDocCredit(); if (cb) cb(); };
-        _pwOffer    = 'unit';
-        document.querySelectorAll('.pw-offer').forEach(o => o.classList.remove('active'));
-        document.getElementById('pwOffer-unit')?.classList.add('active');
+        _pwOffer    = 'pro';
         const btn = document.getElementById('btnPaywall');
         btn.classList.remove('loading'); btn.disabled = false;
         openModal('modalPaywall');
@@ -11560,12 +11554,10 @@ async function _claimAndGenerate(emoji, label, cb) {
       const FREE_DOC_LS = 'ld_free_doc_used_local';
       if (localStorage.getItem(FREE_DOC_LS)) {
         // Already used locally
-        document.getElementById('pwLabel').textContent = 'Vous avez déjà utilisé votre document gratuit. Choisissez une offre pour continuer.';
+        document.getElementById('pwLabel').textContent = 'Votre document gratuit a été utilisé — démarrez l\'Espace Professionnel pour continuer.';
         document.getElementById('pwEmoji').textContent = emoji;
         _pwCallback = () => { consumeDocCredit(); if (cb) cb(); };
-        _pwOffer = 'unit';
-        document.querySelectorAll('.pw-offer').forEach(o => o.classList.remove('active'));
-        document.getElementById('pwOffer-unit')?.classList.add('active');
+        _pwOffer = 'pro';
         openModal('modalPaywall');
       } else {
         localStorage.setItem(FREE_DOC_LS, '1');
