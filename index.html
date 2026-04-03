@@ -4074,97 +4074,126 @@ function selectWelcomeProfile(type, btn) {
     <p>Mise en demeure, résiliation, licenciement — rédigées selon le droit applicable.</p>
   </div>
   <div class="mod-wrap">
-    <div class="tools-grid" id="lettersGrid">
-      <div class="tool-card" data-letter="miseendemeure" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">⚠️</div>
-        <div class="tool-card-title">Mise en demeure</div>
-        <div class="tool-card-desc">Réclamation de paiement impayé</div>
+    <div id="lettersGrid">
+
+      <!-- ── Section Particulier — Accès libre ── -->
+      <div style="margin-bottom:8px;">
+        <div style="margin-bottom:12px;">
+          <span style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#16a34a;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:20px;padding:3px 10px;">✓ Particulier — Accès libre</span>
+        </div>
+        <div class="tools-grid">
+          <div class="tool-card" data-letter="miseendemeure" onclick="selectLetter(this)">
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">⚠️</div>
+            <div class="tool-card-title">Mise en demeure</div>
+            <div class="tool-card-desc">Réclamation de paiement impayé</div>
+          </div>
+          <div class="tool-card" data-letter="resiliation" onclick="selectLetter(this)">
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">📨</div>
+            <div class="tool-card-title">Résiliation de contrat</div>
+            <div class="tool-card-desc">Mettre fin à un contrat en cours</div>
+          </div>
+          <div class="tool-card" data-letter="opposition" onclick="selectLetter(this)">
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🚫</div>
+            <div class="tool-card-title">Opposition à prélèvement</div>
+            <div class="tool-card-desc">Contestation d'un prélèvement bancaire</div>
+          </div>
+          <div class="tool-card" data-letter="resil_bail" onclick="selectLetter(this)">
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🏠</div>
+            <div class="tool-card-title">Résiliation de Bail</div>
+            <div class="tool-card-desc">Congé locataire ou bailleur</div>
+          </div>
+          <div class="tool-card" data-letter="demission" onclick="selectLetter(this)">
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🚪</div>
+            <div class="tool-card-title">Démission</div>
+            <div class="tool-card-desc">Lettre de démission avec préavis légal</div>
+          </div>
+          <div class="tool-card" data-letter="recours_admin" onclick="selectLetter(this)">
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🏛️</div>
+            <div class="tool-card-title">Recours Administratif</div>
+            <div class="tool-card-desc">Recours gracieux ou hiérarchique</div>
+          </div>
+        </div>
       </div>
-      <div class="tool-card" data-letter="resiliation" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">📨</div>
-        <div class="tool-card-title">Résiliation de contrat</div>
-        <div class="tool-card-desc">Mettre fin à un contrat en cours</div>
+
+      <!-- ── Section Professionnelle — Espace Pro ── -->
+      <div style="margin-top:24px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:#92400e;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);border-radius:20px;padding:3px 10px;">Espace Professionnel 🔒</span>
+          <span style="font-size:.72rem;color:#94a3b8;">7 jours gratuits · sans carte</span>
+        </div>
+        <div class="tools-grid">
+          <div class="tool-card" data-letter="licenciement" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">💼</div>
+            <div class="tool-card-title">Licenciement pour faute</div>
+            <div class="tool-card-desc">Notification disciplinaire</div>
+          </div>
+          <div class="tool-card" data-letter="rupture" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🤝</div>
+            <div class="tool-card-title">Rupture Conventionnelle</div>
+            <div class="tool-card-desc">Rupture amiable du CDI</div>
+          </div>
+          <div class="tool-card" data-letter="convocation" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">📅</div>
+            <div class="tool-card-title">Convocation Entretien Préalable</div>
+            <div class="tool-card-desc">Avant sanction disciplinaire</div>
+          </div>
+          <div class="tool-card" data-letter="avertissement" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">📢</div>
+            <div class="tool-card-title">Avertissement Professionnel</div>
+            <div class="tool-card-desc">Sanction disciplinaire écrite</div>
+          </div>
+          <div class="tool-card" data-letter="abandon_poste" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🚨</div>
+            <div class="tool-card-title">Abandon de Poste</div>
+            <div class="tool-card-desc">Mise en demeure de reprendre le travail</div>
+          </div>
+          <div class="tool-card" data-letter="contestation_lic" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">⚖️</div>
+            <div class="tool-card-title">Contestation de Licenciement</div>
+            <div class="tool-card-desc">Saisine prud'hommes</div>
+          </div>
+          <div class="tool-card" data-letter="reclamation" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">📋</div>
+            <div class="tool-card-title">Réclamation commerciale</div>
+            <div class="tool-card-desc">Litige client, produit défectueux</div>
+          </div>
+          <div class="tool-card" data-letter="relance" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🔔</div>
+            <div class="tool-card-title">Relance pré-contentieux</div>
+            <div class="tool-card-desc">Dernière relance avant procédure</div>
+          </div>
+          <div class="tool-card" data-letter="transaction_amiable" data-pro="true" onclick="selectLetter(this)" style="position:relative;opacity:.88;">
+            <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
+            <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
+            <div class="tool-card-icon">🤲</div>
+            <div class="tool-card-title">Proposition Amiable</div>
+            <div class="tool-card-desc">Règlement amiable d'un litige</div>
+          </div>
+        </div>
       </div>
-      <div class="tool-card" data-letter="licenciement" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">💼</div>
-        <div class="tool-card-title">Licenciement pour faute</div>
-        <div class="tool-card-desc">Notification de licenciement disciplinaire</div>
-      </div>
-      <div class="tool-card" data-letter="reclamation" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">📋</div>
-        <div class="tool-card-title">Réclamation commerciale</div>
-        <div class="tool-card-desc">Litige client, produit défectueux</div>
-      </div>
-      <div class="tool-card" data-letter="opposition" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🚫</div>
-        <div class="tool-card-title">Opposition à prélèvement</div>
-        <div class="tool-card-desc">Contestation d'un prélèvement bancaire</div>
-      </div>
-      <div class="tool-card" data-letter="relance" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🔔</div>
-        <div class="tool-card-title">Relance pré-contentieux</div>
-        <div class="tool-card-desc">Dernière relance avant procédure judiciaire</div>
-      </div>
-      <div class="tool-card" data-letter="demission" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🚪</div>
-        <div class="tool-card-title">Démission</div>
-        <div class="tool-card-desc">Lettre de démission avec préavis légal</div>
-      </div>
-      <div class="tool-card" data-letter="rupture" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🤝</div>
-        <div class="tool-card-title">Rupture Conventionnelle</div>
-        <div class="tool-card-desc">Demande de rupture amiable du contrat</div>
-      </div>
-      <div class="tool-card" data-letter="convocation" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">📅</div>
-        <div class="tool-card-title">Convocation Entretien Préalable</div>
-        <div class="tool-card-desc">Convocation avant sanction disciplinaire</div>
-      </div>
-      <div class="tool-card" data-letter="avertissement" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">📢</div>
-        <div class="tool-card-title">Avertissement Professionnel</div>
-        <div class="tool-card-desc">Notification de sanction disciplinaire écrite</div>
-      </div>
-      <div class="tool-card" data-letter="contestation_lic" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">⚖️</div>
-        <div class="tool-card-title">Contestation de Licenciement</div>
-        <div class="tool-card-desc">Saisine prud'hommes, licenciement sans cause</div>
-      </div>
-      <div class="tool-card" data-letter="resil_bail" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🏠</div>
-        <div class="tool-card-title">Résiliation de Bail</div>
-        <div class="tool-card-desc">Congé donné par le locataire ou le bailleur</div>
-      </div>
-      <div class="tool-card" data-letter="transaction_amiable" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🤲</div>
-        <div class="tool-card-title">Proposition Amiable</div>
-        <div class="tool-card-desc">Offre de règlement amiable d'un litige</div>
-      </div>
-      <div class="tool-card" data-letter="abandon_poste" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🚨</div>
-        <div class="tool-card-title">Abandon de Poste</div>
-        <div class="tool-card-desc">Mise en demeure de reprendre le travail</div>
-      </div>
-      <div class="tool-card" data-letter="recours_admin" onclick="selectLetter(this)">
-        <div class="tool-card-check"><i class="fa-solid fa-check"></i></div>
-        <div class="tool-card-icon">🏛️</div>
-        <div class="tool-card-title">Recours Administratif</div>
-        <div class="tool-card-desc">RAPO — recours gracieux ou hiérarchique</div>
-      </div>
+
     </div>
 
     <div class="mod-panel" id="letterFormPanel" style="display:none;">
@@ -8747,6 +8776,14 @@ const LETTER_TYPES = {
 let selectedLetter = null;
 
 function selectLetter(card) {
+  // ── Gate : lettre pro + utilisateur non pro ─────────────
+  if (card.dataset.pro === 'true' && typeof isProUser === 'function' && !isProUser()) {
+    card.style.transform = 'scale(.97)';
+    setTimeout(() => { card.style.transform = ''; }, 200);
+    _pwCallback = null;
+    openModal('modalPaywall');
+    return;
+  }
   document.querySelectorAll('#lettersGrid .tool-card').forEach(c => c.classList.remove('selected'));
   card.classList.add('selected');
   selectedLetter = card.dataset.letter;
