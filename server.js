@@ -214,11 +214,22 @@ const JWT_EXPIRY = '30d';
 const ADMIN_KEY  = process.env.ADMIN_KEY  || 'ld-admin-dev';
 
 // ── MIDDLEWARE ───────────────────────────────────────────────────────────────
-// Nettoie FRONTEND_URL des éventuels guillemets/espaces parasites
-const _rawOrigin = process.env.FRONTEND_URL || '';
-const CORS_ORIGIN = _rawOrigin.replace(/['"]/g, '').trim() || '*';
+// Origines autorisées : FRONTEND_URL (env) + domaines fixes legaldraft.fr
+const _rawOrigin = (process.env.FRONTEND_URL || '').replace(/['"]/g, '').trim();
+const ALLOWED_ORIGINS = new Set([
+  'https://legaldraft.fr',
+  'https://www.legaldraft.fr',
+  ..._rawOrigin ? _rawOrigin.split(',').map(o => o.trim()).filter(Boolean) : [],
+]);
 app.use(cors({
-  origin:  CORS_ORIGIN,
+  origin: (origin, cb) => {
+    // Autoriser les requêtes sans origin (Postman, curl, mobile)
+    if (!origin) return cb(null, true);
+    if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+    // Autoriser localhost en dev
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return cb(null, true);
+    cb(new Error(`CORS: origin non autorisée — ${origin}`));
+  },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key'],
 }));
