@@ -2596,7 +2596,6 @@ function selectWelcomeProfile(type, btn) {
     <button onclick="_devPanel_enter_pro()" style="padding:7px 10px; font-size:.72rem; font-weight:600; border-radius:8px; border:1px solid rgba(34,211,238,.3); background:rgba(34,211,238,.08); color:#67e8f9; cursor:pointer;">⚖️ Aller à l'Espace Pro</button>
     <div style="font-size:.6rem;color:rgba(255,255,255,.3);text-align:center;padding:4px 0 2px;letter-spacing:.08em;">─── PLANS ───</div>
     <div id="devPlanBadge" style="font-size:.7rem;font-weight:700;color:#d4af37;padding:3px 8px;background:rgba(212,175,55,.1);border-radius:6px;text-align:center;display:block;">plan: none</div>
-    <button onclick="_devPlan_unit()" style="padding:7px 10px; font-size:.72rem; font-weight:600; border-radius:8px; border:1px solid rgba(212,175,55,.3); background:rgba(212,175,55,.07); color:#d4af37; cursor:pointer;">📄 Plan Unitaire (1 doc)</button>
     <button onclick="_devPlan_pack()" style="padding:7px 10px; font-size:.72rem; font-weight:600; border-radius:8px; border:1px solid rgba(212,175,55,.3); background:rgba(212,175,55,.07); color:#d4af37; cursor:pointer;">📦 Pack 5 docs</button>
     <button onclick="_devPlan_monthly()" style="padding:7px 10px; font-size:.72rem; font-weight:600; border-radius:8px; border:1px solid rgba(212,175,55,.3); background:rgba(212,175,55,.07); color:#d4af37; cursor:pointer;">🗓️ Mensuel (15 docs)</button>
     <button onclick="_devPlan_cabinet()" style="padding:7px 10px; font-size:.72rem; font-weight:600; border-radius:8px; border:1px solid rgba(212,175,55,.3); background:rgba(212,175,55,.07); color:#d4af37; cursor:pointer;">🏢 Cabinet (30j)</button>
@@ -3809,28 +3808,28 @@ function selectWelcomeProfile(type, btn) {
         </div>
         <div class="contracts-grid">
 
-          <div class="contract-card" data-type="bail_hab" data-label="Bail d'Habitation" data-emoji="🏠" data-price="9.00" onclick="selectContract(this)">
+          <div class="contract-card" data-type="bail_hab" data-label="Bail d'Habitation" data-emoji="🏠" data-price="0" onclick="selectContract(this)">
             <div class="card-icon">🏠</div>
             <div class="card-title">Bail d'Habitation</div>
             <div class="card-desc">Location résidentielle, meublé ou vide</div>
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="reconnaissance_dette" data-label="Reconnaissance de Dette" data-emoji="📝" data-price="9.00" onclick="selectContract(this)">
+          <div class="contract-card" data-type="reconnaissance_dette" data-label="Reconnaissance de Dette" data-emoji="📝" data-price="0" onclick="selectContract(this)">
             <div class="card-icon">📝</div>
             <div class="card-title">Reconnaissance de Dette</div>
             <div class="card-desc">Prêt entre particuliers</div>
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="prestation" data-label="Prestation de Services" data-emoji="📋" data-price="9.00" onclick="selectContract(this)">
+          <div class="contract-card" data-type="prestation" data-label="Prestation de Services" data-emoji="📋" data-price="0" onclick="selectContract(this)">
             <div class="card-icon">📋</div>
             <div class="card-title">Prestation de Services</div>
             <div class="card-desc">Freelance, consultant, mission simple</div>
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="stage" data-label="Convention de Stage" data-emoji="🎓" data-price="9.00" onclick="selectContract(this)">
+          <div class="contract-card" data-type="stage" data-label="Convention de Stage" data-emoji="🎓" data-price="0" onclick="selectContract(this)">
             <div class="card-icon">🎓</div>
             <div class="card-title">Convention de Stage</div>
             <div class="card-desc">Stage école, université</div>
@@ -3848,7 +3847,7 @@ function selectWelcomeProfile(type, btn) {
         </div>
         <div class="contracts-grid">
 
-          <div class="contract-card" data-type="travail" data-label="Contrat de Travail" data-emoji="💼" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="travail" data-label="Contrat de Travail" data-emoji="💼" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">💼</div>
             <div class="card-title">Contrat de Travail</div>
@@ -3856,7 +3855,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="nda" data-label="NDA / Confidentialité" data-emoji="🔐" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="nda" data-label="NDA / Confidentialité" data-emoji="🔐" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🔐</div>
             <div class="card-title">NDA / Confidentialité</div>
@@ -3864,7 +3863,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="cgv" data-label="Conditions Générales de Vente" data-emoji="🛒" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="cgv" data-label="Conditions Générales de Vente" data-emoji="🛒" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🛒</div>
             <div class="card-title">CGV</div>
@@ -3872,7 +3871,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="partenariat" data-label="Accord de Partenariat" data-emoji="🤝" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="partenariat" data-label="Accord de Partenariat" data-emoji="🤝" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🤝</div>
             <div class="card-title">Partenariat</div>
@@ -3880,7 +3879,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="bail" data-label="Bail Commercial" data-emoji="🏢" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="bail" data-label="Bail Commercial" data-emoji="🏢" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🏢</div>
             <div class="card-title">Bail Commercial</div>
@@ -3888,7 +3887,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="soustraitance" data-label="Sous-traitance" data-emoji="🔧" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="soustraitance" data-label="Sous-traitance" data-emoji="🔧" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🔧</div>
             <div class="card-title">Sous-traitance</div>
@@ -3896,7 +3895,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="cession" data-label="Cession de Droits d'Auteur" data-emoji="✍️" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="cession" data-label="Cession de Droits d'Auteur" data-emoji="✍️" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">✍️</div>
             <div class="card-title">Cession de Droits</div>
@@ -3904,7 +3903,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="mandat" data-label="Mandat Commercial" data-emoji="📊" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="mandat" data-label="Mandat Commercial" data-emoji="📊" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">📊</div>
             <div class="card-title">Mandat Commercial</div>
@@ -3912,7 +3911,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="franchise" data-label="Contrat de Franchise" data-emoji="🏪" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="franchise" data-label="Contrat de Franchise" data-emoji="🏪" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🏪</div>
             <div class="card-title">Franchise</div>
@@ -3920,7 +3919,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="distribution" data-label="Distribution Exclusive" data-emoji="📦" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="distribution" data-label="Distribution Exclusive" data-emoji="📦" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">📦</div>
             <div class="card-title">Distribution Exclusive</div>
@@ -3928,7 +3927,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="portage" data-label="Portage Salarial" data-emoji="🧳" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="portage" data-label="Portage Salarial" data-emoji="🧳" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🧳</div>
             <div class="card-title">Portage Salarial</div>
@@ -3936,7 +3935,7 @@ function selectWelcomeProfile(type, btn) {
             <div class="card-check"><i class="fa-solid fa-check"></i></div>
           </div>
 
-          <div class="contract-card" data-type="pacte_associes" data-label="Pacte d'Associés" data-emoji="🤲" data-price="9.00" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
+          <div class="contract-card" data-type="pacte_associes" data-label="Pacte d'Associés" data-emoji="🤲" data-price="0" data-pro="true" onclick="selectContract(this)" style="position:relative;opacity:.88;">
             <div style="position:absolute;top:7px;right:7px;background:rgba(212,175,55,.15);border-radius:5px;padding:2px 6px;font-size:.6rem;font-weight:700;color:#92400e;">PRO 🔒</div>
             <div class="card-icon">🤲</div>
             <div class="card-title">Pacte d'Associés</div>
@@ -5938,7 +5937,7 @@ function selectContract(card) {
   state.selectedType  = card.dataset.type;
   state.selectedLabel = card.dataset.label;
   state.selectedEmoji = card.dataset.emoji;
-  state.selectedPrice = 9.00;
+  state.selectedPrice = 0;
 
   const btn = document.getElementById('btnStep1');
   btn.classList.add('gold');
@@ -6031,7 +6030,6 @@ function renderOrderSummary() {
     else if (role === PRO_ROLES.TRIAL_CANCEL_SCHEDULED) planLabel = '🧪 Essai Pro (annulation programmée) — illimité';
     else if (plan.type === 'monthly')  planLabel = `Plan mensuel — ${15-(plan.monthlyCount||0)} doc${15-(plan.monthlyCount||0)!==1?'s':''} restant${15-(plan.monthlyCount||0)!==1?'s':''}`;
     else if (plan.type === 'pack')     planLabel = `Pack — ${plan.docsRemaining} doc${plan.docsRemaining!==1?'s':''} restant${plan.docsRemaining!==1?'s':''}`;
-    else if (plan.type === 'unit')     planLabel = 'Plan unitaire — 1 document';
     else if (plan.type === 'cabinet')  planLabel = 'Plan Cabinet — illimité';
     else if (check.particulier) {
       const q = getParticulierQuota();
@@ -6045,30 +6043,26 @@ function renderOrderSummary() {
       </div>`;
   }
 
-  const price = (state.selectedPrice != null) ? Number(state.selectedPrice) : 0;
   document.getElementById('orderSummary').innerHTML = `
     ${planBadgeHtml}
     <div class="order-summary-title">Récapitulatif de la commande</div>
     <div class="order-line">
       <span class="label">${state.selectedEmoji} ${state.selectedLabel}</span>
-      <span class="value">${check.ok ? '<span style="text-decoration:line-through;opacity:.4">' + price.toFixed(2) + ' €</span> <span style="color:#16a34a;font-weight:700;margin-left:6px;">Inclus</span>' : price.toFixed(2) + ' € TTC'}</span>
-    </div>
-    <div class="order-line" style="font-size:.75rem;color:var(--warm-gray);">
-      <span class="label">TVA incluse</span>
-      <span class="value"></span>
+      <span class="value" style="color:#16a34a;font-weight:700;">Inclus</span>
     </div>
     <div class="order-line total">
       <span class="label">Total à payer</span>
-      <span class="value">${check.ok ? '<span style="color:#16a34a;font-weight:700;">0,00 €</span>' : price.toFixed(2) + ' € TTC'}</span>
+      <span class="value" style="color:#16a34a;font-weight:700;">0,00 €</span>
     </div>`;
 }
 
 /* ── Payment processing ──────────────────────────────────── */
+// Plan unit supprimé — seul le 99€/mois existe.
+// Cette fonction gère uniquement les plans actifs (mensuel, pro, trial, particulier).
 function processPayment() {
   const btn = document.getElementById('btnPay');
-
-  // ── Plan actif : bypass du formulaire carte ───────────────
   const check = canGenerateDocument();
+
   if (check.ok) {
     btn.classList.add('loading');
     btn.disabled = true;
@@ -6079,75 +6073,13 @@ function processPayment() {
       else consumeDocCredit();
       renderSuccessPage();
       goToStep(4);
-    }, 800);
+    }, 600);
     return;
   }
 
-  // ── Pas de plan actif : validation carte ─────────────────
-  const num  = document.getElementById('cardNumber').value.replace(/\s/g,'');
-  const name = document.getElementById('cardName').value.trim();
-  const exp  = document.getElementById('cardExpiry').value.trim();
-  const cvc  = document.getElementById('cardCvc').value.trim();
-
-  if (!num || num.length < 16 || !name || !exp || exp.length < 5 || !cvc || cvc.length < 3) {
-    alert('Veuillez remplir tous les champs de paiement correctement.');
-    return;
-  }
-
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  // If backend unavailable, show warning
-  if (!_backendAvailable) {
-    btn.classList.remove('loading'); btn.disabled = false;
-    showToast('⚠️ Paiement impossible — service temporairement indisponible.', 'warn');
-    return;
-  }
-
-  (async () => {
-    try {
-      // 1. Create PaymentIntent on backend
-      const piRes = await fetch(API_BASE + '/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ offer: 'unit', currency: 'eur' }),
-      });
-      if (!piRes.ok) throw new Error('PaymentIntent failed');
-      const { clientSecret } = await piRes.json();
-
-      // 2. Confirm payment with Stripe.js
-      const stripeObj = window.Stripe ? Stripe(STRIPE_PK) : null;
-      if (!stripeObj) throw new Error('Stripe.js not loaded');
-
-      const { error } = await stripeObj.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: { token: 'tok_visa' }, // TEST: use test token
-          billing_details: {},
-        },
-      });
-
-      if (error) {
-        showToast('❌ Paiement refusé : ' + error.message, 'error');
-        return;
-      }
-
-      // 3. Payment confirmed
-      activatePlan('unit');
-      consumeDocCredit();
-      renderSuccessPage();
-      goToStep(4);
-
-    } catch (err) {
-      // Fallback: if Stripe or backend fails in test mode, still allow
-      console.warn('Stripe payment error:', err.message, '— falling back to test mode');
-      activatePlan('unit');
-      consumeDocCredit();
-      renderSuccessPage();
-      goToStep(4);
-    } finally {
-      btn.classList.remove('loading'); btn.disabled = false;
-    }
-  })();
+  // Aucun plan actif → rediriger vers l'abonnement
+  showToast('Souscrivez au plan Pro 99€/mois pour générer des documents IA.', 'warn');
+  setTimeout(() => openModal('modalPaywall'), 400);
 }
 
 /* ── Step 4 — Success details ────────────────────────────── */
@@ -6166,8 +6098,6 @@ function renderSuccessPage() {
     amountHtml = '<span style="color:var(--step-done);font-weight:700;">🧪 Inclus dans votre essai gratuit</span>';
   } else if (plan && paidPlans.includes(plan.type)) {
     amountHtml = '<span style="color:var(--step-done);font-weight:700;">✅ Inclus dans votre plan</span>';
-  } else if (plan && plan.type === 'unit') {
-    amountHtml = `<span>${state.selectedPrice.toFixed(2)} € TTC</span>`;
   } else {
     // Particulier free template
     amountHtml = '<span style="color:var(--step-done);font-weight:700;">Gratuit — modèle standard</span>';
@@ -7292,7 +7222,7 @@ function downloadContract() {
   const plan = typeof getUserPlan === 'function' ? getUserPlan() : null;
   const role = getUserRole();
   const trialRoles = ['pro_trial_active','pro_trial_cancel_scheduled','verified_pro','pending_kyc'];
-  const paidPlanTypes = ['unit','pack','monthly','pro','cabinet'];
+  const paidPlanTypes = ['pack','monthly','pro','cabinet'];
   const hasAIAccess = token && (
     (plan && paidPlanTypes.includes(plan.type)) ||
     trialRoles.includes(role)
@@ -7982,7 +7912,7 @@ function confirmTrialCancel() {
 }
 
 // ── PLAN DATA (pricing system) ────────────────────────────
-const PLAN_TYPES = { NONE:'none', UNIT:'unit', PACK:'pack', MONTHLY:'monthly', PRO:'pro', CABINET:'cabinet' };
+const PLAN_TYPES = { NONE:'none', PACK:'pack', MONTHLY:'monthly', PRO:'pro', CABINET:'cabinet' };
 
 function getPlanData() {
   try { return JSON.parse(localStorage.getItem('ld_plan_data') || 'null') || { type: PLAN_TYPES.NONE, docsRemaining: 0 }; }
@@ -8048,15 +7978,14 @@ function consumeDocCredit() {
   const plan = getPlanData();
   if (plan.type === PLAN_TYPES.MONTHLY) {
     setPlanData({ monthlyCount: (plan.monthlyCount || 0) + 1 });
-  } else if ([PLAN_TYPES.UNIT, PLAN_TYPES.PACK].includes(plan.type)) {
-    setPlanData({ docsRemaining: Math.max(0, (plan.docsRemaining || 1) - 1) });
+  } else if (plan.type === PLAN_TYPES.PACK) {
+    setPlanData({ docsRemaining: Math.max(0, (plan.docsRemaining || 5) - 1) });
   }
 }
 function activatePlan(type) {
   const now = new Date();
   const expiry30 = new Date(now.getTime() + 30 * 24 * 3600 * 1000).toISOString();
   const plans = {
-    unit:    { type: PLAN_TYPES.UNIT,    docsRemaining: 1,   activatedAt: now.toISOString(), expiresAt: null },
     pack:    { type: PLAN_TYPES.PACK,    docsRemaining: 5,   activatedAt: now.toISOString(), expiresAt: null },
     monthly: { type: PLAN_TYPES.MONTHLY, docsRemaining: 15,  monthlyCount: 0, activatedAt: now.toISOString(), expiresAt: expiry30 },
     cabinet: { type: PLAN_TYPES.CABINET, docsRemaining: 999, monthlyCount: 0, activatedAt: now.toISOString(), expiresAt: expiry30 },
@@ -8105,9 +8034,6 @@ function _updatePlanStatusBadge() {
   } else if (plan.type === PLAN_TYPES.PACK) {
     const r = plan.docsRemaining || 0;
     badge.innerHTML = `<i class="fa-solid fa-layer-group" style="font-size:.7rem;"></i>&nbsp;Pack · ${r} doc${r !== 1 ? 's' : ''}`;
-    badge.style.display = 'inline-flex';
-  } else if (plan.type === PLAN_TYPES.UNIT) {
-    badge.innerHTML = `<i class="fa-solid fa-file" style="font-size:.7rem;"></i>&nbsp;1 doc`;
     badge.style.display = 'inline-flex';
   } else if (plan.type === PLAN_TYPES.CABINET) {
     badge.innerHTML = '<i class="fa-solid fa-building" style="font-size:.7rem;"></i>&nbsp;Cabinet';
@@ -8205,7 +8131,7 @@ function _refreshGenerateButtons() {
     return;
   }
 
-  if (plan.type === PLAN_TYPES.PACK || plan.type === PLAN_TYPES.UNIT) {
+  if (plan.type === PLAN_TYPES.PACK) {
     const rem = plan.docsRemaining || 0;
     html = rem === 0
       ? '⚠️ Épuisé'
@@ -8521,7 +8447,6 @@ function _devUpdatePanel() {
   badge.style.color = colors[role] || '#bc993c';
   _devPlanUpdateBadge();
 }
-function _devPlan_unit() { activatePlan('unit'); _devUpdatePanel(); }
 function _devPlan_pack() { activatePlan('pack'); _devUpdatePanel(); }
 function _devPlan_monthly() { activatePlan('monthly'); _devUpdatePanel(); }
 function _devPlan_cabinet() { activatePlan('cabinet'); _devUpdatePanel(); }
@@ -12424,7 +12349,8 @@ async function _claimAndGenerate(emoji, label, cb) {
     // ✅ Backend confirmé — activer le plan local et générer
     const u = getAuthUser();
     if (u) { u.freeDocUsed = true; setAuthUser(token, u); }
-    activatePlan('unit');
+    // Free doc = pack temporaire 1 doc (plan unit supprimé)
+    setPlanData({ type: PLAN_TYPES.PACK, docsRemaining: 1, activatedAt: new Date().toISOString(), expiresAt: null });
     consumeDocCredit();
     showToast('🎁 Document gratuit utilisé — génération en cours…', 'success');
     if (cb) cb();
@@ -12442,7 +12368,7 @@ async function _claimAndGenerate(emoji, label, cb) {
         openModal('modalPaywall');
       } else {
         localStorage.setItem(FREE_DOC_LS, '1');
-        activatePlan('unit');
+        setPlanData({ type: PLAN_TYPES.PACK, docsRemaining: 1, activatedAt: new Date().toISOString(), expiresAt: null });
         consumeDocCredit();
         showToast('🎁 Document gratuit utilisé (mode hors-ligne) — génération en cours…', 'success');
         if (cb) cb();
@@ -12962,9 +12888,6 @@ function renderAnalytics() {
     creditsLeft = Math.max(0, 15 - (plan.monthlyCount || 0));
   } else if (plan.type === 'pack') {
     planLabel = 'Pack 5 documents';
-    creditsLeft = plan.docsRemaining || 0;
-  } else if (plan.type === 'unit') {
-    planLabel = 'Document unitaire';
     creditsLeft = plan.docsRemaining || 0;
   } else if (plan.type === 'cabinet') {
     planLabel = 'Plan Cabinet';

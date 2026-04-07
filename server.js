@@ -250,7 +250,7 @@ async function sendTrialExpiryEmail(userEmail, daysLeft) {
 
 // ── Email confirmation paiement ──────────────────────────────────────────────
 async function sendPaymentConfirmEmail(userEmail, { amount, plan, invoiceUrl }) {
-  const planLabels = { unit:'Document unitaire', pack:'Pack 5 documents', monthly:'Abonnement mensuel (15 docs/mois)', pro:'Espace Pro' };
+  const planLabels = { pack:'Pack 5 documents', monthly:'Abonnement mensuel Pro', pro:'Espace Pro', cabinet:'Plan Cabinet' };
   const label = planLabels[plan] || plan;
   await sendEmail({
     to: userEmail,
@@ -367,12 +367,11 @@ app.use('/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 
 // ── PRIX ─────────────────────────────────────────────────────────────────────
+// Plan unit supprimé — seul le 99€/mois existe.
 const PRICES = {
-  unit: 900,     // 9,00 €  en centimes
-  pack: 2500,    // 25,00 € — pack 5 docs
-  sub:  2900,    // 29,00 € — abonnement mensuel (NOTE: /create-subscription utilise
-                 //           STRIPE_SUBSCRIPTION_PRICE_ID depuis .env, pas cette valeur.
-                 //           sub ici sert uniquement si l'offre 'sub' est passée à /create-payment-intent.)
+  pack: 2500,    // 25,00 € — pack 5 docs (optionnel futur)
+  sub:  9900,    // 99,00 € — abonnement mensuel (NOTE: /create-subscription utilise
+                 //           STRIPE_SUBSCRIPTION_PRICE_ID depuis .env)
 };
 
 const CURRENCIES = {
@@ -1047,10 +1046,10 @@ app.post('/webhook', (req, res) => {
     try {
       switch (event.type) {
 
-        // ── Paiement one-shot confirmé (unit / pack) ─────────────────────
+        // ── Paiement one-shot confirmé (pack) ─────────────────────────────
         case 'payment_intent.succeeded': {
           const pi     = event.data.object;
-          const offer  = pi.metadata?.offer || 'unit'; // 'unit' | 'pack'
+          const offer  = pi.metadata?.offer || 'pack'; // seul 'pack' subsiste
           const email  = pi.receipt_email || pi.metadata?.email;
           const amount = pi.amount;
           console.log(`✅ PaymentIntent réussi : ${pi.id} — ${amount/100}€ — offre: ${offer}`);
@@ -1059,9 +1058,8 @@ app.post('/webhook', (req, res) => {
           if (email) {
             const user = await db.getUserByEmail(email);
             if (user) {
-              // Calcul des crédits selon l'offre
-              const docsMap = { unit: 1, pack: 5 };
-              const docs    = docsMap[offer] || 1;
+              const docsMap = { pack: 5 };
+              const docs    = docsMap[offer] || 5;
               await db.updateUserPlan(user.id, offer, {
                 stripePaymentIntentId: pi.id,
                 docsRemaining: docs,
