@@ -637,13 +637,25 @@
     /* ── Responsive ─────────────────────────────────────────── */
     @media (max-width: 680px) {
       .contracts-grid { grid-template-columns: repeat(2, 1fr); }
-      header { padding: 14px 18px; }
+      header { padding: 12px 16px; }
       .step-label { font-size: .64rem; }
       .step-desc { display: none; }
       .step-item { padding: 12px 14px; }
       .step-panel { padding: 24px 20px; }
       .hero { padding: 40px 20px 32px; }
-      .modal-box { padding: 28px 24px; }
+      .modal-box { padding: 24px 18px; width: calc(100vw - 32px); max-width: 100%; box-sizing: border-box; }
+      .modal-box input, .modal-box select, .modal-box textarea { max-width: 100%; box-sizing: border-box; }
+    }
+    @media (max-width: 520px) {
+      .logo-tag { display: none; }
+      .logo-text { font-size: 1.1rem; }
+      .logo-icon { width: 32px; height: 32px; font-size: .95rem; }
+      header { padding: 10px 14px; gap: 8px; }
+      .header-actions { gap: 7px; }
+      .header-actions .btn-outline { padding: 6px 10px; font-size: .72rem; }
+    }
+    @media (max-width: 380px) {
+      .header-actions .btn-outline:first-child { display: none; } /* masque "Aide" sur très petit écran */
     }
     @media (max-width: 420px) {
       .contracts-grid { grid-template-columns: 1fr; }
@@ -6143,12 +6155,30 @@ function renderSuccessPage() {
   const now   = new Date();
   const date  = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
   const refId = 'LD-' + Math.random().toString(36).substring(2,10).toUpperCase();
+
+  // Determine displayed amount based on user plan
+  const role  = getUserRole();
+  const plan  = getUserPlan ? getUserPlan() : null;
+  const trialRoles = ['pro_trial_active','pro_trial_cancel_scheduled'];
+  const paidPlans  = ['monthly','pro','cabinet','pack'];
+  let amountHtml;
+  if (trialRoles.includes(role)) {
+    amountHtml = '<span style="color:var(--step-done);font-weight:700;">🧪 Inclus dans votre essai gratuit</span>';
+  } else if (plan && paidPlans.includes(plan.type)) {
+    amountHtml = '<span style="color:var(--step-done);font-weight:700;">✅ Inclus dans votre plan</span>';
+  } else if (plan && plan.type === 'unit') {
+    amountHtml = `<span>${state.selectedPrice.toFixed(2)} € TTC</span>`;
+  } else {
+    // Particulier free template
+    amountHtml = '<span style="color:var(--step-done);font-weight:700;">Gratuit — modèle standard</span>';
+  }
+
   document.getElementById('successDetails').innerHTML = `
     <div class="success-detail-row"><i class="fa-solid fa-file-contract"></i><span class="lbl">Contrat</span><span class="val">${state.selectedEmoji} ${state.selectedLabel}</span></div>
     <div class="success-detail-row"><i class="fa-solid fa-calendar"></i><span class="lbl">Date</span><span class="val">${date}</span></div>
     <div class="success-detail-row"><i class="fa-solid fa-receipt"></i><span class="lbl">Référence</span><span class="val">${refId}</span></div>
-    <div class="success-detail-row"><i class="fa-solid fa-euro-sign"></i><span class="lbl">Montant payé</span><span class="val">${state.selectedPrice.toFixed(2)} € TTC</span></div>
-    <div class="success-detail-row"><i class="fa-regular fa-envelope"></i><span class="lbl">Email</span><span class="val">Facture envoyée à votre adresse</span></div>`;
+    <div class="success-detail-row"><i class="fa-solid fa-euro-sign"></i><span class="lbl">Montant</span><span class="val">${amountHtml}</span></div>
+    <div class="success-detail-row"><i class="fa-regular fa-envelope"></i><span class="lbl">Email</span><span class="val">Confirmation envoyée</span></div>`;
 }
 
 /* ── Fill test card ──────────────────────────────────────── */
@@ -7257,11 +7287,22 @@ function downloadContract() {
   };
 
   const token = getAuthToken();
-  // Utilisateur connecté → génération IA pure
-  if (token) {
+  // Vérification plan : seuls les plans payants / trial / pro accèdent à l'IA Claude
+  // Les utilisateurs gratuits (PLAN_TYPES.NONE) reçoivent le template standard (coût IA = 0)
+  const plan = typeof getUserPlan === 'function' ? getUserPlan() : null;
+  const role = getUserRole();
+  const trialRoles = ['pro_trial_active','pro_trial_cancel_scheduled','verified_pro','pending_kyc'];
+  const paidPlanTypes = ['unit','pack','monthly','pro','cabinet'];
+  const hasAIAccess = token && (
+    (plan && paidPlanTypes.includes(plan.type)) ||
+    trialRoles.includes(role)
+  );
+
+  if (hasAIAccess) {
+    // Plan payant ou essai → génération IA Claude
     _downloadContractAI(ref, templates);
   } else {
-    // Non connecté → template standard
+    // Gratuit ou non connecté → template standard (0 coût IA)
     _downloadContractTemplate(ref, templates);
   }
 }
@@ -7295,6 +7336,13 @@ async function _downloadContractAI(ref, templates) {
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
       body: JSON.stringify({ type, title, fields, jurisdiction: lr.pays || 'France', isOHADA: lr.isOHADA })
     });
+    if (res.status === 429) {
+      const errData = await res.json().catch(() => ({}));
+      const msg = errData.message || 'Limite mensuelle de documents IA atteinte. Votre quota se réinitialise le 1er du mois.';
+      showToast('⚠️ ' + msg, 'warn');
+      if (btn) { btn.disabled = false; btn.textContent = '⬇ Télécharger le modèle (PDF)'; }
+      return;
+    }
     if (!res.ok) throw new Error('API ' + res.status);
     const { content } = await res.json();
     if (!content) throw new Error('Contenu vide');

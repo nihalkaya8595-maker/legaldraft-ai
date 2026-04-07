@@ -62,11 +62,16 @@ try {
 }
 
 // ── Claude AI helper ────────────────────────────────────
-async function callClaude(system, prompt, maxTokens = 1024) {
+// Model routing: Sonnet for standard tasks (5× cheaper), Opus for complex analysis only
+const CLAUDE_SONNET = 'claude-3-5-sonnet-20241022'; // $3/$15 per 1M tokens
+const CLAUDE_OPUS   = 'claude-opus-4-5';            // $15/$75 — use sparingly
+
+async function callClaude(system, prompt, maxTokens = 1024, useOpus = false) {
   const Anthropic = require('@anthropic-ai/sdk');
   const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const model = useOpus ? CLAUDE_OPUS : CLAUDE_SONNET;
   const result = await anthropic.messages.create({
-    model: 'claude-opus-4-5',
+    model,
     max_tokens: maxTokens,
     system,
     messages: [{ role: 'user', content: prompt }]
@@ -631,48 +636,71 @@ app.get('/admin/free-doc-usage', async (req, res) => {
  * Fallback : Claude génère des actualités si RSS indisponible.
  */
 app.get('/api/veille', async (req, res) => {
-  const cacheKey = 'veille_juridique_v1';
+  const cacheKey = 'veille_juridique_v2';
   try {
     const cached = await db.getCached(cacheKey);
     if (cached) return res.json(JSON.parse(cached));
   } catch {}
 
-  try {
-    // Fetch RSS Village de la Justice
-    const rssRes = await fetch('https://www.village-justice.com/articles/RSS-flux,2.html', {
-      signal: AbortSignal.timeout(6000),
-      headers: { 'User-Agent': 'LegalDraftAI/1.0' }
-    });
-    if (!rssRes.ok) throw new Error('RSS not ok');
-    const xml = await rssRes.text();
-    const items = parseRSSItems(xml);
-    if (!items.length) throw new Error('Empty RSS');
+  // Sources RSS multiples — on essaie dans l'ordre jusqu'à en trouver une qui répond
+  const RSS_SOURCES = [
+    { url: 'https://www.village-justice.com/articles/RSS-flux,2.html', name: 'Village de la Justice' },
+    { url: 'https://feeds.feedburner.com/LegaVox', name: 'LegaVox' },
+    { url: 'https://www.dalloz-actualite.fr/rss.xml', name: 'Dalloz Actualité' },
+  ];
 
-    const result = { items, source: 'Village de la Justice', fetchedAt: new Date().toISOString() };
-    db.setCached(cacheKey, JSON.stringify(result), 6).catch(() => {});
-    return res.json(result);
-  } catch (rssErr) {
-    console.warn('RSS fetch failed:', rssErr.message, '— fallback Claude');
-    // Fallback: Claude génère les actualités
+  for (const source of RSS_SOURCES) {
     try {
-      const year = new Date().getFullYear();
-      const raw = await callClaude(
-        'Tu es un expert en actualité juridique française et OHADA. Réponds uniquement en JSON valide.',
-        `Génère 6 actualités juridiques importantes et récentes pour ${year} en droit français et OHADA.
-Retourne UNIQUEMENT ce JSON: [{"title":"...","summary":"...en 150 mots max...","cat":"travail|affaires|rgpd|fiscal|ohada","date":"mois ${year}"}]`,
-        1500
-      );
-      let items;
-      try { items = JSON.parse(raw.trim().replace(/^```json?\s*/i,'').replace(/\s*```$/,'')); }
-      catch { items = []; }
+      const rssRes = await fetch(source.url, {
+        signal: AbortSignal.timeout(8000),
+        headers: { 'User-Agent': 'LegalDraftAI/1.0 (+https://legaldraft.fr)', 'Accept': 'application/rss+xml, application/xml, text/xml' }
+      });
+      if (!rssRes.ok) { console.warn(`RSS ${source.name}: HTTP ${rssRes.status}`); continue; }
+      const xml = await rssRes.text();
+      const items = parseRSSItems(xml);
+      if (!items.length) { console.warn(`RSS ${source.name}: empty items`); continue; }
 
-      const result = { items, source: 'Claude AI', fetchedAt: new Date().toISOString() };
-      db.setCached(cacheKey, JSON.stringify(result), 2).catch(() => {});
+      const result = { items: items.slice(0, 10), source: source.name, fetchedAt: new Date().toISOString() };
+      db.setCached(cacheKey, JSON.stringify(result), 6).catch(() => {});
+      console.log(`✅ Veille RSS ok: ${source.name} (${items.length} items)`);
       return res.json(result);
-    } catch (aiErr) {
-      console.error('Veille AI fallback error:', aiErr.message);
-      return res.status(500).json({ error: 'Veille indisponible' });
+    } catch (e) {
+      console.warn(`RSS ${source.name} failed:`, e.message);
     }
+  }
+
+  // Fallback Claude AI — génère des actualités si tous les RSS échouent
+  console.warn('All RSS sources failed — using Claude AI fallback');
+  try {
+    const year = new Date().getFullYear();
+    const month = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    const raw = await callClaude(
+      'Tu es un expert en actualité juridique française et OHADA. Réponds uniquement en JSON valide, sans markdown ni texte avant/après.',
+      `Génère 8 actualités juridiques importantes et récentes (${month}) en droit français et OHADA.
+Retourne UNIQUEMENT ce JSON: [{"title":"...","summary":"résumé en 2-3 phrases concises...","cat":"travail|affaires|rgpd|fiscal|ohada|procédure","date":"${month}","link":""}]`,
+      2000
+    );
+    let items;
+    try { items = JSON.parse(raw.trim().replace(/^```json?\s*/i,'').replace(/\s*```$/,'')); }
+    catch { console.error('Claude veille JSON parse failed'); items = []; }
+
+    if (!items.length) throw new Error('Claude returned no items');
+    const result = { items, source: 'LegalDraft IA', fetchedAt: new Date().toISOString() };
+    db.setCached(cacheKey, JSON.stringify(result), 3).catch(() => {});
+    return res.json(result);
+  } catch (aiErr) {
+    console.error('Veille AI fallback error:', aiErr.message);
+    // Dernier recours : actualités statiques hard-codées pour ne jamais afficher d'erreur
+    const year = new Date().getFullYear();
+    const staticItems = [
+      { title: 'Réforme du droit des contrats : bilan et perspectives', summary: 'L\'ordonnance de 2016 portant réforme du droit des contrats continue de produire ses effets. Les tribunaux consolident leur jurisprudence sur les nouvelles dispositions relatives à la formation et à l\'exécution des contrats.', cat: 'affaires', date: `${year}`, link: '' },
+      { title: 'RGPD : nouvelles lignes directrices de la CNIL', summary: 'La CNIL publie de nouvelles recommandations sur la collecte des données personnelles et le consentement des utilisateurs dans le cadre de la mise en conformité des entreprises.', cat: 'rgpd', date: `${year}`, link: '' },
+      { title: 'Droit du travail : actualités sur le télétravail', summary: 'Les règles encadrant le télétravail évoluent. Employeurs et salariés doivent adapter leurs accords collectifs aux nouvelles exigences légales et conventionnelles.', cat: 'travail', date: `${year}`, link: '' },
+      { title: 'OHADA : révision de l\'Acte Uniforme sur les sociétés commerciales', summary: 'L\'Organisation pour l\'Harmonisation en Afrique du Droit des Affaires poursuit sa modernisation. Les nouvelles dispositions impactent la création et la gouvernance des sociétés dans les États membres.', cat: 'ohada', date: `${year}`, link: '' },
+      { title: 'Bail commercial : jurisprudence récente sur le loyer', summary: 'La Cour de cassation précise les conditions de révision du loyer commercial et les obligations des parties lors du renouvellement du bail.', cat: 'affaires', date: `${year}`, link: '' },
+      { title: 'Fiscalité des entreprises : nouvelles mesures', summary: 'Le gouvernement annonce des ajustements fiscaux affectant les PME et les indépendants. Entreprises et experts-comptables doivent adapter leurs stratégies.', cat: 'fiscal', date: `${year}`, link: '' },
+    ];
+    return res.json({ items: staticItems, source: 'LegalDraft IA (statique)', fetchedAt: new Date().toISOString() });
   }
 });
 
@@ -716,9 +744,62 @@ Retourne UNIQUEMENT ce JSON:
  * Génère le corps du contrat (articles) avec Claude AI.
  * Réponse : { content: string }
  */
+// ── Fair use tracking (in-memory per period — persisted to DB profile) ──────
+// FAIR_USE_MONTHLY_LIMIT : 50 documents IA / mois par utilisateur Pro
+const FAIR_USE_MONTHLY_LIMIT = 50;
+
+async function checkAndIncrementFairUse(userId) {
+  try {
+    const user = await db.getUserById(userId);
+    if (!user) return { ok: false, reason: 'user_not_found' };
+
+    // Cabinet plan gets 150 docs/month
+    const limit = user.current_plan === 'cabinet' ? 150 : FAIR_USE_MONTHLY_LIMIT;
+
+    const profileRaw = user.profile ? JSON.parse(user.profile) : {};
+    const now = new Date();
+    const periodKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const usage = profileRaw.ai_usage || {};
+
+    if (usage.period !== periodKey) {
+      // Reset counter for new month
+      usage.period = periodKey;
+      usage.count = 0;
+    }
+
+    if (usage.count >= limit) {
+      return { ok: false, reason: 'fair_use_exceeded', count: usage.count, limit };
+    }
+
+    usage.count = (usage.count || 0) + 1;
+    profileRaw.ai_usage = usage;
+    await db.updateUserProfile(userId, JSON.stringify(profileRaw));
+    return { ok: true, count: usage.count, limit, remaining: limit - usage.count };
+  } catch (e) {
+    console.warn('Fair use check error (non-blocking):', e.message);
+    return { ok: true }; // Fail open — ne bloque pas en cas d'erreur DB
+  }
+}
+
 app.post('/api/generate-contract', requireAuth, async (req, res) => {
   const { type, title, fields = {}, jurisdiction = 'France', isOHADA = false } = req.body || {};
   if (!type || !title) return res.status(400).json({ error: 'type et title requis' });
+
+  // ── Fair use check ────────────────────────────────────────────────────────
+  const fuCheck = await checkAndIncrementFairUse(req.user.id);
+  if (!fuCheck.ok) {
+    if (fuCheck.reason === 'fair_use_exceeded') {
+      console.warn(`⚠️ Fair use exceeded: user ${req.user.email} (${fuCheck.count}/${fuCheck.limit} docs ce mois)`);
+      return res.status(429).json({
+        error: 'fair_use_exceeded',
+        message: `Limite mensuelle atteinte (${fuCheck.limit} documents IA/mois). Votre compteur se réinitialise le 1er du mois prochain.`,
+        count: fuCheck.count,
+        limit: fuCheck.limit
+      });
+    }
+  } else {
+    console.log(`📊 AI usage: ${req.user.email} — ${fuCheck.count || '?'}/${fuCheck.limit || FAIR_USE_MONTHLY_LIMIT} docs ce mois`);
+  }
 
   const fieldsList = Object.entries(fields)
     .filter(([, val]) => val && val !== '___' && String(val).trim())
@@ -768,7 +849,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
     const Anthropic = require('@anthropic-ai/sdk');
     const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
     const result = await anthropic.messages.create({
-      model: 'claude-opus-4-5',
+      model: CLAUDE_SONNET,
       max_tokens: 1024,
       system: "Tu es LexIA, un assistant juridique expert en droit français, droit du travail, droit OHADA et RGPD. Tu fournis des informations juridiques générales claires, structurées et précises. Tu ne donnes JAMAIS de conseil juridique personnalisé. Tu rappelles toujours de consulter un professionnel pour les cas spécifiques. Tu réponds toujours en français.",
       messages: [...history, { role: 'user', content: message }]
@@ -793,7 +874,7 @@ app.post('/api/analyze', requireAuth, async (req, res) => {
     const Anthropic = require('@anthropic-ai/sdk');
     const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
     const result = await anthropic.messages.create({
-      model: 'claude-opus-4-5',
+      model: CLAUDE_SONNET,
       max_tokens: 2048,
       system: 'Tu es un expert en analyse de contrats juridiques français. Analyse le document fourni et retourne UNIQUEMENT un JSON valide sans markdown avec cette structure exacte: { "score": number(0-100), "scoreLabel": string, "clauses": [{"name":string,"present":boolean}], "risks": [{"text":string,"severity":"high"|"medium"|"low"}], "recommendations": [string], "summary": string }. Ne retourne aucun texte avant ou après le JSON.',
       messages: [{ role: 'user', content: `Analyse ce document juridique:\n\nFichier: ${filename}\n\n${text.slice(0, 8000)}` }]
@@ -841,7 +922,7 @@ app.post('/api/improve', requireAuth, async (req, res) => {
     const Anthropic = require('@anthropic-ai/sdk');
     const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
     const result = await anthropic.messages.create({
-      model: 'claude-opus-4-5',
+      model: CLAUDE_SONNET,
       max_tokens: 2048,
       system: "Tu es un expert en rédaction juridique française. Tu améliores, corriges et synthétises les textes juridiques. Réponds toujours en français.",
       messages: [{ role: 'user', content: userPrompt }]
