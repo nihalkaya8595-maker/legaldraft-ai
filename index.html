@@ -4847,7 +4847,8 @@ function selectWelcomeProfile(type, btn) {
   <div class="mod-wrap">
     <div class="dico-search-bar">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input class="dico-search-input" id="dicoSearch" type="text" placeholder="Rechercher un terme juridique… ex : nullité, préavis, OHADA" oninput="filterDico(this.value)">
+      <input class="dico-search-input" id="dicoSearch" type="text" placeholder="Rechercher un terme juridique… ex : nullité, préavis, OHADA" oninput="filterDico(this.value)" onkeydown="if(event.key==='Enter')lookupDicoAI(this.value)">
+      <button onclick="lookupDicoAI(document.getElementById('dicoSearch').value)" style="background:var(--gold);color:#1e293b;border:none;border-radius:8px;padding:6px 14px;font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">🤖 Ask AI</button>
     </div>
     <div class="dico-cats" id="dicoCats">
       <button class="dico-cat active" onclick="filterDicoBycat('all',this)">Tous</button>
@@ -7254,8 +7255,122 @@ function downloadContract() {
     portage:            () => tpl_portage(ref),
     pacte_associes:     () => tpl_pacte_associes(ref)
   };
-  const html = templates[state.selectedType]();
-  const win  = window.open('', '_blank');
+
+  const token = getAuthToken();
+  // Utilisateur connecté → génération IA pure
+  if (token) {
+    _downloadContractAI(ref, templates);
+  } else {
+    // Non connecté → template standard
+    _downloadContractTemplate(ref, templates);
+  }
+}
+
+// Génération IA pure — Claude rédige les articles
+async function _downloadContractAI(ref, templates) {
+  const type  = state.selectedType;
+  const title = state.selectedLabel || type;
+  const emoji = state.selectedEmoji || '📄';
+
+  // Collecte tous les champs du formulaire actif
+  const fields = {};
+  document.querySelectorAll('#contractStepper input, #contractStepper select, #contractStepper textarea').forEach(el => {
+    if (el.value && el.value.trim() && el.id) {
+      const label = el.labels?.[0]?.textContent?.trim() ||
+                    el.closest('.form-group')?.querySelector('label')?.textContent?.trim() ||
+                    el.placeholder || el.id;
+      fields[label] = el.value.trim();
+    }
+  });
+
+  const lr = (typeof legalRef === 'function') ? legalRef(type) : { isOHADA: false, pays: 'France', law: '', flag: '🇫🇷', label: 'Droit français', ville: '' };
+
+  // Bouton en loading
+  const btn = document.getElementById('btnDownload') || document.querySelector('.btn-download');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Génération IA…'; }
+
+  try {
+    const res = await fetch(API_BASE + '/api/generate-contract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAuthToken() },
+      body: JSON.stringify({ type, title, fields, jurisdiction: lr.pays || 'France', isOHADA: lr.isOHADA })
+    });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const { content } = await res.json();
+    if (!content) throw new Error('Contenu vide');
+
+    // Parse les articles générés par l'IA
+    const articlesHtml = _parseAIArticles(content);
+
+    // Bloc parties depuis les champs du formulaire (simplifié)
+    const fieldEntries = Object.entries(fields);
+    const partiesHtml = fieldEntries.length ? `
+      <div class="parties-block">
+        <h3>Informations des parties et conditions</h3>
+        ${fieldEntries.map(([k,v]) => `<div class="party-info"><strong>${k} :</strong> ${v}</div>`).join('')}
+      </div>` : '';
+
+    const html = contractWrap(title, ref, `
+      <div class="contract-header">
+        <div class="contract-type">LegalDraft AI — Généré par Intelligence Artificielle</div>
+        <div class="contract-title">${title}</div>
+        <div class="contract-meta">Réf. ${ref} &nbsp;·&nbsp; ${todayFR()} &nbsp;·&nbsp; 🤖 Claude AI</div>
+      </div>
+      ${partiesHtml}
+      ${articlesHtml}
+      ${legalFooter(ref, lr)}
+    `);
+
+    saveToVault({ id: ref, type, typeLabel: title, emoji, ref, date: todayFR(), html });
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    showToast('✅ Contrat généré par IA Claude', 'success');
+
+  } catch (err) {
+    console.warn('AI contract failed, fallback template:', err.message);
+    showToast('⚠️ IA indisponible — modèle standard utilisé', 'warn');
+    _downloadContractTemplate(ref, templates);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '⬇ Télécharger le contrat'; }
+  }
+}
+
+// Parse la réponse IA en articles HTML
+function _parseAIArticles(text) {
+  const lines = text.split('\n');
+  let html = '';
+  let currentTitle = '';
+  let currentContent = [];
+  let num = 0;
+
+  const flush = () => {
+    if (currentTitle) {
+      html += `<div class="article"><div class="article-num">Article ${num}.</div><div class="article-title">${currentTitle}</div>
+        ${currentContent.filter(l => l.trim()).map(l => `<p>${l}</p>`).join('')}</div>`;
+    }
+  };
+
+  for (const line of lines) {
+    const match = line.match(/^ARTICLE\s+(\d+)\s*[—–-]+\s*(.+)/i);
+    if (match) {
+      flush();
+      num = parseInt(match[1]);
+      currentTitle = match[2].trim();
+      currentContent = [];
+    } else if (currentTitle && line.trim()) {
+      currentContent.push(line.trim());
+    }
+  }
+  flush();
+  return html || `<div class="article"><div class="article-num">1.</div><div class="article-title">Contenu du contrat</div><p>${text}</p></div>`;
+}
+
+// Fallback template (non connecté ou IA indisponible)
+function _downloadContractTemplate(ref, templates) {
+  const html = templates[state.selectedType]?.();
+  if (!html) return;
+  const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
 }
@@ -8511,7 +8626,7 @@ function _activateModule(id) {
   if (id === 'accueil') setTimeout(renderDashboard, 50);
   if (id === 'compte')  setTimeout(renderAccount, 50);
   if (id === 'coffre') refreshVault();
-  if (id === 'veille') renderVeille('all');
+  if (id === 'veille') loadVeilleDynamique();
   if (id === 'dictionnaire') renderDico(DICO_DATA);
   if (id === 'comparateur') renderComparateur('all');
   if (id === 'analytics') setTimeout(renderAnalytics, 50);
@@ -9436,7 +9551,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // Init vault
   refreshVault();
-  // Init veille
+  // Init veille (statique au départ, dynamique si le module est ouvert)
   renderVeille('all');
 
   // ── Vérification email — paramètre URL ?email_verified=1 ─────────────────
@@ -10304,7 +10419,54 @@ function renderVeille(cat) {
 function filterVeille(cat, btn) {
   document.querySelectorAll('.veille-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderVeille(cat);
+  if (_veilleApiData.length) renderVeilleItems(_veilleApiData, cat);
+  else renderVeille(cat);
+}
+
+// ── Veille dynamique depuis l'API ──────────────────────────────────────────
+let _veilleApiData = [];
+const _CAT_BADGES = {
+  travail:  { badge: 'Droit du travail', cls: 'badge-travail' },
+  affaires: { badge: 'Droit des affaires', cls: 'badge-affaires' },
+  rgpd:     { badge: 'RGPD', cls: 'badge-rgpd' },
+  fiscal:   { badge: 'Fiscal', cls: 'badge-fiscal' },
+  ohada:    { badge: 'OHADA', cls: 'badge-ohada' },
+};
+
+function renderVeilleItems(items, cat = 'all') {
+  const grid = document.getElementById('newsGrid');
+  if (!grid) return;
+  const filtered = cat === 'all' ? items : items.filter(i => i.cat === cat);
+  if (!filtered.length) { grid.innerHTML = '<p style="text-align:center;color:#888;padding:2rem;">Aucune actualité pour ce filtre.</p>'; return; }
+  grid.innerHTML = filtered.map(n => {
+    const b = _CAT_BADGES[n.cat] || { badge: n.cat || 'Actualité', cls: 'badge-affaires' };
+    return `<div class="news-card"${n.link ? ` style="cursor:pointer;" onclick="window.open('${n.link}','_blank')"` : ''}>
+      <span class="news-badge ${b.cls}">${b.badge}</span>
+      <div class="news-date"><i class="fa-regular fa-calendar" style="margin-right:4px;"></i>${n.date || ''}</div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-summary">${n.summary}</div>
+      <div class="news-read"><i class="fa-solid fa-arrow-right"></i> ${n.link ? 'Lire l\'article' : 'Lire plus'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadVeilleDynamique() {
+  const grid = document.getElementById('newsGrid');
+  if (grid) grid.innerHTML = '<div style="text-align:center;padding:2.5rem;"><div class="loading-spin" style="margin:0 auto 12px;"></div><p style="color:var(--warm-gray);font-size:.85rem;">Chargement de l\'actualité juridique…</p></div>';
+  try {
+    const res = await fetch(`${API_BASE}/api/veille`, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error('API error');
+    const { items, source } = await res.json();
+    if (!items?.length) throw new Error('empty');
+    _veilleApiData = items;
+    // Afficher badge source
+    const header = document.querySelector('#mod-veille .mod-header p');
+    if (header) header.innerHTML = `Actualités juridiques en temps réel — <span style="color:var(--gold);font-weight:600;">Source : ${source}</span>`;
+    renderVeilleItems(items, 'all');
+  } catch {
+    _veilleApiData = [];
+    renderVeille('all'); // Fallback statique
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -10401,6 +10563,42 @@ function filterDicoBycat(cat, btn) {
   const q = document.getElementById('dicoSearch')?.value || '';
   filterDico(q);
 }
+async function lookupDicoAI(term) {
+  term = (term || '').trim();
+  if (term.length < 2) { showToast('Saisissez au moins 2 caractères.', 'warn'); return; }
+  const grid = document.getElementById('dicoGrid');
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2.5rem;"><div class="loading-spin" style="margin:0 auto 12px;"></div><p style="color:var(--warm-gray);font-size:.85rem;">Recherche IA pour "<strong>${term}</strong>"…</p></div>`;
+  try {
+    const res = await fetch(`${API_BASE}/api/dictionnaire/${encodeURIComponent(term)}`);
+    if (!res.ok) throw new Error('non trouvé');
+    const d = await res.json();
+    // Affiche la carte IA en tête + résultats statiques filtrés en dessous
+    const staticMatches = DICO_DATA.filter(x => x.term.toLowerCase().includes(term.toLowerCase()) || x.def.toLowerCase().includes(term.toLowerCase()));
+    const staticHtml = staticMatches.map(x => `
+      <div class="dico-card">
+        <div class="dico-card-term">${x.term}</div>
+        <div class="dico-card-cat">${x.cat.charAt(0).toUpperCase()+x.cat.slice(1)}</div>
+        <div class="dico-card-def">${x.def}</div>
+        <div class="dico-card-ref">${x.ref}</div>
+      </div>`).join('');
+    grid.innerHTML = `
+      <div class="dico-card" style="border:2px solid var(--gold);grid-column:1/-1;background:linear-gradient(135deg,rgba(245,200,66,.06),transparent);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <span style="background:var(--gold);color:#1e293b;padding:2px 10px;border-radius:20px;font-size:.65rem;font-weight:800;letter-spacing:.06em;">🤖 CLAUDE AI</span>
+          <span style="font-size:.7rem;color:var(--warm-gray);">Définition générée par IA — à valider par un professionnel</span>
+        </div>
+        <div class="dico-card-term">${d.term}</div>
+        <div class="dico-card-cat">${(d.cat||'').charAt(0).toUpperCase()+(d.cat||'').slice(1)}</div>
+        <div class="dico-card-def">${d.def}</div>
+        <div class="dico-card-ref">${d.ref}</div>
+      </div>
+      ${staticHtml}`;
+  } catch {
+    renderDico(DICO_DATA.filter(d => d.term.toLowerCase().includes(term.toLowerCase()) || d.def.toLowerCase().includes(term.toLowerCase())));
+    showToast('Définition IA non disponible — résultats locaux affichés.', 'warn');
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => { renderDico(DICO_DATA); });
 
 /* ═══════════════════════════════════════════════════════════

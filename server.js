@@ -61,6 +61,37 @@ try {
              webhooks:       { constructEvent: () => { throw new Error('Stripe non configuré'); } } };
 }
 
+// ── Claude AI helper ────────────────────────────────────
+async function callClaude(system, prompt, maxTokens = 1024) {
+  const Anthropic = require('@anthropic-ai/sdk');
+  const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const result = await anthropic.messages.create({
+    model: 'claude-opus-4-5',
+    max_tokens: maxTokens,
+    system,
+    messages: [{ role: 'user', content: prompt }]
+  });
+  return result.content[0].text;
+}
+
+// Simple RSS parser (no external deps)
+function parseRSSItems(xml) {
+  const items = [];
+  const blocks = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
+  for (const block of blocks.slice(0, 8)) {
+    const get = (tag) => {
+      const m = block.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
+      return m ? m[1].replace(/<[^>]+>/g, '').trim() : '';
+    };
+    const title = get('title');
+    const summary = get('description').slice(0, 220);
+    const link = get('link') || get('guid');
+    const date = get('pubDate');
+    if (title) items.push({ title, summary, link, date, cat: 'affaires' });
+  }
+  return items;
+}
+
 // ── Email (Resend) ──────────────────────────────────────
 let resendClient = null;
 try {
@@ -593,6 +624,136 @@ app.get('/admin/free-doc-usage', async (req, res) => {
 /* ══════════════════════════════════════════════════════
    AI ENDPOINTS — Claude API
 ══════════════════════════════════════════════════════ */
+
+/**
+ * GET /api/veille
+ * Récupère les actualités juridiques depuis RSS (Village de la Justice) + cache 6h.
+ * Fallback : Claude génère des actualités si RSS indisponible.
+ */
+app.get('/api/veille', async (req, res) => {
+  const cacheKey = 'veille_juridique_v1';
+  try {
+    const cached = await db.getCached(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+  } catch {}
+
+  try {
+    // Fetch RSS Village de la Justice
+    const rssRes = await fetch('https://www.village-justice.com/articles/RSS-flux,2.html', {
+      signal: AbortSignal.timeout(6000),
+      headers: { 'User-Agent': 'LegalDraftAI/1.0' }
+    });
+    if (!rssRes.ok) throw new Error('RSS not ok');
+    const xml = await rssRes.text();
+    const items = parseRSSItems(xml);
+    if (!items.length) throw new Error('Empty RSS');
+
+    const result = { items, source: 'Village de la Justice', fetchedAt: new Date().toISOString() };
+    db.setCached(cacheKey, JSON.stringify(result), 6).catch(() => {});
+    return res.json(result);
+  } catch (rssErr) {
+    console.warn('RSS fetch failed:', rssErr.message, '— fallback Claude');
+    // Fallback: Claude génère les actualités
+    try {
+      const year = new Date().getFullYear();
+      const raw = await callClaude(
+        'Tu es un expert en actualité juridique française et OHADA. Réponds uniquement en JSON valide.',
+        `Génère 6 actualités juridiques importantes et récentes pour ${year} en droit français et OHADA.
+Retourne UNIQUEMENT ce JSON: [{"title":"...","summary":"...en 150 mots max...","cat":"travail|affaires|rgpd|fiscal|ohada","date":"mois ${year}"}]`,
+        1500
+      );
+      let items;
+      try { items = JSON.parse(raw.trim().replace(/^```json?\s*/i,'').replace(/\s*```$/,'')); }
+      catch { items = []; }
+
+      const result = { items, source: 'Claude AI', fetchedAt: new Date().toISOString() };
+      db.setCached(cacheKey, JSON.stringify(result), 2).catch(() => {});
+      return res.json(result);
+    } catch (aiErr) {
+      console.error('Veille AI fallback error:', aiErr.message);
+      return res.status(500).json({ error: 'Veille indisponible' });
+    }
+  }
+});
+
+/**
+ * GET /api/dictionnaire/:term
+ * Génère une définition juridique IA pour le terme demandé. Cache 7 jours.
+ */
+app.get('/api/dictionnaire/:term', async (req, res) => {
+  const term = (req.params.term || '').trim();
+  if (term.length < 2 || term.length > 80) return res.status(400).json({ error: 'Terme invalide' });
+
+  const cacheKey = `dico_${term.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
+  try {
+    const cached = await db.getCached(cacheKey);
+    if (cached) return res.json(JSON.parse(cached));
+  } catch {}
+
+  try {
+    const raw = await callClaude(
+      'Tu es un expert en droit français et droit OHADA. Réponds uniquement en JSON valide, sans markdown.',
+      `Définis le terme juridique "${term}" en droit français (et OHADA si applicable).
+Retourne UNIQUEMENT ce JSON:
+{"term":"${term}","def":"définition complète et précise en 2-3 phrases","ref":"référence légale exacte (article, loi, acte uniforme)","cat":"contrats|travail|societes|procedure|ohada|immobilier|fiscal"}`,
+      500
+    );
+    let parsed;
+    try { parsed = JSON.parse(raw.trim().replace(/^```json?\s*/i,'').replace(/\s*```$/,'')); }
+    catch { parsed = { term, def: raw.trim(), ref: '', cat: 'contrats' }; }
+
+    db.setCached(cacheKey, JSON.stringify(parsed), 168).catch(() => {}); // 7 jours
+    return res.json(parsed);
+  } catch (err) {
+    console.error('Dictionnaire AI error:', err.message);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/generate-contract  (JWT requis)
+ * Body: { type, title, fields: {}, jurisdiction, isOHADA }
+ * Génère le corps du contrat (articles) avec Claude AI.
+ * Réponse : { content: string }
+ */
+app.post('/api/generate-contract', requireAuth, async (req, res) => {
+  const { type, title, fields = {}, jurisdiction = 'France', isOHADA = false } = req.body || {};
+  if (!type || !title) return res.status(400).json({ error: 'type et title requis' });
+
+  const fieldsList = Object.entries(fields)
+    .filter(([, val]) => val && val !== '___' && String(val).trim())
+    .map(([key, val]) => `- ${key}: ${val}`)
+    .join('\n');
+
+  const system = `Tu es un expert juriste spécialisé en ${isOHADA ? 'droit OHADA et droit français' : 'droit français'} (${new Date().getFullYear()}).
+Tu génères des contrats juridiques professionnels, complets et conformes au droit en vigueur.
+Réponds UNIQUEMENT avec les articles du contrat au format demandé, sans introduction ni conclusion.`;
+
+  const prompt = `Génère les articles d'un "${title}" complet et professionnel.
+
+Informations fournies:
+${fieldsList || '(informations génériques)'}
+Juridiction: ${isOHADA ? `Droit OHADA — ${jurisdiction}` : `Droit français — ${jurisdiction}`}
+
+Format de sortie OBLIGATOIRE pour chaque article:
+ARTICLE N — TITRE EN MAJUSCULES
+Contenu rédigé en langage juridique précis...
+
+Exigences:
+- 8 à 12 articles selon la complexité du contrat
+- Couvrir obligatoirement: objet, obligations des parties, durée, prix/rémunération (si applicable), confidentialité, résiliation, force majeure, loi applicable et juridiction compétente
+- Langage juridique professionnel, phrases complètes, style formel
+- Commencer DIRECTEMENT par "ARTICLE 1 —" sans aucun texte avant`;
+
+  try {
+    const content = await callClaude(system, prompt, 3500);
+    console.log(`📄 Contrat IA généré : "${title}" pour ${req.user.email}`);
+    res.json({ content });
+  } catch (err) {
+    console.error('Generate contract AI error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 /**
  * POST /api/chat  (JWT requis)

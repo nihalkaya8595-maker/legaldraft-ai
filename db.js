@@ -63,6 +63,13 @@ if (USE_POSTGRES) {
     CREATE INDEX IF NOT EXISTS vault_docs_user_idx ON vault_docs(user_id);
     ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT;
+    CREATE TABLE IF NOT EXISTS ai_cache (
+      cache_key  TEXT PRIMARY KEY,
+      cache_value TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS ai_cache_expires_idx ON ai_cache(expires_at);
   `).then(() => {
     console.log('✅ PostgreSQL — tables vérifiées/créées');
   }).catch(err => {
@@ -252,6 +259,42 @@ async function deleteVaultDoc(userId, docId) {
   }
 }
 
+// ── AI CACHE ─────────────────────────────────────────────────────────────────
+
+const CACHE_FILE = path.join(__dirname, 'legaldraft-cache.json');
+
+async function getCached(key) {
+  const now = new Date().toISOString();
+  if (USE_POSTGRES) {
+    const { rows } = await pool.query(
+      'SELECT cache_value FROM ai_cache WHERE cache_key=$1 AND expires_at > $2',
+      [key, now]
+    );
+    return rows[0]?.cache_value || null;
+  }
+  const cache = _read(CACHE_FILE);
+  const entry = cache.find(c => c.key === key && c.expires_at > now);
+  return entry?.value || null;
+}
+
+async function setCached(key, value, ttlHours = 24) {
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlHours * 3600 * 1000).toISOString();
+  const createdAt = now.toISOString();
+  if (USE_POSTGRES) {
+    await pool.query(
+      `INSERT INTO ai_cache (cache_key, cache_value, created_at, expires_at)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (cache_key) DO UPDATE SET cache_value=$2, created_at=$3, expires_at=$4`,
+      [key, value, createdAt, expiresAt]
+    );
+  } else {
+    const cache = _read(CACHE_FILE).filter(c => c.key !== key);
+    cache.push({ key, value, created_at: createdAt, expires_at: expiresAt });
+    _write(CACHE_FILE, cache);
+  }
+}
+
 // ── EMAIL VERIFICATION ───────────────────────────────────────────────────────
 
 async function setVerificationToken(userId, token) {
@@ -333,4 +376,6 @@ module.exports = {
   getUserByVerificationToken,
   markEmailVerified,
   updateUserPlan,
+  getCached,
+  setCached,
 };
